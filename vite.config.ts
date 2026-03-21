@@ -2,7 +2,7 @@
 import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-  base: "/Work-Module/",
+  base: "/",
   plugins: [react()],
   build: {
     rollupOptions: {
