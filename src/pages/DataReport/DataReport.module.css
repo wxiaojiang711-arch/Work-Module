@@ -1,0 +1,151 @@
+﻿.page {
+  height: 100%;
+  overflow: auto;
+  background: #f3f6fb;
+  padding: 20px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.filterWrap {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
+  max-width: 900px;
+}
+
+.taskNameLink {
+  padding: 0 !important;
+}
+
+.urgeLine {
+  border-left: 3px solid #ff4d4f;
+}
+
+.rejectRow {
+  background: #fff7e6 !important;
+}
+
+.overdueRow {
+  background: #fff1f0 !important;
+}
+
+.stickyFooter {
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+  padding: 12px 24px;
+  margin: 16px -20px -20px;
+}
+
+.formCard {
+  margin-bottom: 12px;
+}
+
+.actionBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.tabLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.groupTitle {
+  border-left: 3px solid #1890ff;
+  padding-left: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  margin-top: 24px;
+  margin-bottom: 16px;
+}
+
+.readonlyFieldLabelRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.readonlyFieldLabel {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.readonlyFieldRequired {
+  font-size: 12px;
+  color: #bfbfbf;
+  margin-left: 8px;
+}
+
+.readonlyFieldContent {
+  position: relative;
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 12px 16px;
+  border: 1px solid #f0f0f0;
+  margin-top: 8px;
+  margin-bottom: 16px;
+  font-size: 14px;
+  line-height: 1.8;
+  color: #333;
+  white-space: pre-wrap;
+}
+
+.aiTag {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 11px;
+  background: #e6f7ff;
+  color: #1890ff;
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+.emptyText {
+  font-style: italic;
+  color: #bfbfbf;
+}
+
+.attachmentItem {
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #f0f0f0;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+}
+
+.fileIcon {
+  font-size: 20px;
+  margin-right: 10px;
+}
+
+.fileName {
+  flex: 1;
+}
+
+.fileSize {
+  color: #999;
+  margin-right: 16px;
+}
+
+.sourceText {
+  font-size: 12px;
+  color: #bfbfbf;
+  margin-top: 8px;
+  font-style: italic;
+}

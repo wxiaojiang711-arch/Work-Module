@@ -1,0 +1,73 @@
+﻿.page {
+  height: 100%;
+  overflow: auto;
+  padding: 20px;
+  background: #f3f6fb;
+}
+
+.breadcrumb {
+  margin-bottom: 8px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.title {
+  margin: 0 !important;
+}
+
+.filterWrap {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+  border: 1px solid #f0f0f0;
+}
+
+.operationBar {
+  margin-bottom: 12px;
+}
+
+.fileCell {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.fileMeta {
+  min-width: 0;
+}
+
+.fileNameBtn {
+  padding: 0 !important;
+  height: auto !important;
+  line-height: 1.4 !important;
+}
+
+.fileDesc {
+  margin-top: 4px;
+  color: #999;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 360px;
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.actions :global(.ant-btn-link) {
+  padding-inline: 4px;
+}
+
+:global(.ant-table-tbody > tr:hover > td) {
+  background: #e6f7ff !important;
+}

@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>个人中心</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f7fa;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .header-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header-title {
+      font-size: 24px;
+      font-weight: 600;
+    }
+
+    .logout-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+    }
+
+    .logout-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 30px auto;
+      padding: 0 20px;
+    }
+
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 30px;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      padding: 25px;
+    }
+
+    .profile-card {
+      text-align: center;
+    }
+
+    .avatar {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      margin: 0 auto 15px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .avatar:hover {
+      transform: scale(1.05);
+    }
+
+    .profile-name {
+      font-size: 18px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .profile-email {
+      font-size: 13px;
+      color: #999;
+      margin-bottom: 15px;
+    }
+
+    .profile-status {
+      display: inline-block;
+      background: #e8f5e9;
+      color: #27ae60;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .menu-list {
+      list-style: none;
+    }
+
+    .menu-item {
+      padding: 12px 15px;
+      margin-bottom: 8px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      color: #666;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .menu-item:hover {
+      background: #f5f7fa;
+      color: #667eea;
+    }
+
+    .menu-item.active {
+      background: #f0f4ff;
+      color: #667eea;
+      font-weight: 600;
+    }
+
+    .menu-icon {
+      font-size: 16px;
+    }
+
+    .main-content {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .content-section {
+      display: none;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      color: #555;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      background: #f9f9f9;
+      font-family: inherit;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      outline: none;
+      border-color: #667eea;
+      background: white;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #666;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .info-item {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+
+    .info-label {
+      font-size: 12px;
+      color: #999;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .info-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 25px;
+      border-radius: 12px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .message {
+      padding: 12px 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      display: none;
+    }
+
+    .message.success {
+      background: #e8f5e9;
+      color: #27ae60;
+      border-left: 4px solid #27ae60;
+    }
+
+    .message.error {
+      background: #ffebee;
+      color: #e74c3c;
+      border-left: 4px solid #e74c3c;
+    }
+
+    .message.show {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .header-content {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-content">
+      <div class="header-title">个人中心</div>
+      <button class="logout-btn" onclick="handleLogout()">退出登录</button>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="profile-grid">
+      <!-- 侧边栏 -->
+      <div class="sidebar">
+        <div class="card profile-card">
+          <div class="avatar" onclick="handleChangeAvatar()">👤</div>
+          <div class="profile-name">张三</div>
+          <div class="profile-email">zhangsan@example.com</div>
+          <div class="profile-status">活跃</div>
+        </div>
+
+        <div class="card">
+          <ul class="menu-list">
+            <li class="menu-item active" onclick="switchSection('profile')">
+              <span class="menu-icon">👤</span>
+              <span>个人信息</span>
+            </li>
+            <li class="menu-item" onclick="switchSection('account')">
+              <span class="menu-icon">🔐</span>
+              <span>账户安全</span>
+            </li>
+            <li class="menu-item" onclick="switchSection('notifications')">
+              <span class="menu-icon">🔔</span>
+              <span>通知设置</span>
+            </li>
+            <li class="menu-item" onclick="switchSection('stats')">
+              <span class="menu-icon">📊</span>
+              <span>数据统计</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 主内容区 -->
+      <div class="main-content">
+        <!-- 个人信息 -->
+        <div class="content-section active" id="profile">
+          <div class="card">
+            <h2 class="section-title">个人信息</h2>
+            <div id="profileMessage" class="message"></div>
+            <form id="profileForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="firstName">名字</label>
+                  <input type="text" id="firstName" value="张" required />
+                </div>
+                <div class="form-group">
+                  <label for="lastName">姓氏</label>
+                  <input type="text" id="lastName" value="三" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="email">邮箱</label>
+                <input type="email" id="email" value="zhangsan@example.com" required />
+              </div>
+
+              <div class="form-group">
+                <label for="phone">电话</label>
+                <input type="tel" id="phone" value="+86 138 1234 5678" />
+              </div>
+
+              <div class="form-group">
+                <label for="bio">个人简介</label>
+                <textarea id="bio" placeholder="介绍一下你自己...">热爱编程和开源项目</textarea>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="city">城市</label>
+                  <input type="text" id="city" value="北京" />
+                </div>
+                <div class="form-group">
+                  <label for="country">国家</label>
+                  <input type="text" id="country" value="中国" />
+                </div>
+              </div>
+
+              <div class="button-group">
+                <button type="submit" class="btn btn-primary">保存更改</button>
+                <button type="reset" class="btn btn-secondary">取消</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- 账户安全 -->
+        <div class="content-section" id="account">
+          <div class="card">
+            <h2 class="section-title">账户安全</h2>
+            <div id="accountMessage" class="message"></div>
+
+            <div class="info-grid">
+              <div class="info-item">
+                <div class="info-label">账户状态</div>
+                <div class="info-value">✓ 已验证</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">最后登录</div>
+                <div class="info-value">2026-03-17 14:30</div>
+              </div>
+              <div class="info-item">
+                <div class="info-label">登录设备</div>
+                <div class="info-value">Windows 11</div>
+              </div>
+            </div>
+
+            <h3 style="margin-top: 30px; margin-bottom: 20px; font-size: 16px; color: #333;">修改密码</h3>
+            <form id="passwordForm">
+              <div class="form-group">
+                <label for="oldPassword">当前密码</label>
+                <input type="password" id="oldPassword" placeholder="请输入当前密码" required />
+              </div>
+
+              <div class="form-group">
+                <label for="newPassword">新密码</label>
+                <input type="password" id="newPassword" placeholder="请输入新密码" required />
+              </div>
+
+              <div class="form-group">
+                <label for="confirmPassword">确认密码</label>
+                <input type="password" id="confirmPassword" placeholder="请再次输入新密码" required />
+              </div>
+
+              <div class="button-group">
+                <button type="submit" class="btn btn-primary">更新密码</button>
+                <button type="reset" class="btn btn-secondary">取消</button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- 通知设置 -->
+        <div class="content-section" id="notifications">
+          <div class="card">
+            <h2 class="section-title">通知设置</h2>
+            <div id="notificationMessage" class="message"></div>
+
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9f9f9; border-radius: 8px;">
+                <div>
+                  <div style="font-weight: 600; color: #333; margin-bottom: 5px;">邮件通知</div>
+                  <div style="font-size: 13px; color: #999;">接收重要账户更新的邮件</div>
+                </div>
+                <input type="checkbox" id="emailNotif" checked style="width: 20px; height: 20px; cursor: pointer;" />
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9f9f9; border-radius: 8px;">
+                <div>
+                  <div style="font-weight: 600; color: #333; margin-bottom: 5px;">推送通知</div>
+                  <div style="font-size: 13px; color: #999;">接收实时推送通知</div>
+                </div>
+                <input type="checkbox" id="pushNotif" checked style="width: 20px; height: 20px; cursor: pointer;" />
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9f9f9; border-radius: 8px;">
+                <div>
+                  <div style="font-weight: 600; color: #333; margin-bottom: 5px;">营销邮件</div>
+                  <div style="font-size: 13px; color: #999;">接收最新的产品和优惠信息</div>
+                </div>
+                <input type="checkbox" id="marketingNotif" style="width: 20px; height: 20px; cursor: pointer;" />
+              </div>
+
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f9f9f9; border-radius: 8px;">
+                <div>
+                  <div style="font-weight: 600; color: #333; margin-bottom: 5px;">安全警报</div>
+                  <div style="font-size: 13px; color: #999;">异常登录和安全事件提醒</div>
+                </div>
+                <input type="checkbox" id="securityNotif" checked style="width: 20px; height: 20px; cursor: pointer;" />
+              </div>
+            </div>
+
+            <div class="button-group" style="margin-top: 25px;">
+              <button class="btn btn-primary" onclick="saveNotifications()">保存设置</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 数据统计 -->
+        <div class="content-section" id="stats">
+          <div class="card">
+            <h2 class="section-title">数据统计</h2>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-number">1,234</div>
+                <div class="stat-label">总访问次数</div>
+              </div>
+              <div class="stat-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                <div class="stat-number">42</div>
+                <div class="stat-label">发布内容</div>
+              </div>
+              <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                <div class="stat-number">856</div>
+                <div class="stat-label">获赞数</div>
+              </div>
+              <div class="stat-card" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                <div class="stat-number">128</div>
+                <div class="stat-label">粉丝数</div>
+              </div>
+            </div>
+
+            <div style="margin-top: 30px;">
+              <h3 style="font-size: 16px; color: #333; margin-bottom: 20px;">最近活动</h3>
+              <div style="display: flex; flex-direction: column; gap: 12px;">
+                <div style="padding: 12px; background: #f9f9f9; border-radius: 8px; border-left: 4px solid #667eea;">
+                  <div style="font-weight: 600; color: #333; margin-bottom: 3px;">发布了新内容</div>
+                  <div style="font-size: 13px; color: #999;">2026-03-17 14:30</div>
+                </div>
+                <div style="padding: 12px; background: #f9f9f9; border-radius: 8px; border-left: 4px solid #667eea;">
+                  <div style="font-weight: 600; color: #333; margin-bottom: 3px;">更新了个人信息</div>
+                  <div style="font-size: 13px; color: #999;">2026-03-16 10:15</div>
+                </div>
+                <div style="padding: 12px; background: #f9f9f9; border-radius: 8px; border-left: 4px solid #667eea;">
+                  <div style="font-weight: 600; color: #333; margin-bottom: 3px;">登录账户</div>
+                  <div style="font-size: 13px; color: #999;">2026-03-15 09:45</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 切换内容区域
+    function switchSection(sectionId) {
+      // ��藏所有内容区域
+      document.querySelectorAll(".content-section").forEach((section) => {
+        section.classList.remove("active");
+      });
+
+      // 移除所有菜单项的活跃状态
+      document.querySelectorAll(".menu-item").forEach((item) => {
+        item.classList.remove("active");
+      });
+
+      // 显示选中的内容区域
+      document.getElementById(sectionId).classList.add("active");
+
+      // 添加菜单项的活跃状态
+      event.target.closest(".menu-item").classList.add("active");
+    }
+
+    // 个人信息表单提交
+    document.getElementById("profileForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const message = document.getElementById("profileMessage");
+      message.textContent = "✓ 个人信息已成功保存";
+      message.classList.add("success", "show");
+      setTimeout(() => {
+        message.classList.remove("show");
+      }, 3000);
+    });
+
+    // 密码修改表单提交
+    document.getElementById("passwordForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const newPassword = document.getElementById("newPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+
+      if (newPassword !== confirmPassword) {
+        const message = document.getElementById("accountMessage");
+        message.textContent = "✗ 两次输入的密码不一致";
+        message.classList.add("error", "show");
+        setTimeout(() => {
+          message.classList.remove("show");
+        }, 3000);
+        return;
+      }
+
+      const message = document.getElementById("accountMessage");
+      message.textContent = "✓ 密码已成功更新";
+      message.classList.add("success", "show");
+      document.getElementById("passwordForm").reset();
+      setTimeout(() => {
+        message.classList.remove("show");
+      }, 3000);
+    });
+
+    // 保存通知设置
+    function saveNotifications() {
+      const message = document.getElementById("notificationMessage");
+      message.textContent = "✓ 通知设置已保存";
+      message.classList.add("success", "show");
+      setTimeout(() => {
+        message.classList.remove("show");
+      }, 3000);
+    }
+
+    // 修改头像
+    function handleChangeAvatar() {
+      alert("点击上传新头像");
+    }
+
+    // 退出登录
+    function handleLogout() {
+      if (confirm("确定要退出登录吗？")) {
+        alert("已退出登录，跳转到登录页面");
+        window.location.href = "index.html";
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+﻿.page {
+  height: 100%;
+  overflow: auto;
+  background: #f3f6fb;
+  padding: 20px;
+}
+
+.layout {
+  display: flex;
+  gap: 12px;
+  min-height: calc(100vh - 116px);
+}
+
+.leftPanel {
+  width: 280px;
+  min-width: 280px;
+}
+
+.rightPanel {
+  flex: 1;
+  min-width: 0;
+}
+
+.orgCard {
+  height: calc(100vh - 116px);
+}
+
+.orgCard :global(.ant-card-body) {
+  height: calc(100% - 57px);
+  overflow-y: auto;
+}
+
+.filterWrap {
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin: 10px 0 12px;
+}
+
+.pathText {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.match {
+  color: #f50;
+}
+
+.formSectionTitle {
+  border-left: 3px solid #1890ff;
+  padding-left: 10px;
+  font-size: 15px;
+  font-weight: 500;
+  margin-top: 24px;
+  margin-bottom: 16px;
+}
+
+.roleCardGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.roleCard {
+  width: calc(50% - 6px);
+  min-width: 220px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  border: 1px solid #e8e8e8;
+  cursor: pointer;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+
+.roleCard:hover {
+  border: 1px solid #91d5ff;
+}
+
+.roleCardChecked {
+  border: 1px solid #1890ff;
+  background: #e6f7ff;
+}
+
+.roleCardDisabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.roleCardDisabled:hover {
+  border: 1px solid #e8e8e8;
+}
+
+.roleColorDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 8px;
+  display: inline-block;
+}
+
+.drawerFooter {
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  border-top: 1px solid #f0f0f0;
+  padding: 12px 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.userInfoCard {
+  border-radius: 8px;
+}
+
+.permissionRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+}
+
+.permissionSource {
+  font-size: 11px;
+  color: #bfbfbf;
+}

@@ -1,0 +1,41 @@
+﻿.page {
+  height: 100%;
+  padding: 20px;
+  background: #f3f6fb;
+  overflow-y: auto;
+}
+
+.card {
+  border-radius: 10px;
+}
+
+.filterRow {
+  margin-bottom: 16px;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.topActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.nameLink {
+  padding-left: 0;
+}
+
+.actionSpace {
+  row-gap: 0;
+}
+
+.actionBtn {
+  padding-inline: 4px !important;
+}
+
+@media (max-width: 1200px) {
+  .topActions {
+    justify-content: flex-start;
+  }
+}

@@ -1,0 +1,27 @@
+.card {
+  height: 100%;
+  border-radius: 10px;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.toolbar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.search {
+  max-width: 520px;
+}
+
+.actionSpace {
+  row-gap: 0;
+}
+
+.actionBtn {
+  padding-inline: 4px !important;
+}

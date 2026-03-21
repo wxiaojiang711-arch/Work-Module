@@ -1,0 +1,43 @@
+.appLayout {
+  min-height: 100vh;
+}
+
+.navSider {
+  background: #ffffff !important;
+  border-right: 1px solid #e6ebf5;
+  height: calc(100vh - 56px);
+  overflow: auto;
+}
+
+.menu {
+  border-inline-end: none !important;
+  padding-top: 10px;
+  height: 100%;
+}
+
+.mainLayout {
+  min-width: 0;
+  background: #f3f6fb;
+  height: calc(100vh - 56px);
+}
+
+.content {
+  height: calc(100vh - 56px);
+  overflow: auto;
+  padding: 0;
+}
+
+.placeholderWrap {
+  height: 100%;
+  padding: 16px;
+}
+
+.placeholderCard {
+  border-radius: 10px;
+}
+
+.placeholderTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
