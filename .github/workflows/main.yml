@@ -1,5 +1,5 @@
 # 工作流名称（自定义，随便写）
-name: Deploy Vue to GitHub Pages
+name: Deploy React to GitHub Pages
 
 # 触发条件：当推送到 main 分支时自动运行
 on:
@@ -29,8 +29,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 4. 打包 Vue 项目（生成 dist 文件夹）
-      - name: Build Vue project
+      # 4. 打包 React 项目（生成 dist 文件夹）
+      - name: Build React project
         run: npm run build
 
       # 5. 部署 dist 文件夹到 GitHub Pages
@@ -39,7 +39,7 @@ jobs:
         with:
           # 自动生成的 token，无需手动配置
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          # 要部署的文件夹（Vue 打包后的 dist）
+          # 要部署的文件夹（React 打包后的 dist）
           publish_dir: ./dist
           # 部署到 gh-pages 分支（自动创建，不用管）
           publish_branch: gh-pages
