@@ -32,12 +32,22 @@ export interface UnitProgressItem {
 
 export interface TaskConfig {
   name: string;
+  urgency: "normal" | "urgent";
   timeRange: [Dayjs | null, Dayjs | null];
   description: string;
   attachments: any[];
   selectedTemplates: string[];
   fillPermissions: string[];
   viewPermissions: string[];
+  fillUnitScope?: string;
+  fillUnitCustom?: string[];
+  fillRoles?: string[];
+  fillPermissionTypes?: string[];
+  fillTimeWindow?: [Dayjs | null, Dayjs | null];
+  allowOverdueFill?: boolean;
+  needReview?: boolean;
+  reviewers?: string[];
+  reviewPermissions?: string[];
 }
 
 export const taskStatusTextMap: Record<TaskStatus, string> = {
@@ -107,6 +117,17 @@ export const availableTemplates: TemplateItem[] = [
   { id: "tpl-005", name: "重大项目推进周报", category: "department" },
 ];
 
+export const taskTemplateMap: Record<string, string[]> = {
+  "task-001": ["tpl-001"],
+  "task-002": ["tpl-002"],
+  "task-003": ["tpl-001", "tpl-005"],
+  "task-004": ["tpl-002"],
+  "task-005": ["tpl-001", "tpl-002"],
+  "task-006": ["tpl-005"],
+  "task-007": ["tpl-001", "tpl-003", "tpl-004"],
+  "task-008": ["tpl-003", "tpl-005"],
+};
+
 export const templateCategoryTextMap: Record<TemplateItem["category"], string> = {
   department: "部门工作模块",
   town: "镇街工作模块",
@@ -117,39 +138,99 @@ export const templateCategoryTextMap: Record<TemplateItem["category"], string> =
 export const taskListMock: TaskItem[] = [
   {
     id: "task-001",
-    name: "2024年第一季度经济运行数据采集",
-    formCount: 3,
+    name: "部门简介",
+    formCount: 1,
     status: "collecting",
     progress: { completed: 8, total: 12 },
     startTime: "2024-03-01 00:00:00",
     deadline: "2024-03-31 23:59:59",
     creator: "张三",
     createdAt: "2024-02-20 10:00:00",
-    description: "请各单位按要求填报季度经济运行数据。",
+    description: "请各单位按要求填报部门简介。",
   },
   {
     id: "task-002",
-    name: "智慧城市项目进展月报",
-    formCount: 2,
+    name: "工作体系架构图",
+    formCount: 1,
     status: "pending",
     progress: { completed: 0, total: 15 },
     startTime: "2024-04-01 00:00:00",
     deadline: "2024-04-15 23:59:59",
     creator: "李四",
     createdAt: "2024-03-18 14:30:00",
-    description: "采集智慧城市项目的月度进展。",
+    description: "采集各单位工作体系架构图。",
   },
   {
     id: "task-003",
-    name: "重点产业链运行监测",
-    formCount: 4,
+    name: "核心业务",
+    formCount: 2,
     status: "finished",
     progress: { completed: 10, total: 10 },
     startTime: "2024-02-01 00:00:00",
     deadline: "2024-02-29 23:59:59",
     creator: "王五",
     createdAt: "2024-01-25 09:20:00",
-    description: "重点产业链运行情况采集。",
+    description: "核心业务情况采集。",
+  },
+  {
+    id: "task-004",
+    name: "特色优势",
+    formCount: 1,
+    status: "collecting",
+    progress: { completed: 5, total: 12 },
+    startTime: "2024-03-10 00:00:00",
+    deadline: "2024-04-10 23:59:59",
+    creator: "张三",
+    createdAt: "2024-03-05 10:00:00",
+    description: "采集各单位特色优势。",
+  },
+  {
+    id: "task-005",
+    name: "标志性成果打造情况",
+    formCount: 2,
+    status: "pending",
+    progress: { completed: 0, total: 12 },
+    startTime: "2024-04-05 00:00:00",
+    deadline: "2024-04-30 23:59:59",
+    creator: "李四",
+    createdAt: "2024-03-20 11:00:00",
+    description: "采集标志性成果打造情况。",
+  },
+  {
+    id: "task-006",
+    name: "存在的主要问题",
+    formCount: 1,
+    status: "collecting",
+    progress: { completed: 3, total: 12 },
+    startTime: "2024-03-15 00:00:00",
+    deadline: "2024-04-20 23:59:59",
+    creator: "王五",
+    createdAt: "2024-03-10 09:00:00",
+    description: "采集各单位存在的主要问题。",
+  },
+  {
+    id: "task-007",
+    name: "主要指标数据表",
+    formCount: 3,
+    status: "pending",
+    progress: { completed: 0, total: 15 },
+    startTime: "2024-04-01 00:00:00",
+    deadline: "2024-04-25 23:59:59",
+    creator: "张三",
+    createdAt: "2024-03-18 15:00:00",
+    description: "采集主要指标数据表。",
+  },
+  {
+    id: "task-008",
+    name: "季度主要目标任务分解表",
+    formCount: 2,
+    status: "collecting",
+    progress: { completed: 6, total: 12 },
+    startTime: "2024-03-01 00:00:00",
+    deadline: "2024-03-31 23:59:59",
+    creator: "李四",
+    createdAt: "2024-02-25 10:00:00",
+    description: "采集季度主要目标任务分解表。",
   },
 ];
 

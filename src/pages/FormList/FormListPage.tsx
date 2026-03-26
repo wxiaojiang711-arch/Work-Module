@@ -1,12 +1,11 @@
 ﻿import React, { useCallback, useMemo, useState } from "react";
-import type { MenuProps, TableProps } from "antd";
+import type { TableProps } from "antd";
 import {
   Breadcrumb,
   Button,
   Card,
   Col,
   DatePicker,
-  Dropdown,
   Empty,
   Input,
   message,
@@ -15,9 +14,9 @@ import {
   Select,
   Space,
   Table,
-  Tag,
   Typography,
 } from "antd";
+import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
@@ -26,68 +25,29 @@ import { categories, templateFormsMock, type TemplateCategory, type TemplateForm
 
 const { RangePicker } = DatePicker;
 
-type FormPermission = string;
 type FormStatus = TemplateFormItem["status"];
 
 interface FilterState {
   keyword: string;
   status: "全部" | FormStatus;
-  permissions: FormPermission[];
   createdAtRange: [string, string] | null;
 }
 
 const initialFilters: FilterState = {
   keyword: "",
   status: "全部",
-  permissions: [],
   createdAtRange: null,
 };
 
 const statusOptions = ["全部", "发布中", "草稿", "已结束"];
-const permissionOptions = [
-  "区大数据局",
-  "区发改委",
-  "区委办公室",
-  "区文旅委",
-  "区住建委",
-  "区交通局",
-  "区教育局",
-  "区卫健委",
-  "区市场监管局",
-  "区生态环境局",
-  "区人社局",
-  "镇街A",
-  "镇街B",
-  "国企A",
-  "国企B",
-];
-
-const statusColorMap: Record<FormStatus, string> = {
-  发布中: "success",
-  草稿: "processing",
-  已结束: "default",
-};
-
-const getPermissionColor = (permission: string): string => {
-  if (permission.startsWith("区")) {
-    return "blue";
-  }
-  if (permission.startsWith("镇街")) {
-    return "green";
-  }
-  if (permission.startsWith("国企")) {
-    return "orange";
-  }
-  return "default";
-};
-
 const wait = (ms: number) => new Promise<void>((resolve) => window.setTimeout(resolve, ms));
 
 interface FormListPageProps {
   categoryId?: TemplateCategory["id"];
+  hideHeader?: boolean;
 }
 
-const FormListPage: React.FC<FormListPageProps> = ({ categoryId: categoryIdProp }) => {
+const FormListPage: React.FC<FormListPageProps> = ({ categoryId: categoryIdProp, hideHeader = false }) => {
   const navigate = useNavigate();
   const { categoryId: categoryIdFromParams } = useParams<{ categoryId: TemplateCategory["id"] }>();
   const categoryId = categoryIdProp ?? categoryIdFromParams;
@@ -104,6 +64,9 @@ const FormListPage: React.FC<FormListPageProps> = ({ categoryId: categoryIdProp 
   const [appliedFilters, setAppliedFilters] = useState<FilterState>(initialFilters);
   const [tableLoading, setTableLoading] = useState(false);
   const [actionLoadingIds, setActionLoadingIds] = useState<Record<string, boolean>>({});
+  const [editingRowId, setEditingRowId] = useState<string | null>(null);
+  const [editingName, setEditingName] = useState("");
+  const [originalName, setOriginalName] = useState("");
 
   React.useEffect(() => {
     setFormList(templateFormsMock.filter((item) => item.categoryId === categoryId));
@@ -122,9 +85,82 @@ const FormListPage: React.FC<FormListPageProps> = ({ categoryId: categoryIdProp 
     [navigate],
   );
 
+  const goToEditPage = useCallback(
+    (record: TemplateFormItem) => {
+      const isDepartmentWorkModule =
+        categoryId === "department" && record.name.includes("部门工作模块");
+      if (isDepartmentWorkModule) {
+        navigateTo(`/template/${categoryId}/form/create?preset=work-module`);
+        return;
+      }
+      navigateTo(`/template/${categoryId}/form/edit/${record.id}`);
+    },
+    [categoryId, navigateTo],
+  );
+
   const openInNewTab = useCallback((path: string) => {
     window.open(`${window.location.origin}${path}`, "_blank", "noopener,noreferrer");
   }, []);
+
+  const handleCopyForm = useCallback((record: TemplateFormItem) => {
+    const now = new Date();
+    const newForm: TemplateFormItem = {
+      ...record,
+      id: `form-copy-${Date.now()}`,
+      name: `${record.name} - 副本`,
+      status: "草稿",
+      submissionCount: 0,
+      createdAt: now.toISOString().slice(0, 19).replace("T", " "),
+      creator: "当前单位",
+      lastUpdated: now.toISOString().slice(0, 19).replace("T", " "),
+    };
+    setFormList((prev) => [newForm, ...prev]);
+    setEditingRowId(newForm.id);
+    setEditingName(newForm.name);
+    setOriginalName(record.name);
+  }, []);
+
+  const validateCopyName = useCallback(
+    (name: string): string | null => {
+      const trimmedName = name.trim();
+      if (!trimmedName) {
+        return "表单名称不能为空";
+      }
+      if (trimmedName === originalName) {
+        return "复制表单的名称不能与原表单相同，请修改";
+      }
+      const isDuplicate = formList.some((item) => item.id !== editingRowId && item.name === trimmedName);
+      if (isDuplicate) {
+        return "该表单名称已存在，请重新输入";
+      }
+      return null;
+    },
+    [editingRowId, formList, originalName],
+  );
+
+  const handleSaveCopy = useCallback(() => {
+    const error = validateCopyName(editingName);
+    if (error) {
+      message.error(error);
+      return;
+    }
+    const trimmedName = editingName.trim();
+    setFormList((prev) => prev.map((item) => (item.id === editingRowId ? { ...item, name: trimmedName } : item)));
+    setEditingRowId(null);
+    setEditingName("");
+    setOriginalName("");
+    message.success("复制表单已保存");
+  }, [editingName, editingRowId, validateCopyName]);
+
+  const handleCancelCopy = useCallback(() => {
+    if (!editingRowId) {
+      return;
+    }
+    setFormList((prev) => prev.filter((item) => item.id !== editingRowId));
+    setEditingRowId(null);
+    setEditingName("");
+    setOriginalName("");
+  }, [editingRowId]);
 
   const displayList = useMemo(() => {
     const keyword = appliedFilters.keyword.trim().toLowerCase();
@@ -138,17 +174,13 @@ const FormListPage: React.FC<FormListPageProps> = ({ categoryId: categoryIdProp 
       const matchStatus =
         appliedFilters.status === "全部" || item.status === appliedFilters.status;
 
-      const matchPermissions =
-        appliedFilters.permissions.length === 0 ||
-        appliedFilters.permissions.some((department) => item.permissions.includes(department));
-
       const range = appliedFilters.createdAtRange;
       if (!range) {
-        return matchKeyword && matchStatus && matchPermissions;
+        return matchKeyword && matchStatus;
       }
 
       const createdDate = item.createdAt.slice(0, 10);
-      return matchKeyword && matchStatus && matchPermissions && createdDate >= range[0] && createdDate <= range[1];
+      return matchKeyword && matchStatus && createdDate >= range[0] && createdDate <= range[1];
     });
   }, [appliedFilters, formList]);
 
@@ -167,30 +199,6 @@ const FormListPage: React.FC<FormListPageProps> = ({ categoryId: categoryIdProp 
     setTableLoading(false);
   }, []);
 
-  const handleToggleStatus = useCallback(
-    async (record: TemplateFormItem) => {
-      setActionLoading(record.id, true);
-
-      try {
-        await wait(350);
-        const nextStatus: FormStatus = record.status === "发布中" ? "草稿" : "发布中";
-        setFormList((prev) =>
-          prev.map((item) =>
-            item.id === record.id
-              ? { ...item, status: nextStatus, lastUpdated: dayjs().format("YYYY-MM-DD HH:mm:ss") }
-              : item,
-          ),
-        );
-        message.success(nextStatus === "发布中" ? "表单已发布" : "表单已暂停");
-      } catch {
-        message.error("状态切换失败，请稍后重试");
-      } finally {
-        setActionLoading(record.id, false);
-      }
-    },
-    [setActionLoading],
-  );
-
   const handleDelete = useCallback(
     async (record: TemplateFormItem) => {
       setActionLoading(record.id, true);
@@ -208,60 +216,38 @@ const FormListPage: React.FC<FormListPageProps> = ({ categoryId: categoryIdProp 
     [setActionLoading],
   );
 
-  const handleMoreAction = useCallback((key: string, record: TemplateFormItem) => {
-    if (key === "copy") {
-      message.success(`已复制表单：${record.name}`);
-      return;
-    }
-    if (key === "export") {
-      message.success(`已导出配置：${record.name}`);
-      return;
-    }
-    if (key === "share") {
-      message.success(`已生成分享链接：${record.name}`);
-      return;
-    }
-    message.warning("暂不支持该操作");
-  }, []);
-
   const columns: TableProps<TemplateFormItem>["columns"] = [
     {
       title: "文件名称",
       dataIndex: "name",
       key: "name",
       ellipsis: true,
-      render: (_value, record) => (
-        <Button type="link" className={styles.nameLink} onClick={() => openInNewTab(`/template/${categoryId}/form/preview/${record.id}`)}>
-          {record.name}
-        </Button>
-      ),
+      width: 380,
+      render: (_value, record) => {
+        if (record.id === editingRowId) {
+          const hasError = Boolean(validateCopyName(editingName));
+          return (
+            <Input
+              autoFocus
+              value={editingName}
+              status={hasError ? "error" : ""}
+              onChange={(event) => setEditingName(event.target.value)}
+              onPressEnter={handleSaveCopy}
+            />
+          );
+        }
+        return (
+          <Button type="link" className={styles.nameLink} onClick={() => openInNewTab(`/template/${categoryId}/form/preview/${record.id}`)}>
+            {record.name}
+          </Button>
+        );
+      },
     },
     {
-      title: "创建时间",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      width: 180,
-    },
-    {
-      title: "创建人",
+      title: "创建单位",
       dataIndex: "creator",
       key: "creator",
-      width: 120,
-    },
-    {
-      title: "表单权限",
-      dataIndex: "permissions",
-      key: "permissions",
-      width: 200,
-      render: (value: string[]) => (
-        <Space size={4} wrap>
-          {value.map((department) => (
-            <Tag key={department} color={getPermissionColor(department)}>
-              {department}
-            </Tag>
-          ))}
-        </Space>
-      ),
+      width: 180,
     },
     {
       title: "填写次数",
@@ -270,48 +256,49 @@ const FormListPage: React.FC<FormListPageProps> = ({ categoryId: categoryIdProp 
       width: 120,
     },
     {
-      title: "状态",
-      dataIndex: "status",
-      key: "status",
-      width: 110,
-      render: (value: FormStatus) => <Tag color={statusColorMap[value]}>{value}</Tag>,
+      title: "创建时间",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      width: 180,
     },
     {
       title: "操作",
       key: "actions",
-      width: 430,
+      width: 320,
       fixed: "right",
       render: (_value, record) => {
-        const moreMenu: MenuProps = {
-          onClick: ({ key }) => handleMoreAction(String(key), record),
-          items: [
-            { key: "copy", label: "复制" },
-            { key: "export", label: "导出配置" },
-            { key: "share", label: "分享" },
-          ],
-        };
+        if (record.id === editingRowId) {
+          return (
+            <Space size={0}>
+              <Button
+                type="link"
+                icon={<CheckOutlined />}
+                className={styles.actionBtn}
+                style={{ color: "#52c41a" }}
+                onClick={handleSaveCopy}
+              >
+                保存
+              </Button>
+              <Button
+                type="link"
+                icon={<CloseOutlined />}
+                className={styles.actionBtn}
+                onClick={handleCancelCopy}
+              >
+                取消
+              </Button>
+            </Space>
+          );
+        }
 
         return (
           <Space size={1} wrap className={styles.actionSpace}>
-            <Button type="link" className={styles.actionBtn} onClick={() => navigateTo(`/template/${categoryId}/form/edit/${record.id}`)}>
+            <Button type="link" className={styles.actionBtn} onClick={() => goToEditPage(record)}>
               编辑
             </Button>
             <Button type="link" className={styles.actionBtn} onClick={() => openInNewTab(`/template/${categoryId}/form/preview/${record.id}`)}>
               预览
             </Button>
-            <Button type="link" className={styles.actionBtn} onClick={() => navigateTo(`/template/${categoryId}/form/data/${record.id}`)}>
-              数据
-            </Button>
-            <Popconfirm
-              title={record.status === "发布中" ? "确认暂停该表单吗？" : "确认发布该表单吗？"}
-              okText="确认"
-              cancelText="取消"
-              onConfirm={() => handleToggleStatus(record)}
-            >
-              <Button type="link" className={styles.actionBtn} loading={Boolean(actionLoadingIds[record.id])}>
-                {record.status === "发布中" ? "暂停" : "发布"}
-              </Button>
-            </Popconfirm>
             <Popconfirm
               title="确认删除该表单吗？删除后不可恢复。"
               okText="删除"
@@ -322,9 +309,9 @@ const FormListPage: React.FC<FormListPageProps> = ({ categoryId: categoryIdProp 
                 删除
               </Button>
             </Popconfirm>
-            <Dropdown menu={moreMenu} trigger={["click"]}>
-              <Button type="link" className={styles.actionBtn}>更多</Button>
-            </Dropdown>
+            <Button type="link" className={styles.actionBtn} onClick={() => handleCopyForm(record)}>
+              复制模板
+            </Button>
           </Space>
         );
       },
@@ -345,90 +332,92 @@ const FormListPage: React.FC<FormListPageProps> = ({ categoryId: categoryIdProp 
     <div className={styles.page}>
       <Card className={styles.card}>
         <Space direction="vertical" size={16} style={{ width: "100%" }}>
-          <div>
-            <Breadcrumb
-              items={[
-                { title: <Link to="/template">文件模板管理</Link> },
-                { title: category.title },
-              ]}
-            />
-            <Typography.Title level={5} style={{ margin: "12px 0 0" }}>
-              {category.title} - 表单列表
-            </Typography.Title>
-          </div>
+          {!hideHeader && (
+            <div>
+              <Breadcrumb
+                items={[
+                  { title: <Link to="/template">文件模板管理</Link> },
+                  { title: category.title },
+                ]}
+              />
+              <Typography.Title level={5} style={{ margin: "12px 0 0" }}>
+                {category.title} - 表单列表
+              </Typography.Title>
+            </div>
+          )}
 
           <Row gutter={[12, 12]} align="middle" className={styles.filterRow}>
             <Col xs={24} sm={24} md={12} lg={8} xl={7}>
-              <Input.Search
-                allowClear
-                value={filters.keyword}
-                placeholder="请输入表单名称或描述"
-                onChange={(e) => setFilters((prev) => ({ ...prev, keyword: e.target.value }))}
-                onSearch={handleQuery}
-              />
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{ whiteSpace: "nowrap" }}>关键词：</span>
+                <Input.Search
+                  allowClear
+                  value={filters.keyword}
+                  placeholder="请输入表单名称或描述"
+                  onChange={(e) => setFilters((prev) => ({ ...prev, keyword: e.target.value }))}
+                  onSearch={handleQuery}
+                />
+              </div>
             </Col>
 
             <Col xs={24} sm={12} md={6} lg={4} xl={3}>
-              <Select
-                className={styles.fullWidth}
-                value={filters.status}
-                options={statusOptions.map((option) => ({ label: option, value: option }))}
-                onChange={(value) => setFilters((prev) => ({ ...prev, status: value }))}
-              />
-            </Col>
-
-            <Col xs={24} sm={12} md={6} lg={4} xl={4}>
-              <Select
-                mode="multiple"
-                allowClear
-                className={styles.fullWidth}
-                value={filters.permissions}
-                options={permissionOptions.map((option) => ({ label: option, value: option }))}
-                placeholder="表单权限"
-                onChange={(value) => setFilters((prev) => ({ ...prev, permissions: value as string[] }))}
-              />
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{ whiteSpace: "nowrap" }}>状态：</span>
+                <Select
+                  className={styles.fullWidth}
+                  value={filters.status}
+                  options={statusOptions.map((option) => ({ label: option, value: option }))}
+                  onChange={(value) => setFilters((prev) => ({ ...prev, status: value }))}
+                />
+              </div>
             </Col>
 
             <Col xs={24} sm={24} md={12} lg={6} xl={5}>
-              <RangePicker
-                className={styles.fullWidth}
-                format="YYYY-MM-DD"
-                value={
-                  filters.createdAtRange
-                    ? [dayjs(filters.createdAtRange[0], "YYYY-MM-DD"), dayjs(filters.createdAtRange[1], "YYYY-MM-DD")]
-                    : null
-                }
-                onChange={(dates) => {
-                  const start = dates?.[0];
-                  const end = dates?.[1];
-
-                  if (!start || !end) {
-                    setFilters((prev) => ({ ...prev, createdAtRange: null }));
-                    return;
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{ whiteSpace: "nowrap" }}>创建时间：</span>
+                <RangePicker
+                  className={styles.fullWidth}
+                  format="YYYY-MM-DD"
+                  value={
+                    filters.createdAtRange
+                      ? [dayjs(filters.createdAtRange[0], "YYYY-MM-DD"), dayjs(filters.createdAtRange[1], "YYYY-MM-DD")]
+                      : null
                   }
+                  onChange={(dates) => {
+                    const start = dates?.[0];
+                    const end = dates?.[1];
 
-                  setFilters((prev) => ({
-                    ...prev,
-                    createdAtRange: [start.format("YYYY-MM-DD"), end.format("YYYY-MM-DD")],
-                  }));
-                }}
-              />
+                    if (!start || !end) {
+                      setFilters((prev) => ({ ...prev, createdAtRange: null }));
+                      return;
+                    }
+
+                    setFilters((prev) => ({
+                      ...prev,
+                      createdAtRange: [start.format("YYYY-MM-DD"), end.format("YYYY-MM-DD")],
+                    }));
+                  }}
+                />
+              </div>
             </Col>
 
-            <Col xs={24} sm={24} md={24} lg={24} xl={5}>
+            <Col xs={24} sm={24} md={24} lg={24} xl={9}>
               <div className={styles.topActions}>
                 <Space wrap>
                   <Button type="primary" loading={tableLoading} onClick={handleQuery}>
                     查询
                   </Button>
                   <Button onClick={handleReset}>重置</Button>
-                  <Button type="primary" onClick={() => navigateTo(`/template/${categoryId}/form/create`)}>
-                    创建表单
-                  </Button>
                 </Space>
               </div>
             </Col>
           </Row>
+
+          <div>
+            <Button type="primary" onClick={() => navigateTo(`/template/${categoryId}/form/create`)}>
+              创建表单
+            </Button>
+          </div>
 
           <Table<TemplateFormItem>
             rowKey="id"
@@ -452,3 +441,4 @@ const FormListPage: React.FC<FormListPageProps> = ({ categoryId: categoryIdProp 
 };
 
 export default FormListPage;
+

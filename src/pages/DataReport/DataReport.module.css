@@ -2,7 +2,7 @@
   height: 100%;
   overflow: auto;
   background: #f3f6fb;
-  padding: 20px;
+  padding: 20px 20px 0;
 }
 
 .titleRow {
@@ -17,7 +17,120 @@
   border-radius: 8px;
   padding: 12px 16px;
   margin-bottom: 16px;
-  max-width: 900px;
+}
+
+.workModuleEntryCard {
+  background: #fff;
+  border: 1px solid #e8edf5;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
+}
+
+.workModuleEntryHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.workModuleEntryTitle {
+  margin: 0;
+  font-size: 18px;
+  color: #1f2937;
+}
+
+.workModuleEntrySubTitle {
+  margin-top: 20px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.workModuleEntryBody {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.workModuleMainInfo {
+  min-width: 460px;
+  flex: 2;
+}
+
+.workModuleInfoGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+  gap: 10px 18px;
+  margin-bottom: 12px;
+}
+
+.workModuleInfoGridFour {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.workModuleInfoItem {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.workModuleInfoItem strong {
+  color: #1f2937;
+  margin-left: 6px;
+}
+
+.workModuleHistory {
+  min-width: 260px;
+  flex: 1;
+}
+
+.historyLabel {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.workModuleStats {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.workModuleStatItem {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: #475569;
+}
+
+.workModuleColumnCard {
+  border-radius: 10px;
+}
+
+.workModuleColumnHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.workModuleEntryCard.workModuleEntryCardCompact {
+  padding: 12px;
+}
+
+.workModuleEntryCardCompact .workModuleEntryHeader {
+  margin-bottom: 8px;
+}
+
+.workModuleEntryCardCompact .workModuleInfoGrid {
+  margin-bottom: 0;
+  gap: 8px 16px;
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
 }
 
 .taskNameLink {
@@ -40,10 +153,12 @@
   position: sticky;
   bottom: 0;
   z-index: 10;
+  display: flex;
+  align-items: center;
   background: #fff;
   border-top: 1px solid #f0f0f0;
-  padding: 12px 24px;
-  margin: 16px -20px -20px;
+  padding: 22px 24px;
+  margin: 16px -20px 0;
 }
 
 .formCard {

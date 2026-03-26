@@ -7,6 +7,12 @@
   PicCenterOutlined,
   RadarChartOutlined,
   UploadOutlined,
+  TagsOutlined,
+  PictureOutlined,
+  BgColorsOutlined,
+  GroupOutlined,
+  TeamOutlined,
+  TableOutlined,
 } from "@ant-design/icons";
 import React from "react";
 
@@ -19,18 +25,59 @@ export type FieldType =
   | "select"
   | "datePicker"
   | "upload"
-  | "location";
+  | "location"
+  | "textLabel"
+  | "image"
+  | "richText"
+  | "group"
+  | "orgTree"
+  | "indicatorTable";
 
 export interface FormField {
   id: string;
   type: FieldType;
   label: string;
+  children?: FormField[];
   props: {
     placeholder?: string;
     options?: Array<{ label: string; value: string }>;
     min?: number;
     max?: number;
     format?: string;
+    // 文本标签
+    text?: string;
+    textAlign?: "left" | "center" | "right";
+    textColor?: string;
+    fontSize?: "small" | "medium" | "large";
+    // 图片
+    uploadLimit?: number;
+    imageWidth?: string;
+    imageHeight?: string;
+    showPreview?: boolean;
+    // 富文本
+    editorHeight?: number;
+    toolbarFeatures?: string[];
+    showWordCount?: boolean;
+    maxWords?: number;
+    // 分组
+    groupTitle?: string;
+    borderStyle?: "solid" | "dashed" | "none";
+    borderColor?: string;
+    backgroundColor?: string;
+    padding?: number;
+    // 组织树
+    treeLevel?: 2 | 3;
+    showAddButton?: boolean;
+    showDeleteButton?: boolean;
+    defaultExpandLevel?: "all" | "first" | "none";
+    // 指标数据
+    tableRows?: number;
+    tableCols?: number;
+    rowHeaders?: string[];
+    colHeaders?: string[];
+    allowAddRow?: boolean;
+    // 更新频率
+    updateFrequency?: "daily" | "weekly" | "monthly" | "quarterly" | "irregular";
   };
   validation: {
     required: boolean;
@@ -107,6 +154,9 @@ export const componentGroups: Array<{
       { type: "input", label: "单行文本", icon: React.createElement(FileTextOutlined) },
       { type: "textarea", label: "多行文本", icon: React.createElement(PicCenterOutlined) },
       { type: "number", label: "数字输入", icon: React.createElement(NumberOutlined) },
+      { type: "textLabel", label: "文本标签", icon: React.createElement(TagsOutlined) },
+      { type: "image", label: "图片", icon: React.createElement(PictureOutlined) },
+      { type: "richText", label: "富文本编辑器", icon: React.createElement(BgColorsOutlined) },
     ],
   },
   {
@@ -116,15 +166,18 @@ export const componentGroups: Array<{
       { type: "radio", label: "单项选择", icon: React.createElement(CheckSquareOutlined) },
       { type: "checkbox", label: "多项选择", icon: React.createElement(CheckSquareOutlined) },
       { type: "select", label: "下拉选择", icon: React.createElement(DownSquareOutlined) },
+      { type: "datePicker", label: "日期选择", icon: React.createElement(CalendarOutlined) },
     ],
   },
   {
     key: "advanced",
     label: "高级控件",
     children: [
-      { type: "datePicker", label: "日期选择", icon: React.createElement(CalendarOutlined) },
       { type: "upload", label: "文件上传", icon: React.createElement(UploadOutlined) },
       { type: "location", label: "地理位置", icon: React.createElement(RadarChartOutlined) },
+      { type: "group", label: "分组控件", icon: React.createElement(GroupOutlined) },
+      { type: "orgTree", label: "组织树", icon: React.createElement(TeamOutlined) },
+      { type: "indicatorTable", label: "指标数据", icon: React.createElement(TableOutlined) },
     ],
   },
 ];
@@ -139,15 +192,22 @@ const typeLabelMap: Record<FieldType, string> = {
   datePicker: "日期选择",
   upload: "文件上传",
   location: "地理位置",
+  textLabel: "文本标签",
+  image: "图片",
+  richText: "富文本",
+  group: "分组",
+  orgTree: "组织树",
+  indicatorTable: "指标数据",
 };
 
 export const createFieldByType = (type: FieldType): FormField => {
   const uid = typeof crypto !== "undefined" && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}`;
 
-  return {
+  const baseField: FormField = {
     id: `field_${uid}`,
     type,
     label: typeLabelMap[type],
+    children: [],
     props: {
       placeholder: `请输入${typeLabelMap[type]}`,
       options: type === "radio" || type === "checkbox" || type === "select" ? [...defaultOptions] : undefined,
@@ -159,4 +219,37 @@ export const createFieldByType = (type: FieldType): FormField => {
       required: false,
     },
   };
+
+  // 为新组件设置默认属性
+  if (type === "textLabel") {
+    baseField.props.text = "文本标签";
+    baseField.props.textAlign = "left";
+    baseField.props.textColor = "#000000";
+    baseField.props.fontSize = "medium";
+  } else if (type === "image") {
+    baseField.props.uploadLimit = 1;
+    baseField.props.showPreview = true;
+  } else if (type === "richText") {
+    baseField.props.editorHeight = 300;
+    baseField.props.toolbarFeatures = ["bold", "italic", "underline"];
+    baseField.props.showWordCount = true;
+  } else if (type === "group") {
+    baseField.props.borderStyle = "solid";
+    baseField.props.borderColor = "#d9d9d9";
+    baseField.props.backgroundColor = "#ffffff";
+    baseField.props.padding = 16;
+  } else if (type === "orgTree") {
+    baseField.props.treeLevel = 2;
+    baseField.props.showAddButton = true;
+    baseField.props.showDeleteButton = true;
+    baseField.props.defaultExpandLevel = "all";
+  } else if (type === "indicatorTable") {
+    baseField.props.tableRows = 2;
+    baseField.props.tableCols = 3;
+    baseField.props.rowHeaders = ["指标1", "指标2"];
+    baseField.props.colHeaders = ["列1", "列2", "列3"];
+    baseField.props.allowAddRow = false;
+  }
+
+  return baseField;
 };

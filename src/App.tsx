@@ -20,18 +20,23 @@ const KnowledgeBaseManagementPage = React.lazy(() => import("./pages/KnowledgeBa
 const KnowledgeBaseDetailPage = React.lazy(() => import("./pages/KnowledgeBaseManagement/KnowledgeBaseDetailPage"));
 const TemplateCategoryPage = React.lazy(() => import("./pages/TemplateCategory"));
 const FormListPage = React.lazy(() => import("./pages/FormList"));
+const OrganizationTemplateListPage = React.lazy(() => import("./pages/FormList/OrganizationListPage"));
 const FormBuilderPage = React.lazy(() => import("./pages/FormBuilder"));
 const TaskListPage = React.lazy(() => import("./pages/Task"));
 const TaskFormPage = React.lazy(() => import("./pages/Task/TaskFormPage"));
 const TaskDetailPage = React.lazy(() => import("./pages/Task/TaskDetailPage"));
+const TaskDataViewPage = React.lazy(() => import("./pages/Task/TaskDataViewPage"));
 const OrganizationListPage = React.lazy(() => import("./pages/OrganizationList"));
 const UserManagePage = React.lazy(() => import("./pages/UserManage"));
 const RoleManagePage = React.lazy(() => import("./pages/RoleManage"));
 const DataReportListPage = React.lazy(() => import("./pages/DataReport/DataReportListPage"));
 const DataReportFormPage = React.lazy(() => import("./pages/DataReport/DataReportFormPage"));
+const WorkModuleFillPage = React.lazy(() => import("./pages/DataReport/WorkModuleFillPage"));
+const WorkModuleColumnPage = React.lazy(() => import("./pages/DataReport/WorkModuleColumnPage"));
 const ReportDetailPage = React.lazy(() => import("./pages/DataReport/ReportDetailPage"));
-import DataRecallPage from "./pages/DataRecall/DataRecallPage";
+const AiQaLeaderPage = React.lazy(() => import("./pages/AiQaLeaderPage"));
 const SmartReportPage = React.lazy(() => import("./pages/SmartReport"));
+const LoginPage = React.lazy(() => import("./pages/Login"));
 
 type SubMenuKey =
   | "knowledge-base-management"
@@ -53,7 +58,7 @@ const menuPathMap: Record<SubMenuKey, string> = {
   "knowledge-params-config": "/collection/params-config",
   "knowledge-templates": "/template",
   "collection-tasks": "/task",
-  "sharing-data-recall": "/sharing/data-recall",
+  "sharing-data-recall": "/sharing/intelligent-qa",
   "sharing-intelligent-report": "/sharing/intelligent-report",
   "settings-user-management": "/settings/users",
   "settings-role-management": "/settings/roles",
@@ -69,7 +74,6 @@ const menuItems: MenuProps["items"] = [
       { key: "knowledge-templates", label: "文件模板管理" },
       { key: "collection-tasks", label: "采集任务" },
       { key: "knowledge-data-report", label: "数据上报" },
-      { key: "knowledge-params-config", label: "参数配置" },
     ],
   },
   {
@@ -86,7 +90,7 @@ const menuItems: MenuProps["items"] = [
     icon: <ShareAltOutlined />,
     label: "知识共享",
     children: [
-      { key: "sharing-data-recall", label: "数据召回" },
+      { key: "sharing-data-recall", label: "智能问数" },
       { key: "sharing-intelligent-report", label: "智能报告" },
     ],
   },
@@ -138,7 +142,7 @@ const resolveMenuKeyByPath = (pathname: string): SubMenuKey => {
   if (pathname === "/task" || pathname.startsWith("/task/")) {
     return "collection-tasks";
   }
-  if (pathname.startsWith("/sharing/data-recall")) {
+  if (pathname.startsWith("/sharing/intelligent-qa") || pathname.startsWith("/sharing/data-recall")) {
     return "sharing-data-recall";
   }
   if (pathname.startsWith("/sharing/intelligent-report")) {
@@ -188,7 +192,16 @@ const App: React.FC = () => {
     return <MobileApp />;
   }
 
+  if (pathname === "/login") {
+    return (
+      <Suspense fallback={null}>
+        <LoginPage />
+      </Suspense>
+    );
+  }
+
   const renderPage = () => {
+
     if (matchPath("/knowledge/base-management/:kbId", pathname)) {
       return (
         <Suspense fallback={null}>
@@ -213,6 +226,22 @@ const App: React.FC = () => {
       return (
         <Suspense fallback={null}>
           <DataReportListPage />
+        </Suspense>
+      );
+    }
+
+    if (pathname === "/report/fill/task-000") {
+      return (
+        <Suspense fallback={null}>
+          <WorkModuleFillPage />
+        </Suspense>
+      );
+    }
+
+    if (pathname === "/report/work-module") {
+      return (
+        <Suspense fallback={null}>
+          <WorkModuleColumnPage />
         </Suspense>
       );
     }
@@ -251,11 +280,9 @@ const App: React.FC = () => {
 
     if (matchPath("/template/:categoryId/form/edit/:formId", pathname)) {
       return (
-        <PlaceholderPage
-          title="编辑表单"
-          icon={<FolderOpenOutlined />}
-          description="此路由已打通。你可以在这里接入表单编辑器页面。"
-        />
+        <Suspense fallback={null}>
+          <FormBuilderPage />
+        </Suspense>
       );
     }
 
@@ -281,9 +308,19 @@ const App: React.FC = () => {
 
     const categoryMatch = matchPath("/template/:categoryId", pathname);
     if (categoryMatch) {
+      const categoryId = categoryMatch.params.categoryId;
+
+      if (categoryId === "organization") {
+        return (
+          <Suspense fallback={null}>
+            <OrganizationTemplateListPage />
+          </Suspense>
+        );
+      }
+
       return (
         <Suspense fallback={null}>
-          <FormListPage categoryId={categoryMatch.params.categoryId as "department" | "town" | "soe" | "theme"} />
+          <FormListPage categoryId={categoryId as "department" | "town" | "soe" | "theme" | "decision"} />
         </Suspense>
       );
     }
@@ -292,6 +329,22 @@ const App: React.FC = () => {
       return (
         <Suspense fallback={null}>
           <TaskListPage />
+        </Suspense>
+      );
+    }
+
+    if (matchPath("/task/create", pathname)) {
+      return (
+        <Suspense fallback={null}>
+          <TaskFormPage />
+        </Suspense>
+      );
+    }
+
+    if (matchPath("/task/:taskId/view/:unitId", pathname)) {
+      return (
+        <Suspense fallback={null}>
+          <TaskDataViewPage />
         </Suspense>
       );
     }
@@ -320,8 +373,20 @@ const App: React.FC = () => {
       );
     }
 
-    if (pathname.startsWith("/sharing/data-recall")) {
-      return <DataRecallPage />;
+    if (matchPath("/task/:taskId", pathname)) {
+      return (
+        <Suspense fallback={null}>
+          <TaskDetailPage />
+        </Suspense>
+      );
+    }
+
+    if (pathname.startsWith("/sharing/intelligent-qa") || pathname.startsWith("/sharing/data-recall")) {
+      return (
+        <Suspense fallback={null}>
+          <AiQaLeaderPage />
+        </Suspense>
+      );
     }
 
     if (pathname.startsWith("/collection/params-config")) {
@@ -369,11 +434,13 @@ const App: React.FC = () => {
     );
   };
 
+  const hideGlobalHeader = pathname.startsWith("/sharing/intelligent-qa") || pathname.startsWith("/sharing/data-recall");
+
   return (
     <Layout className={styles.appLayout}>
-      <GlobalHeader />
-      <Layout className={styles.mainLayout}>
-        <Layout.Sider width={240} className={styles.navSider}>
+      {!hideGlobalHeader && <GlobalHeader />}
+      <Layout className={`${styles.mainLayout} ${hideGlobalHeader ? styles.mainLayoutNoHeader : ""}`}>
+        <Layout.Sider width={240} className={`${styles.navSider} ${hideGlobalHeader ? styles.navSiderNoHeader : ""}`}>
           <Menu
             mode="inline"
             className={styles.menu}
@@ -387,7 +454,9 @@ const App: React.FC = () => {
             }}
           />
         </Layout.Sider>
-        <Layout.Content className={styles.content}>{renderPage()}</Layout.Content>
+        <Layout.Content className={`${styles.content} ${hideGlobalHeader ? styles.contentNoHeader : ""}`}>
+          {renderPage()}
+        </Layout.Content>
       </Layout>
     </Layout>
   );

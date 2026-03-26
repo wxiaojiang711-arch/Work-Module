@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import { Form, Input, Typography, Upload } from "antd";
+import { Form, Input, Radio, Upload } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import type { TaskConfig } from "./taskConstants";
 
@@ -17,6 +17,16 @@ const TaskBasicInfoStep: React.FC<TaskBasicInfoStepProps> = ({ taskConfig, onCha
           placeholder="请输入采集任务名称"
           onChange={(event) => onChange({ name: event.target.value })}
         />
+      </Form.Item>
+
+      <Form.Item label="紧急程度" required>
+        <Radio.Group
+          value={taskConfig.urgency}
+          onChange={(event) => onChange({ urgency: event.target.value })}
+        >
+          <Radio value="normal">普通</Radio>
+          <Radio value="urgent">紧急</Radio>
+        </Radio.Group>
       </Form.Item>
 
       <Form.Item label="任务描述">
@@ -47,9 +57,6 @@ const TaskBasicInfoStep: React.FC<TaskBasicInfoStepProps> = ({ taskConfig, onCha
         </Upload.Dragger>
       </Form.Item>
 
-      <Typography.Paragraph type="secondary" style={{ marginBottom: 0 }}>
-        超过截止时间后，填报入口将自动关闭，相关人员仅可查看已提交的数据。
-      </Typography.Paragraph>
     </Form>
   );
 };

@@ -1,0 +1,125 @@
+[1mdiff --git a/src/pages/Task/TaskPermissionStep.tsx b/src/pages/Task/TaskPermissionStep.tsx[m
+[1mindex 4e98a9c..e48db98 100644[m
+[1m--- a/src/pages/Task/TaskPermissionStep.tsx[m
+[1m+++ b/src/pages/Task/TaskPermissionStep.tsx[m
+[36m@@ -1,49 +1,82 @@[m
+[31m-﻿import React from "react";[m
+[31m-import { Card, Space, TreeSelect, Typography } from "antd";[m
+[32m+[m[32m﻿import React, { useState } from "react";[m
+[32m+[m[32mimport { Card, Row, Col, Tabs, Typography } from "antd";[m
+[32m+[m[32mimport { BankOutlined, FileTextOutlined, AppstoreOutlined } from "@ant-design/icons";[m
+ [m
+[31m-import { permissionTreeData, type TaskConfig } from "./taskConstants";[m
+[32m+[m[32mconst TaskPermissionStep: React.FC = () => {[m
+[32m+[m[32m  const [expandedCard, setExpandedCard] = useState<string | null>(null);[m
+ [m
+[31m-interface TaskPermissionStepProps {[m
+[31m-  taskConfig: TaskConfig;[m
+[31m-  onChange: (patch: Partial<TaskConfig>) => void;[m
+[31m-}[m
+[32m+[m[32m  const handleCardClick = (cardKey: string) => {[m
+[32m+[m[32m    setExpandedCard(expandedCard === cardKey ? null : cardKey);[m
+[32m+[m[32m  };[m
+ [m
+[31m-const TaskPermissionStep: React.FC<TaskPermissionStepProps> = ({ taskConfig, onChange }) => {[m
+   return ([m
+[31m-    <div style={{ maxWidth: 800, margin: "0 auto", paddingBottom: 24 }}>[m
+[31m-      <Space direction="vertical" size={16} style={{ width: "100%" }}>[m
+[31m-        <Card title="填写权限">[m
+[31m-          <Typography.Paragraph type="secondary">[m
+[31m-            设置哪些组织可以填写此采集任务中的表单[m
+[31m-          </Typography.Paragraph>[m
+[31m-          <TreeSelect[m
+[31m-            treeData={permissionTreeData}[m
+[31m-            treeCheckable[m
+[31m-            value={taskConfig.fillPermissions}[m
+[31m-            style={{ width: "100%" }}[m
+[31m-            placeholder="请选择可填写的单位"[m
+[31m-            allowClear[m
+[31m-            maxTagCount="responsive"[m
+[31m-            onChange={(value) => onChange({ fillPermissions: value as string[] })}[m
+[31m-          />[m
+[32m+[m[32m    <div style={{ padding: 24 }}>[m
+[32m+[m[32m      <Typography.Title level={4}>文件模板管理</Typography.Title>[m
+[32m+[m[32m      <Typography.Paragraph type="secondary">[m
+[32m+[m[32m        请选择工作模块，进入对应的套卷模板类别进行管理。[m
+[32m+[m[32m      </Typography.Paragraph>[m
+[32m+[m
+[32m+[m[32m      <Row gutter={[16, 16]} style={{ marginTop: 24 }}>[m
+[32m+[m[32m        <Col span={8}>[m
+[32m+[m[32m          <Card[m
+[32m+[m[32m            hoverable[m
+[32m+[m[32m            onClick={() => handleCardClick("decision")}[m
+[32m+[m[32m            style={{ textAlign: "center", cursor: "pointer" }}[m
+[32m+[m[32m          >[m
+[32m+[m[32m            <FileTextOutlined style={{ fontSize: 48, color: "#00bcd4" }} />[m
+[32m+[m[32m            <Typography.Title level={5} style={{ marginTop: 16 }}>决策库</Typography.Title>[m
+[32m+[m[32m            <Typography.Text type="secondary">管理各类决策相关文件</Typography.Text>[m
+[32m+[m[32m          </Card>[m
+[32m+[m[32m        </Col>[m
+[32m+[m
+[32m+[m[32m        <Col span={8}>[m
+[32m+[m[32m          <Card[m
+[32m+[m[32m            hoverable[m
+[32m+[m[32m            onClick={() => handleCardClick("organization")}[m
+[32m+[m[32m            style={{ textAlign: "center", cursor: "pointer" }}[m
+[32m+[m[32m          >[m
+[32m+[m[32m            <BankOutlined style={{ fontSize: 48, color: "#2196f3" }} />[m
+[32m+[m[32m            <Typography.Title level={5} style={{ marginTop: 16 }}>单位库</Typography.Title>[m
+[32m+[m[32m            <Typography.Text type="secondary">管理各类单位相关文件</Typography.Text>[m
+[32m+[m[32m          </Card>[m
+[32m+[m[32m        </Col>[m
+[32m+[m
+[32m+[m[32m        <Col span={8}>[m
+[32m+[m[32m          <Card[m
+[32m+[m[32m            hoverable[m
+[32m+[m[32m            onClick={() => handleCardClick("theme")}[m
+[32m+[m[32m            style={{ textAlign: "center", cursor: "pointer" }}[m
+[32m+[m[32m          >[m
+[32m+[m[32m            <AppstoreOutlined style={{ fontSize: 48, color: "#ff9800" }} />[m
+[32m+[m[32m            <Typography.Title level={5} style={{ marginTop: 16 }}>主题库</Typography.Title>[m
+[32m+[m[32m            <Typography.Text type="secondary">管理各类主题相关文件</Typography.Text>[m
+[32m+[m[32m          </Card>[m
+[32m+[m[32m        </Col>[m
+[32m+[m[32m      </Row>[m
+[32m+[m
+[32m+[m[32m      {expandedCard === "decision" && ([m
+[32m+[m[32m        <Card style={{ marginTop: 24 }}>[m
+[32m+[m[32m          <div>决策库列表内容</div>[m
+         </Card>[m
+[32m+[m[32m      )}[m
+ [m
+[31m-        <Card title="查看权限">[m
+[31m-          <Typography.Paragraph type="secondary">[m
+[31m-            设置哪些组织可以查阅此采集任务的提交数据[m
+[31m-          </Typography.Paragraph>[m
+[31m-          <TreeSelect[m
+[31m-            treeData={permissionTreeData}[m
+[31m-            treeCheckable[m
+[31m-            value={taskConfig.viewPermissions}[m
+[31m-            style={{ width: "100%" }}[m
+[31m-            placeholder="请选择可查看的单位"[m
+[31m-            allowClear[m
+[31m-            maxTagCount="responsive"[m
+[31m-            onChange={(value) => onChange({ viewPermissions: value as string[] })}[m
+[32m+[m[32m      {expandedCard === "organization" && ([m
+[32m+[m[32m        <Card style={{ marginTop: 24 }}>[m
+[32m+[m[32m          <Tabs[m
+[32m+[m[32m            items={[[m
+[32m+[m[32m              { key: "department", label: "部门", children: <div>部门列表内容</div> },[m
+[32m+[m[32m              { key: "town", label: "镇街", children: <div>镇街列表内容</div> },[m
+[32m+[m[32m              { key: "soe", label: "国企", children: <div>国企列表内容</div> },[m
+[32m+[m[32m            ]}[m
+           />[m
+         </Card>[m
+[31m-      </Space>[m
+[32m+[m[32m      )}[m
+[32m+[m
+[32m+[m[32m      {expandedCard === "theme" && ([m
+[32m+[m[32m        <Card style={{ marginTop: 24 }}>[m
+[32m+[m[32m          <div>主题库列表内容</div>[m
+[32m+[m[32m        </Card>[m
+[32m+[m[32m      )}[m
+     </div>[m
+   );[m
+ };[m

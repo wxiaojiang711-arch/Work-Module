@@ -29,6 +29,7 @@ import {
   type PendingReportItem,
   type SubmittedReportItem,
 } from "./reportMockData";
+import { workModuleOverviewMock, workModuleStatusMap } from "./workModuleColumnMock";
 
 const now = dayjs("2024-03-21 12:00:00");
 
@@ -45,27 +46,24 @@ const DataReportListPage: React.FC = () => {
   });
   const [appliedQuery, setAppliedQuery] = useState(query);
   const [rejectModal, setRejectModal] = useState<{ open: boolean; record?: PendingReportItem }>({ open: false });
+  const workModuleStatusMeta = workModuleStatusMap[workModuleOverviewMock.currentStatus];
+
+  const openWorkModuleColumn = (period: string, taskId: string) => {
+    navigate(`/report/work-module?period=${period}&taskId=${taskId}`);
+  };
 
   const filteredPending = useMemo(() => {
-    return [...pendingList]
-      .filter((item) => {
-        const keyword = appliedQuery.keyword.trim().toLowerCase();
-        const keywordMatch = !keyword || item.taskName.toLowerCase().includes(keyword);
-        const issuerMatch = !appliedQuery.issuer || item.issuer === appliedQuery.issuer;
-        const urgencyMatch = !appliedQuery.urgency || item.urgency === appliedQuery.urgency;
-        const rangeMatch =
-          !appliedQuery.deadlineRange ||
-          (item.deadline.slice(0, 10) >= appliedQuery.deadlineRange[0] &&
-            item.deadline.slice(0, 10) <= appliedQuery.deadlineRange[1]);
-        return keywordMatch && issuerMatch && urgencyMatch && rangeMatch;
-      })
-      .sort((a, b) => {
-        const urgencyDiff = urgencyMap[b.urgency].order - urgencyMap[a.urgency].order;
-        if (urgencyDiff !== 0) {
-          return urgencyDiff;
-        }
-        return dayjs(a.deadline).valueOf() - dayjs(b.deadline).valueOf();
-      });
+    return pendingList.filter((item) => {
+      const keyword = appliedQuery.keyword.trim().toLowerCase();
+      const keywordMatch = !keyword || item.taskName.toLowerCase().includes(keyword);
+      const issuerMatch = !appliedQuery.issuer || item.issuer === appliedQuery.issuer;
+      const urgencyMatch = !appliedQuery.urgency || item.urgency === appliedQuery.urgency;
+      const rangeMatch =
+        !appliedQuery.deadlineRange ||
+        (item.deadline.slice(0, 10) >= appliedQuery.deadlineRange[0] &&
+          item.deadline.slice(0, 10) <= appliedQuery.deadlineRange[1]);
+      return keywordMatch && issuerMatch && urgencyMatch && rangeMatch;
+    });
   }, [appliedQuery, pendingList]);
 
   const filteredSubmitted = useMemo(() => {
@@ -97,7 +95,15 @@ const DataReportListPage: React.FC = () => {
         <Space size={6}>
           {record.status === "rejected" ? <RollbackOutlined style={{ color: "#fa8c16" }} /> : null}
           {record.urgeCount > 0 ? <BellFilled style={{ color: "#ff4d4f" }} /> : null}
-          <Button type="link" className={styles.taskNameLink} onClick={() => navigate(`/report/fill/${record.id}`)}>
+          <Button
+            type="link"
+            className={styles.taskNameLink}
+            onClick={() =>
+              record.taskName === "工作模块"
+                ? openWorkModuleColumn(workModuleOverviewMock.currentPeriod, record.id)
+                : navigate(`/report/fill/${record.id}`)
+            }
+          >
             {record.taskName}
           </Button>
         </Space>
@@ -208,6 +214,48 @@ const DataReportListPage: React.FC = () => {
         </Typography.Title>
       </div>
 
+      <div className={styles.workModuleEntryCard}>
+        <div className={styles.workModuleEntryHeader}>
+          <div>
+            <h3 className={styles.workModuleEntryTitle}>工作模块（定期）</h3>
+            <div className={styles.workModuleEntrySubTitle}>按季度更新｜用于持续维护各单位工作模块内容</div>
+          </div>
+          <Space>
+            <Button type="primary" onClick={() => navigate(`/report/fill/${workModuleOverviewMock.currentTaskId}`)}>
+              去填报
+            </Button>
+            <Button onClick={() => openWorkModuleColumn(workModuleOverviewMock.currentPeriod, workModuleOverviewMock.currentTaskId)}>
+              进入专栏
+            </Button>
+          </Space>
+        </div>
+
+        <div className={styles.workModuleEntryBody}>
+          <div className={styles.workModuleMainInfo} style={{ minWidth: "100%" }}>
+            <div className={`${styles.workModuleInfoGrid} ${styles.workModuleInfoGridFour}`}>
+              <div className={styles.workModuleInfoItem}>
+                当前期次：<span>{workModuleOverviewMock.currentPeriod}</span>
+              </div>
+              <div className={styles.workModuleInfoItem}>
+                状态：
+                <span>
+                  <Tag color={workModuleStatusMeta.color} style={{ marginLeft: 6 }}>
+                    {workModuleStatusMeta.label}
+                  </Tag>
+                </span>
+              </div>
+              <div className={styles.workModuleInfoItem}>
+                截止时间：<span>{workModuleOverviewMock.deadlineTime}</span>
+              </div>
+              <div className={styles.workModuleInfoItem}>
+                下发单位：<span>{workModuleOverviewMock.issuerOrgName}</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
       <Tabs
         activeKey={tab}
         onChange={(key) => setTab(key as "pending" | "submitted")}
@@ -236,68 +284,82 @@ const DataReportListPage: React.FC = () => {
       <div className={styles.filterWrap}>
         <Row gutter={[12, 12]} align="middle">
           <Col span={6}>
-            <Input.Search
-              allowClear
-              placeholder="搜索任务名称"
-              value={query.keyword}
-              onChange={(e) => setQuery((prev) => ({ ...prev, keyword: e.target.value }))}
-              onSearch={() => setAppliedQuery(query)}
-            />
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ whiteSpace: "nowrap" }}>任务名称：</span>
+              <Input.Search
+                allowClear
+                placeholder="搜索任务名称"
+                value={query.keyword}
+                onChange={(e) => setQuery((prev) => ({ ...prev, keyword: e.target.value }))}
+                onSearch={() => setAppliedQuery(query)}
+              />
+            </div>
           </Col>
           <Col span={5}>
-            <Select
-              allowClear
-              showSearch
-              placeholder="下发单位"
-              style={{ width: "100%" }}
-              value={query.issuer}
-              options={issuerOptions.map((item) => ({ label: item, value: item }))}
-              onChange={(value) => setQuery((prev) => ({ ...prev, issuer: value }))}
-            />
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ whiteSpace: "nowrap" }}>下发单位：</span>
+              <Select
+                allowClear
+                showSearch
+                placeholder="下发单位"
+                style={{ width: "100%" }}
+                value={query.issuer}
+                options={issuerOptions.map((item) => ({ label: item, value: item }))}
+                onChange={(value) => setQuery((prev) => ({ ...prev, issuer: value }))}
+              />
+            </div>
           </Col>
           <Col span={6}>
-            <DatePicker.RangePicker
-              style={{ width: "100%" }}
-              placeholder={["截止开始", "截止结束"]}
-              onChange={(value) => {
-                const start = value?.[0]?.format("YYYY-MM-DD");
-                const end = value?.[1]?.format("YYYY-MM-DD");
-                setQuery((prev) => ({ ...prev, deadlineRange: start && end ? [start, end] : null }));
-              }}
-            />
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ whiteSpace: "nowrap" }}>截止时间：</span>
+              <DatePicker.RangePicker
+                style={{ width: "100%" }}
+                placeholder={["截止开始", "截止结束"]}
+                onChange={(value) => {
+                  const start = value?.[0]?.format("YYYY-MM-DD");
+                  const end = value?.[1]?.format("YYYY-MM-DD");
+                  setQuery((prev) => ({ ...prev, deadlineRange: start && end ? [start, end] : null }));
+                }}
+              />
+            </div>
           </Col>
           {tab === "pending" ? (
             <Col span={4}>
-              <Select
-                allowClear
-                placeholder="紧急程度"
-                style={{ width: "100%" }}
-                value={query.urgency}
-                options={[
-                  { label: "全部", value: undefined },
-                  { label: "普通", value: "normal" },
-                  { label: "紧急", value: "urgent" },
-                  { label: "特急", value: "very_urgent" },
-                ]}
-                onChange={(value) => setQuery((prev) => ({ ...prev, urgency: value }))}
-              />
+              <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                <span style={{ whiteSpace: "nowrap" }}>紧急程度：</span>
+                <Select
+                  allowClear
+                  placeholder="紧急程度"
+                  style={{ width: "100%" }}
+                  value={query.urgency}
+                  options={[
+                    { label: "全部", value: undefined },
+                    { label: "普通", value: "normal" },
+                    { label: "紧急", value: "urgent" },
+                    { label: "特急", value: "very_urgent" },
+                  ]}
+                  onChange={(value) => setQuery((prev) => ({ ...prev, urgency: value }))}
+                />
+              </div>
             </Col>
           ) : null}
-          <Col span={3}>
-            <Space>
-              <Button type="primary" onClick={() => setAppliedQuery(query)}>
-                查询
-              </Button>
-              <Button
-                onClick={() => {
-                  const reset = { keyword: "", issuer: undefined, urgency: undefined, deadlineRange: null };
-                  setQuery(reset);
-                  setAppliedQuery(reset);
-                }}
-              >
-                重置
-              </Button>
-            </Space>
+          <Col flex="auto" style={{ textAlign: "right" }}>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <Space>
+                <Button type="primary" onClick={() => setAppliedQuery(query)}>
+                  查询
+                </Button>
+                <Button
+                  onClick={() => {
+                    const reset = { keyword: "", issuer: undefined, urgency: undefined, deadlineRange: null };
+                    setQuery(reset);
+                    setAppliedQuery(reset);
+                  }}
+                >
+                  重置
+                </Button>
+              </Space>
+            </div>
           </Col>
         </Row>
       </div>
@@ -343,3 +405,4 @@ const DataReportListPage: React.FC = () => {
 };
 
 export default DataReportListPage;
+

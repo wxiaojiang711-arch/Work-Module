@@ -58,13 +58,16 @@ const RoleUsersModal: React.FC<Props> = ({ open, roleName, roleCode, users, onCl
         width={640}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-          <Input.Search
-            allowClear
-            placeholder='搜索用户姓名或账号'
-            value={keyword}
-            onChange={(e) => setKeyword(e.target.value)}
-            style={{ width: 280 }}
-          />
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <span style={{ whiteSpace: "nowrap" }}>用户关键词：</span>
+            <Input.Search
+              allowClear
+              placeholder='搜索用户姓名或账号'
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              style={{ width: 280 }}
+            />
+          </div>
           <Button type='primary' size='small' icon={<PlusOutlined />} onClick={() => setSelectOpen(true)}>
             添加用户
           </Button>
@@ -105,3 +108,4 @@ const RoleUsersModal: React.FC<Props> = ({ open, roleName, roleCode, users, onCl
 };
 
 export default RoleUsersModal;
+

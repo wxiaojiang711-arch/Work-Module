@@ -59,6 +59,42 @@ const defaultData: FormTemplateItem[] = [
   },
 ];
 
+const decisionLibraryData: FormTemplateItem[] = [
+  {
+    id: "decision-001",
+    name: "数字化转型决策方案",
+    description: "企业数字化转型路径与实施方案",
+    createdAt: "2024-02-10 09:00:00",
+    creator: "赵六",
+    permissions: ["区大数据局", "区发改委"],
+    submissionCount: 45,
+    status: "发布中",
+    lastUpdated: "2024-03-15 10:30:00",
+  },
+  {
+    id: "decision-002",
+    name: "智慧政务服务优化建议",
+    description: "基于用户反馈的政务服务流程优化方案",
+    createdAt: "2024-01-25 14:20:00",
+    creator: "孙七",
+    permissions: ["区委办公室", "区大数据局"],
+    submissionCount: 78,
+    status: "发布中",
+    lastUpdated: "2024-03-10 16:45:00",
+  },
+  {
+    id: "decision-003",
+    name: "数据安全管理策略",
+    description: "数据分类分级与安全防护措施",
+    createdAt: "2024-03-01 11:15:00",
+    creator: "周八",
+    permissions: ["区大数据局"],
+    submissionCount: 23,
+    status: "草稿",
+    lastUpdated: "2024-03-05 09:30:00",
+  },
+];
+
 const initialFilters: FilterState = {
   keyword: "",
   status: "全部",
@@ -87,10 +123,13 @@ const wait = (ms: number) => new Promise<void>((resolve) => window.setTimeout(re
 const FileTemplateManagementPage: React.FC = () => {
   const navigate = useNavigate();
   const [formList, setFormList] = useState<FormTemplateItem[]>(defaultData);
+  const [decisionList, setDecisionList] = useState<FormTemplateItem[]>(decisionLibraryData);
   const [filters, setFilters] = useState<FilterState>(initialFilters);
   const [appliedFilters, setAppliedFilters] = useState<FilterState>(initialFilters);
   const [tableLoading, setTableLoading] = useState(false);
+  const [decisionTableLoading, setDecisionTableLoading] = useState(false);
   const [actionLoadingIds, setActionLoadingIds] = useState<Record<string, boolean>>({});
+  const [activeTab, setActiveTab] = useState<"form" | "decision">("form");
 
   const setActionLoading = useCallback((id: string, loading: boolean) => {
     setActionLoadingIds((prev) => ({ ...prev, [id]: loading }));
@@ -306,67 +345,100 @@ const FileTemplateManagementPage: React.FC = () => {
     },
   ];
 
+  const currentList = activeTab === "form" ? displayList : decisionList;
+  const currentLoading = activeTab === "form" ? tableLoading : decisionTableLoading;
+
   return (
     <div className={styles.page}>
+      <div className={styles.tabContainer}>
+        <div
+          className={`${styles.tabItem} ${activeTab === "form" ? styles.tabItemActive : ""}`}
+          onClick={() => setActiveTab("form")}
+        >
+          文件模板管理
+        </div>
+        <div
+          className={`${styles.tabItem} ${activeTab === "decision" ? styles.tabItemActive : ""}`}
+          onClick={() => setActiveTab("decision")}
+        >
+          决策库工作模块
+        </div>
+        <div className={styles.tabItem} style={{ visibility: "hidden" }}>
+          占位
+        </div>
+      </div>
+
       <Card className={styles.card}>
         <Row gutter={[12, 12]} align="middle" className={styles.filterRow}>
           <Col xs={24} sm={24} md={12} lg={8} xl={7}>
-            <Input.Search
-              allowClear
-              value={filters.keyword}
-              placeholder="请输入表单名称或描述"
-              onChange={(e) => setFilters((prev) => ({ ...prev, keyword: e.target.value }))}
-              onSearch={handleQuery}
-            />
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ whiteSpace: "nowrap" }}>关键词：</span>
+              <Input.Search
+                allowClear
+                value={filters.keyword}
+                placeholder="请输入表单名称或描述"
+                onChange={(e) => setFilters((prev) => ({ ...prev, keyword: e.target.value }))}
+                onSearch={handleQuery}
+              />
+            </div>
           </Col>
 
           <Col xs={24} sm={12} md={6} lg={4} xl={3}>
-            <Select
-              className={styles.fullWidth}
-              value={filters.status}
-              options={statusOptions.map((option) => ({ label: option, value: option }))}
-              onChange={(value) => setFilters((prev) => ({ ...prev, status: value }))}
-            />
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ whiteSpace: "nowrap" }}>状态：</span>
+              <Select
+                className={styles.fullWidth}
+                value={filters.status}
+                options={statusOptions.map((option) => ({ label: option, value: option }))}
+                onChange={(value) => setFilters((prev) => ({ ...prev, status: value }))}
+              />
+            </div>
           </Col>
 
           <Col xs={24} sm={12} md={6} lg={4} xl={4}>
-            <Select
-              mode="multiple"
-              allowClear
-              className={styles.fullWidth}
-              value={filters.permissions}
-              options={permissionOptions.map((option) => ({ label: option, value: option }))}
-              placeholder="表单权限"
-              onChange={(value) =>
-                setFilters((prev) => ({ ...prev, permissions: value as FormPermission[] }))
-              }
-            />
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ whiteSpace: "nowrap" }}>表单权限：</span>
+              <Select
+                mode="multiple"
+                allowClear
+                className={styles.fullWidth}
+                value={filters.permissions}
+                options={permissionOptions.map((option) => ({ label: option, value: option }))}
+                placeholder="表单权限"
+                onChange={(value) =>
+                  setFilters((prev) => ({ ...prev, permissions: value as FormPermission[] }))
+                }
+              />
+            </div>
           </Col>
 
           <Col xs={24} sm={24} md={12} lg={6} xl={5}>
-            <RangePicker
-              className={styles.fullWidth}
-              format="YYYY-MM-DD"
-              value={
-                filters.createdAtRange
-                  ? [dayjs(filters.createdAtRange[0], "YYYY-MM-DD"), dayjs(filters.createdAtRange[1], "YYYY-MM-DD")]
-                  : null
-              }
-              onChange={(dates) => {
-                const start = dates?.[0];
-                const end = dates?.[1];
-
-                if (!start || !end) {
-                  setFilters((prev) => ({ ...prev, createdAtRange: null }));
-                  return;
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ whiteSpace: "nowrap" }}>创建时间：</span>
+              <RangePicker
+                className={styles.fullWidth}
+                format="YYYY-MM-DD"
+                value={
+                  filters.createdAtRange
+                    ? [dayjs(filters.createdAtRange[0], "YYYY-MM-DD"), dayjs(filters.createdAtRange[1], "YYYY-MM-DD")]
+                    : null
                 }
+                onChange={(dates) => {
+                  const start = dates?.[0];
+                  const end = dates?.[1];
 
-                setFilters((prev) => ({
-                  ...prev,
-                  createdAtRange: [start.format("YYYY-MM-DD"), end.format("YYYY-MM-DD")],
-                }));
-              }}
-            />
+                  if (!start || !end) {
+                    setFilters((prev) => ({ ...prev, createdAtRange: null }));
+                    return;
+                  }
+
+                  setFilters((prev) => ({
+                    ...prev,
+                    createdAtRange: [start.format("YYYY-MM-DD"), end.format("YYYY-MM-DD")],
+                  }));
+                }}
+              />
+            </div>
           </Col>
 
           <Col xs={24} sm={24} md={24} lg={24} xl={5}>
@@ -376,21 +448,24 @@ const FileTemplateManagementPage: React.FC = () => {
                   查询
                 </Button>
                 <Button onClick={handleReset}>重置</Button>
-                <Button type="primary" onClick={() => navigateTo("/form/create")}>
-                  创建表单
-                </Button>
               </Space>
             </div>
           </Col>
         </Row>
 
+        <div style={{ marginBottom: 12 }}>
+          <Button type="primary" onClick={() => navigateTo("/form/create")}>
+            创建表单
+          </Button>
+        </div>
+
         <Table<FormTemplateItem>
           rowKey="id"
           columns={columns}
-          dataSource={displayList}
-          loading={tableLoading}
+          dataSource={currentList}
+          loading={currentLoading}
           scroll={{ x: 1200 }}
-          locale={{ emptyText: "暂无表单数据，请先创建表单" }}
+          locale={{ emptyText: activeTab === "form" ? "暂无表单数据，请先创建表单" : "暂无决策库数据" }}
           pagination={{
             showSizeChanger: true,
             showQuickJumper: true,
@@ -405,3 +480,4 @@ const FileTemplateManagementPage: React.FC = () => {
 };
 
 export default FileTemplateManagementPage;
+

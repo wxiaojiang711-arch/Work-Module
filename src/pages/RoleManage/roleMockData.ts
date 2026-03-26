@@ -52,7 +52,7 @@ export const roleList: RoleItem[] = [
     type: 'preset',
     color: '#ff4d4f',
     userCount: 2,
-    permissionModules: ['知识库管理', '采集任务管理', '数据上报', '智能报告', '数据召回', '系统管理'],
+    permissionModules: ['知识库管理', '采集任务管理', '数据上报', '智能报告', '智能问数', '系统管理'],
     permissions: ['all'],
   },
   {
@@ -63,7 +63,7 @@ export const roleList: RoleItem[] = [
     type: 'preset',
     color: '#1890ff',
     userCount: 15,
-    permissionModules: ['知识库管理', '采集任务管理', '数据上报', '智能报告', '数据召回', '系统管理'],
+    permissionModules: ['知识库管理', '采集任务管理', '数据上报', '智能报告', '智能问数', '系统管理'],
     permissions: [
       'kb_view_own', 'kb_view_authorized', 'kb_create_own', 'kb_edit_own', 'kb_upload_own', 'kb_delete_file_own', 'kb_set_scope_own', 'kb_view_theme',
       'task_create', 'task_edit_own', 'task_view_own', 'task_urge_own', 'task_review_own', 'task_export_own',
@@ -81,7 +81,7 @@ export const roleList: RoleItem[] = [
     type: 'preset',
     color: '#52c41a',
     userCount: 28,
-    permissionModules: ['知识库管理', '数据上报', '智能报告', '数据召回'],
+    permissionModules: ['知识库管理', '数据上报', '智能报告', '智能问数'],
     permissions: [
       'kb_view_own', 'kb_view_authorized', 'kb_upload_own', 'kb_view_theme',
       'report_view_pending', 'report_submit', 'report_draft', 'report_withdraw', 'report_view_submitted', 'report_export',
@@ -97,23 +97,12 @@ export const roleList: RoleItem[] = [
     type: 'preset',
     color: '#999999',
     userCount: 86,
-    permissionModules: ['知识库管理', '数据上报', '数据召回'],
+    permissionModules: ['知识库管理', '数据上报', '智能问数'],
     permissions: [
       'kb_view_own', 'kb_view_authorized', 'kb_view_theme',
       'report_view_pending', 'report_view_submitted',
       'recall_use', 'recall_scope_authorized',
     ],
-  },
-  {
-    id: 'role-005',
-    name: '审计员',
-    code: 'auditor',
-    description: '负责查看全区操作日志和数据变更记录，进行合规审计，不可修改任何业务数据。',
-    type: 'custom',
-    color: '#722ed1',
-    userCount: 3,
-    permissionModules: ['知识库管理', '数据上报', '系统管理'],
-    permissions: ['kb_view_all', 'kb_view_theme', 'report_view_pending', 'report_view_submitted', 'sys_view_log_all'],
   },
 ];
 
@@ -178,12 +167,12 @@ export const permissionTree: PermissionTreeNode[] = [
   },
   {
     key: 'recall',
-    title: '数据召回',
+    title: '智能问数',
     icon: 'SearchOutlined',
     children: [
-      { key: 'recall_use', title: '使用数据召回功能' },
-      { key: 'recall_scope_all', title: '召回范围：全区所有知识库' },
-      { key: 'recall_scope_authorized', title: '召回范围：本单位+被授权的知识库' },
+      { key: 'recall_use', title: '使用智能问数功能' },
+      { key: 'recall_scope_all', title: '问数范围：全区所有知识库' },
+      { key: 'recall_scope_authorized', title: '问数范围：本单位+被授权的知识库' },
     ],
   },
   {
@@ -258,3 +247,4 @@ export const orgTree: OrgTreeNode[] = [
     children: [{ key: 'soe-001', title: '区城投集团' }],
   },
 ];
+

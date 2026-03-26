@@ -1,0 +1,86 @@
+.global-header {
+  background: #fff !important;
+  border-bottom: 1px solid #f0f0f0;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  height: 56px !important;
+  line-height: 56px !important;
+  padding: 0 24px !important;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.global-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.global-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.platform-logo {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #e6f4ff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #1890ff;
+  font-size: 20px;
+}
+
+.notify-trigger {
+  font-size: 18px;
+  color: #595959;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.notify-trigger:hover {
+  color: #1890ff;
+  animation: bell-shake 0.45s ease-in-out;
+}
+
+@keyframes bell-shake {
+  0% { transform: rotate(0); }
+  25% { transform: rotate(12deg); }
+  50% { transform: rotate(-10deg); }
+  75% { transform: rotate(8deg); }
+  100% { transform: rotate(0); }
+}
+
+.user-trigger {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 6px;
+  padding: 4px 8px;
+  transition: background 0.2s;
+}
+
+.user-trigger:hover {
+  background: #f5f5f5;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.logout-menu-item {
+  color: #ff4d4f !important;
+}
+
+:global(.ant-dropdown-menu-item.logout-menu-item:hover) {
+  background: #fff1f0 !important;
+}

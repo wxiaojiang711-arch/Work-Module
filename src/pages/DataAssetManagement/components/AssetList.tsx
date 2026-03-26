@@ -15,6 +15,7 @@ interface AssetListProps {
 }
 
 const typeLabelMap: Record<KnowledgeBase["type"], string> = {
+  decision: "决策库",
   unit: "单位库",
   theme: "主题库",
 };

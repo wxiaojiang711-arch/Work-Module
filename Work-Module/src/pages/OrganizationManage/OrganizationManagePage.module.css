@@ -1,0 +1,100 @@
+.page {
+  height: 100%;
+  background: #f3f6fb;
+  padding: 16px;
+}
+
+.layout {
+  display: flex;
+  gap: 12px;
+  height: calc(100vh - 88px);
+}
+
+.leftPanel {
+  width: 360px;
+  min-width: 360px;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 16px;
+  overflow-y: auto;
+}
+
+.rightPanel {
+  flex: 1;
+  min-width: 0;
+  background: #fff;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.toolbar {
+  margin-bottom: 12px;
+}
+
+.treeNode {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.nodeName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 8px;
+}
+
+.nodeActions {
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.treeNode:hover .nodeActions {
+  opacity: 1;
+}
+
+.actionIcon {
+  font-size: 14px;
+  color: #999;
+  transition: color 0.2s;
+}
+
+.actionIcon:hover {
+  color: #1890ff;
+}
+
+.actionIconDanger {
+  font-size: 14px;
+  color: #ff7875;
+  transition: color 0.2s;
+}
+
+.actionIconDanger:hover {
+  color: #ff4d4f;
+}
+
+.matchText {
+  color: #f50;
+}
+
+.childTitle {
+  margin-top: 16px !important;
+  margin-bottom: 12px !important;
+}
+
+.emptyWrap {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:global(.ant-tree .ant-tree-node-content-wrapper.ant-tree-node-selected) {
+  background: #e6f7ff !important;
+  border-left: 3px solid #1890ff;
+}

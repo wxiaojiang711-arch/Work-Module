@@ -3,12 +3,16 @@ import {
   Badge,
   Button,
   Card,
+  Checkbox,
+  Divider,
   Dropdown,
   Empty,
   Form,
   Input,
   Modal,
+  Radio,
   Select,
+  Space,
   Tabs,
   Tag,
   Typography,
@@ -33,67 +37,330 @@ import styles from "./KnowledgeBaseManagementPage.module.css";
 
 const mockData: KnowledgeBase[] = [
   {
+    id: "kb-decision-001",
+    title: "决策库",
+    lastUpdated: "2026-03-20 14:30:00",
+    description: "汇集总书记重要讲话批示文件、党中央决策部署文件、市委工作要求、区委工作安排等",
+    visibility: "完全公开",
+    itemCount: 45,
+    type: "decision",
+    tags: ["决策库"],
+  },
+  {
     id: "kb-001",
-    title: "检验检查报告解读",
-    lastUpdated: "2026-03-03 15:46:43",
-    description: "临床检验检查与体检报告解读",
+    title: "区大数据局",
+    lastUpdated: "2026-03-18 09:12:20",
+    description: "汇集区大数据局业务流程、工作规范、制度文件等资料",
     visibility: "组织内公开",
-    itemCount: 9,
+    itemCount: 18,
     type: "unit",
     unitCategory: "department",
-    tags: ["医疗", "检验检查"],
+    tags: ["单位库"],
   },
   {
     id: "kb-002",
-    title: "医共体知识馆",
-    lastUpdated: "2026-02-09 00:51:35",
-    description: "医共体共享协同与运行监管",
+    title: "区发改委",
+    lastUpdated: "2026-03-18 09:15:43",
+    description: "汇集区发改委业务流程、工作规范、制度文件等资料",
     visibility: "组织内公开",
-    itemCount: 9,
+    itemCount: 16,
     type: "unit",
-    unitCategory: "town",
-    tags: ["医共体", "协同"],
+    unitCategory: "department",
+    tags: ["单位库"],
   },
   {
     id: "kb-003",
-    title: "财政预算管理",
-    lastUpdated: "2026-03-12 09:15:22",
-    description: "财政预算编制、执行与绩效评估知识沉淀",
-    visibility: "仅管理员可见",
-    itemCount: 12,
+    title: "区文旅委",
+    lastUpdated: "2026-03-18 09:18:06",
+    description: "汇集区文旅委业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 14,
     type: "unit",
-    unitCategory: "soe",
-    tags: ["财政", "预算"],
+    unitCategory: "department",
+    tags: ["单位库"],
   },
   {
     id: "kb-004",
-    title: "智慧城市治理知识库",
-    lastUpdated: "2026-03-10 08:30:00",
-    description: "城市治理数字化转型相关政策、标准与案例汇编",
-    visibility: "完全公开",
-    itemCount: 23,
-    type: "theme",
-    tags: ["智慧城市", "数字化转型"],
+    title: "区住建委",
+    lastUpdated: "2026-03-18 09:23:11",
+    description: "汇集区住建委业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 12,
+    type: "unit",
+    unitCategory: "department",
+    tags: ["单位库"],
   },
   {
     id: "kb-005",
-    title: "疫情防控知识库",
-    lastUpdated: "2026-03-15 11:20:00",
-    description: "公共卫生应急响应与疫情防控知识体系",
+    title: "区交通局",
+    lastUpdated: "2026-03-18 09:28:52",
+    description: "汇集区交通局业务流程、工作规范、制度文件等资料",
     visibility: "组织内公开",
-    itemCount: 17,
-    type: "theme",
-    tags: ["公共卫生", "疫情防控"],
+    itemCount: 20,
+    type: "unit",
+    unitCategory: "department",
+    tags: ["单位库"],
   },
   {
     id: "kb-006",
-    title: "双碳目标与绿色发展",
-    lastUpdated: "2026-03-01 16:40:00",
-    description: "碳达峰碳中和政策解读与绿色低碳实践案例",
+    title: "区教委",
+    lastUpdated: "2026-03-18 09:33:09",
+    description: "汇集区教委业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 22,
+    type: "unit",
+    unitCategory: "department",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-007",
+    title: "区卫健委",
+    lastUpdated: "2026-03-18 09:37:24",
+    description: "汇集区卫健委业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 11,
+    type: "unit",
+    unitCategory: "department",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-008",
+    title: "区市场监督管理局",
+    lastUpdated: "2026-03-18 09:41:58",
+    description: "汇集区市场监督管理局业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 13,
+    type: "unit",
+    unitCategory: "department",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-009",
+    title: "区生态环境局",
+    lastUpdated: "2026-03-18 09:46:36",
+    description: "汇集区生态环境局业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 17,
+    type: "unit",
+    unitCategory: "department",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-010",
+    title: "区人社局",
+    lastUpdated: "2026-03-18 09:51:04",
+    description: "汇集区人社局业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 15,
+    type: "unit",
+    unitCategory: "department",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-011",
+    title: "渝州路街道",
+    lastUpdated: "2026-03-18 10:05:17",
+    description: "汇集渝州路街道业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 28,
+    type: "unit",
+    unitCategory: "town",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-012",
+    title: "石桥铺街道",
+    lastUpdated: "2026-03-18 10:11:49",
+    description: "汇集石桥铺街道业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 26,
+    type: "unit",
+    unitCategory: "town",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-013",
+    title: "二郎街道",
+    lastUpdated: "2026-03-18 10:18:03",
+    description: "汇集二郎街道业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 30,
+    type: "unit",
+    unitCategory: "town",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-014",
+    title: "杨家坪街道",
+    lastUpdated: "2026-03-18 10:25:12",
+    description: "汇集杨家坪街道业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 24,
+    type: "unit",
+    unitCategory: "town",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-015",
+    title: "黄桷坪街道",
+    lastUpdated: "2026-03-18 10:32:45",
+    description: "汇集黄桷坪街道业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 19,
+    type: "unit",
+    unitCategory: "town",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-016",
+    title: "谢家湾街道",
+    lastUpdated: "2026-03-18 10:39:21",
+    description: "汇集谢家湾街道业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 21,
+    type: "unit",
+    unitCategory: "town",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-017",
+    title: "石坪桥街道",
+    lastUpdated: "2026-03-18 10:46:08",
+    description: "汇集石坪桥街道业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 18,
+    type: "unit",
+    unitCategory: "town",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-018",
+    title: "中梁山街道",
+    lastUpdated: "2026-03-18 10:53:34",
+    description: "汇集中梁山街道业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 22,
+    type: "unit",
+    unitCategory: "town",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-019",
+    title: "九龙街道",
+    lastUpdated: "2026-03-18 11:01:15",
+    description: "汇集九龙街道业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 20,
+    type: "unit",
+    unitCategory: "town",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-020",
+    title: "华岩镇",
+    lastUpdated: "2026-03-18 11:08:42",
+    description: "汇集华岩镇业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 25,
+    type: "unit",
+    unitCategory: "town",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-021",
+    title: "陶家镇",
+    lastUpdated: "2026-03-18 11:15:29",
+    description: "汇集陶家镇业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 23,
+    type: "unit",
+    unitCategory: "town",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-022",
+    title: "西彭镇",
+    lastUpdated: "2026-03-18 11:22:56",
+    description: "汇集西彭镇业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 27,
+    type: "unit",
+    unitCategory: "town",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-023",
+    title: "铜罐驿镇",
+    lastUpdated: "2026-03-18 11:30:18",
+    description: "汇集铜罐驿镇业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 16,
+    type: "unit",
+    unitCategory: "town",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-024",
+    title: "重庆九龙城市开发集团有限公司",
+    lastUpdated: "2026-03-18 11:37:45",
+    description: "汇集重庆九龙城市开发集团有限公司业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 32,
+    type: "unit",
+    unitCategory: "soe",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-025",
+    title: "重庆九龙现代产业发展集团有限公司",
+    lastUpdated: "2026-03-18 11:45:12",
+    description: "汇集重庆九龙现代产业发展集团有限公司业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 29,
+    type: "unit",
+    unitCategory: "soe",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-026",
+    title: "重庆九龙城乡运营集团有限公司",
+    lastUpdated: "2026-03-18 11:52:38",
+    description: "汇集重庆九龙城乡运营集团有限公司业务流程、工作规范、制度文件等资料",
+    visibility: "组织内公开",
+    itemCount: 31,
+    type: "unit",
+    unitCategory: "soe",
+    tags: ["单位库"],
+  },
+  {
+    id: "kb-027",
+    title: "16912事项库",
+    lastUpdated: "2026-03-19 10:05:17",
+    description: "围绕16912事项汇集政策依据、办理流程、责任分工与典型案例",
     visibility: "完全公开",
-    itemCount: 8,
+    itemCount: 28,
     type: "theme",
-    tags: ["双碳", "绿色发展"],
+    tags: ["主题库"],
+  },
+  {
+    id: "kb-028",
+    title: "重大事项库",
+    lastUpdated: "2026-03-19 10:11:49",
+    description: "围绕重大事项汇集政策依据、推进机制、协同流程与经验案例",
+    visibility: "组织内公开",
+    itemCount: 26,
+    type: "theme",
+    tags: ["主题库"],
+  },
+  {
+    id: "kb-029",
+    title: "重大项目库",
+    lastUpdated: "2026-03-19 10:18:03",
+    description: "围绕重大项目汇集政策依据、项目全周期流程、节点模板与案例",
+    visibility: "完全公开",
+    itemCount: 30,
+    type: "theme",
+    tags: ["主题库"],
   },
 ];
 
@@ -105,11 +372,13 @@ const visibilityColorMap: Record<Visibility, string> = {
 };
 
 const typeLabel: Record<KnowledgeBaseType, string> = {
+  decision: "决策库",
   unit: "单位库",
   theme: "主题库",
 };
 
 const typeColor: Record<KnowledgeBaseType, string> = {
+  decision: "cyan",
   unit: "purple",
   theme: "cyan",
 };
@@ -120,6 +389,31 @@ const unitCategoryLabelMap: Record<UnitCategory, string> = {
   soe: "国企",
 };
 
+const currentUnitName = "区大数据局";
+
+const visibilityOptions: Array<{ value: Visibility; title: string; description: string }> = [
+  {
+    value: "组织内公开",
+    title: "组织内公开",
+    description: "本单位内所有用户可见，其他单位不可见",
+  },
+  {
+    value: "部分公开",
+    title: "部分公开",
+    description: "仅指定单位可见，需配置授权单位列表",
+  },
+  {
+    value: "仅管理员可见",
+    title: "仅管理员可见",
+    description: "仅本单位管理员和区委办公室可见",
+  },
+  {
+    value: "完全公开",
+    title: "完全公开",
+    description: "全区所有单位、所有用户可见",
+  },
+];
+
 const KnowledgeBaseManagementPage: React.FC = () => {
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>(mockData);
   const [searchText, setSearchText] = useState("");
@@ -129,6 +423,20 @@ const KnowledgeBaseManagementPage: React.FC = () => {
   const [editingKb, setEditingKb] = useState<KnowledgeBase | null>(null);
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  const watchedVisibility = Form.useWatch("visibility", form) as Visibility | undefined;
+  const watchedType = Form.useWatch("type", form) as KnowledgeBaseType | undefined;
+  const watchedExtraUnits = (Form.useWatch("authorizedUnits", form) as string[] | undefined) ?? [];
+  const watchedAllowOtherUpload = Boolean(Form.useWatch("allowOtherUpload", form));
+  const watchedUploadUnits = (Form.useWatch("uploadUnits", form) as string[] | undefined) ?? [];
+
+  const allUnitOptions = useMemo(() => {
+    const units = knowledgeBases
+      .filter((kb) => kb.type === "unit")
+      .map((kb) => kb.title);
+    return Array.from(new Set([...units, "区委办公室"]))
+      .filter((name) => name !== currentUnitName)
+      .map((name) => ({ label: name, value: name }));
+  }, [knowledgeBases]);
 
   const filteredList = useMemo(() => {
     return knowledgeBases.filter((kb) => {
@@ -145,7 +453,16 @@ const KnowledgeBaseManagementPage: React.FC = () => {
 
   const handleCreate = () => {
     setEditingKb(null);
-    form.resetFields();
+    form.setFieldsValue({
+      type: "unit",
+      ownerUnit: undefined,
+      title: "",
+      description: "",
+      visibility: "组织内公开",
+      authorizedUnits: [],
+      allowOtherUpload: false,
+      uploadUnits: [],
+    });
     setModalOpen(true);
   };
 
@@ -155,9 +472,12 @@ const KnowledgeBaseManagementPage: React.FC = () => {
       title: kb.title,
       description: kb.description,
       type: kb.type,
+      ownerUnit: currentUnitName,
       visibility: kb.visibility,
-      tags: kb.tags,
       unitCategory: kb.unitCategory,
+      authorizedUnits: [],
+      allowOtherUpload: false,
+      uploadUnits: [],
     });
     setModalOpen(true);
   };
@@ -176,15 +496,20 @@ const KnowledgeBaseManagementPage: React.FC = () => {
     });
   };
 
-  const handleModalOk = () => {
-    form.validateFields().then((values) => {
+  const handleModalOk = async () => {
+    try {
+      const values = await form.validateFields();
       if (editingKb) {
         setKnowledgeBases((prev) =>
           prev.map((item) =>
             item.id === editingKb.id
               ? {
                   ...item,
-                  ...values,
+                  title: values.title,
+                  description: values.description || "",
+                  type: values.type,
+                  visibility: values.visibility,
+                  unitCategory: values.type === "unit" ? item.unitCategory ?? "department" : undefined,
                   lastUpdated: new Date().toLocaleString("sv-SE").replace("T", " "),
                 }
               : item,
@@ -195,20 +520,26 @@ const KnowledgeBaseManagementPage: React.FC = () => {
         const newKb: KnowledgeBase = {
           id: `kb-${Date.now()}`,
           title: values.title,
-          description: values.description,
+          description: values.description || "",
           type: values.type,
           visibility: values.visibility,
-          unitCategory: values.type === "unit" ? values.unitCategory ?? "department" : undefined,
+          unitCategory: values.type === "unit" ? "department" : undefined,
           itemCount: 0,
           lastUpdated: new Date().toLocaleString("sv-SE").replace("T", " "),
-          tags: values.tags ?? [],
+          tags: values.type === "unit" ? ["单位库"] : values.type === "theme" ? ["主题库"] : ["决策库"],
         };
         setKnowledgeBases((prev) => [newKb, ...prev]);
         message.success("已创建");
       }
       setModalOpen(false);
       form.resetFields();
-    });
+    } catch (error: any) {
+      const firstError = error?.errorFields?.[0];
+      if (firstError?.name) {
+        form.scrollToField(firstError.name, { behavior: "smooth", block: "center" });
+      }
+      message.error("请先完善必填项");
+    }
   };
 
   const getCardActions = (kb: KnowledgeBase): MenuProps["items"] => [
@@ -288,6 +619,10 @@ const KnowledgeBaseManagementPage: React.FC = () => {
         }}
         items={[
           { key: "all", label: `全部 (${knowledgeBases.length})` },
+          {
+            key: "decision",
+            label: `决策库 (${knowledgeBases.filter((k) => k.type === "decision").length})`,
+          },
           {
             key: "unit",
             label: `单位库 (${knowledgeBases.filter((k) => k.type === "unit").length})`,
@@ -388,64 +723,221 @@ const KnowledgeBaseManagementPage: React.FC = () => {
       )}
 
       <Modal
-        title={editingKb ? "编辑知识库" : "新建知识库"}
+        title={editingKb ? "编辑知识库" : "新增知识库"}
         open={modalOpen}
         onOk={handleModalOk}
         onCancel={() => setModalOpen(false)}
-        okText={editingKb ? "保存" : "创建"}
+        okText="保存"
         cancelText="取消"
+        width={800}
+        styles={{ body: { maxHeight: "80vh", overflowY: "auto", paddingTop: 8 } }}
+        okButtonProps={{ style: { height: 40, borderRadius: 6, background: "#2b5cd6", borderColor: "#2b5cd6", padding: "0 24px" } }}
+        cancelButtonProps={{ style: { height: 40, borderRadius: 6, padding: "0 24px" } }}
         destroyOnClose
       >
-        <Form form={form} layout="vertical" style={{ marginTop: 16 }}>
-          <Form.Item name="title" label="知识库名称" rules={[{ required: true, message: "请输入知识库名称" }]}>
-            <Input placeholder="请输入知识库名称" />
-          </Form.Item>
-          <Form.Item name="description" label="描述" rules={[{ required: true, message: "请输入描述" }]}>
-            <Input.TextArea rows={3} placeholder="请输入知识库描述" />
-          </Form.Item>
-          <Form.Item name="type" label="类型" rules={[{ required: true, message: "请选择类型" }]}>
-            <Select
-              placeholder="请选择类型"
-              options={[
-                { value: "unit", label: "单位库" },
-                { value: "theme", label: "主题库" },
-              ]}
-            />
-          </Form.Item>
-          <Form.Item noStyle shouldUpdate>
-            {({ getFieldValue }) =>
-              getFieldValue("type") === "unit" ? (
-                <Form.Item
-                  name="unitCategory"
-                  label="单位分类"
-                  rules={[{ required: true, message: "请选择单位分类" }]}
-                >
-                  <Select
-                    placeholder="请选择单位分类"
-                    options={[
-                      { value: "department", label: "部门" },
-                      { value: "town", label: "镇街" },
-                      { value: "soe", label: "国企" },
-                    ]}
-                  />
-                </Form.Item>
-              ) : null
+        <Form
+          form={form}
+          layout="vertical"
+          style={{ marginTop: 8 }}
+          onValuesChange={(changedValues) => {
+            if (Object.prototype.hasOwnProperty.call(changedValues, "visibility")) {
+              form.setFieldsValue({ authorizedUnits: [] });
             }
-          </Form.Item>
-          <Form.Item name="visibility" label="可见范围" rules={[{ required: true, message: "请选择可见范围" }]}>
-            <Select
-              placeholder="请选择可见范围"
-              options={[
-                { value: "组织内公开", label: "组织内公开" },
-                { value: "部分公开", label: "部分公开" },
-                { value: "仅管理员可见", label: "仅管理员可见" },
-                { value: "完全公开", label: "完全公开" },
-              ]}
-            />
-          </Form.Item>
-          <Form.Item name="tags" label="标签">
-            <Select mode="tags" placeholder="输入标签后回车" tokenSeparators={[","]} />
-          </Form.Item>
+            if (Object.prototype.hasOwnProperty.call(changedValues, "allowOtherUpload") && !changedValues.allowOtherUpload) {
+              form.setFieldsValue({ uploadUnits: [] });
+            }
+            if (Object.prototype.hasOwnProperty.call(changedValues, "ownerUnit")) {
+              const ownerUnit = changedValues.ownerUnit as string;
+              const type = form.getFieldValue("type") as KnowledgeBaseType;
+              if (ownerUnit) {
+                form.setFieldValue("description", `汇集${ownerUnit}业务流程、工作规范、制度文件等资料`);
+                if (type === "unit") {
+                  form.setFieldValue("title", `${ownerUnit}知识库`);
+                }
+              }
+            }
+            if (Object.prototype.hasOwnProperty.call(changedValues, "type")) {
+              const ownerUnit = form.getFieldValue("ownerUnit") as string;
+              if (changedValues.type === "unit" && ownerUnit) {
+                form.setFieldValue("title", `${ownerUnit}知识库`);
+              }
+            }
+          }}
+        >
+          <div className={styles.modalSectionTitle}>基本信息</div>
+          <div className={styles.modalSection}>
+            <Form.Item name="type" label="知识库类型" rules={[{ required: true, message: "请选择知识库类型" }]}>
+              <Select
+                className={styles.modalInput}
+                placeholder="请选择知识库类型"
+                options={[
+                  { value: "unit", label: "单位库" },
+                  { value: "theme", label: "主题库" },
+                  { value: "decision", label: "决策库" },
+                ]}
+              />
+            </Form.Item>
+            {watchedType === "unit" ? (
+              <Form.Item name="ownerUnit" label="所属单位" rules={[{ required: true, message: "请选择所属单位" }]}>
+                <Select
+                  className={styles.modalInput}
+                  placeholder="请选择所属单位"
+                  showSearch
+                  options={[{ label: currentUnitName, value: currentUnitName }, ...allUnitOptions]}
+                />
+              </Form.Item>
+            ) : null}
+            <Form.Item name="title" label="知识库名称" rules={[{ required: true, message: "请输入知识库名称" }]}>
+              <Input className={styles.modalInput} placeholder="请输入知识库名称" />
+            </Form.Item>
+            <Form.Item name="description" label="知识库描述">
+              <Input.TextArea rows={3} placeholder="请输入知识库描述（选填）" />
+            </Form.Item>
+          </div>
+
+          <div className={styles.modalSectionTitle} style={{ marginTop: 24 }}>
+            权限配置
+            <span style={{ color: "#999", fontSize: 13, fontWeight: 400 }}>（设置知识库的查看权限和上传权限）</span>
+          </div>
+          <Divider style={{ margin: "0 0 16px" }} />
+
+          <div className={styles.modalSection}>
+            <Form.Item name="visibility" label="可见范围" required rules={[{ required: true, message: "请选择可见范围" }]}>
+              <Radio.Group className={styles.visibilityGroup}>
+                <Space direction="vertical" size={12} style={{ width: "100%" }}>
+                  {visibilityOptions.map((option) => (
+                    <div
+                      key={option.value}
+                      className={`${styles.visibilityCard} ${watchedVisibility === option.value ? styles.visibilityCardActive : ""}`}
+                    >
+                      <Radio value={option.value} className={styles.visibilityRadio}>
+                        <div className={styles.visibilityTitle}>{option.title}</div>
+                        <div className={styles.visibilityDesc}>{option.description}</div>
+                      </Radio>
+                    </div>
+                  ))}
+                </Space>
+              </Radio.Group>
+            </Form.Item>
+
+            {watchedVisibility === "组织内公开" || watchedVisibility === "部分公开" ? (
+              <Form.Item
+                name="authorizedUnits"
+                label={watchedVisibility === "部分公开" ? "授权单位" : "额外授权单位（可选）"}
+                required={watchedVisibility === "部分公开"}
+                rules={[
+                  {
+                    validator: async (_, value: string[] | undefined) => {
+                      if (watchedVisibility !== "部分公开") return;
+                      if (!value || value.length === 0) throw new Error("请至少选择一个授权单位");
+                    },
+                  },
+                ]}
+              >
+                <>
+                  <Select
+                    mode="multiple"
+                    showSearch
+                    placeholder="请选择单位"
+                    className={styles.modalInput}
+                    value={watchedExtraUnits}
+                    options={allUnitOptions.filter((item) => !watchedExtraUnits.includes(String(item.value)))}
+                    onChange={(value) => form.setFieldsValue({ authorizedUnits: value })}
+                  />
+                  <div className={styles.tagList}>
+                    {watchedExtraUnits.map((unit) => (
+                      <span key={unit} className={styles.blueTag}>
+                        {unit}
+                        <button
+                          type="button"
+                          className={styles.tagClose}
+                          onClick={() =>
+                            form.setFieldsValue({ authorizedUnits: watchedExtraUnits.filter((item) => item !== unit) })
+                          }
+                        >
+                          ×
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                  <Typography.Text className={styles.fieldHint}>
+                    {watchedVisibility === "部分公开"
+                      ? "必须至少选择一个单位"
+                      : "可添加其他单位扩展查看范围"}
+                  </Typography.Text>
+                </>
+              </Form.Item>
+            ) : null}
+
+            <Form.Item label="上传权限">
+              <Space direction="vertical" size={12} style={{ width: "100%" }}>
+                <div className={styles.uploadPermissionRow}>
+                  <Checkbox checked disabled>
+                    本单位
+                  </Checkbox>
+                  <Typography.Text className={styles.fieldHint} style={{ marginTop: 0 }}>
+                    本单位授权用户可上传
+                  </Typography.Text>
+                </div>
+                <div className={styles.uploadPermissionRow}>
+                  <Form.Item name="allowOtherUpload" valuePropName="checked" noStyle>
+                    <Checkbox>允许其他单位上传</Checkbox>
+                  </Form.Item>
+                  <Typography.Text className={styles.fieldHint} style={{ marginTop: 0 }}>
+                    勾选后可指定其他单位上传数据
+                  </Typography.Text>
+                </div>
+
+                {watchedAllowOtherUpload ? (
+                  <div className={styles.uploadNested}>
+                    <Form.Item
+                      name="uploadUnits"
+                      label="授权上传单位"
+                      required
+                      rules={[
+                        {
+                          validator: async (_, value: string[] | undefined) => {
+                            if (!watchedAllowOtherUpload) return;
+                            if (!value || value.length === 0) throw new Error("请至少选择一个授权上传单位");
+                          },
+                        },
+                      ]}
+                    >
+                      <>
+                        <Select
+                          mode="multiple"
+                          showSearch
+                          placeholder="请选择单位"
+                          className={styles.modalInput}
+                          value={watchedUploadUnits}
+                          options={allUnitOptions.filter((item) => !watchedUploadUnits.includes(String(item.value)))}
+                          onChange={(value) => form.setFieldsValue({ uploadUnits: value })}
+                        />
+                        <div className={styles.tagList}>
+                          {watchedUploadUnits.map((unit) => (
+                            <span key={unit} className={styles.greenTag}>
+                              {unit}
+                              <button
+                                type="button"
+                                className={styles.tagClose}
+                                onClick={() =>
+                                  form.setFieldsValue({ uploadUnits: watchedUploadUnits.filter((item) => item !== unit) })
+                                }
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                        <Typography.Text className={styles.fieldHint}>选择允许上传数据的单位</Typography.Text>
+                      </>
+                    </Form.Item>
+                  </div>
+                ) : null}
+              </Space>
+            </Form.Item>
+
+          </div>
         </Form>
       </Modal>
     </div>

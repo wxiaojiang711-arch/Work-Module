@@ -43,7 +43,8 @@ interface FileAsset {
   fileType: FileType;
   description: string | null;
   sourceUnit: string;
-  owner: string;
+  reporter: string;
+  reportTime: string;
   updateFrequency: UpdateFrequency;
   issueDate: string;
   lastUpdated: string;
@@ -59,7 +60,8 @@ const fileListMock: FileAsset[] = [
     fileType: "docx",
     description: "区大数据局部门职能及组织架构介绍",
     sourceUnit: "区大数据发展管理局",
-    owner: "张三",
+    reporter: "张三",
+    reportTime: "2026-03-16 14:20:35",
     updateFrequency: "irregular",
     issueDate: "2023-12-01 09:00:00",
     lastUpdated: "2026-03-16 14:20:35",
@@ -73,7 +75,8 @@ const fileListMock: FileAsset[] = [
     fileType: "png",
     description: null,
     sourceUnit: "区大数据发展管理局",
-    owner: "张三",
+    reporter: "张三",
+    reportTime: "2026-03-15 18:05:22",
     updateFrequency: "irregular",
     issueDate: "2023-11-15 10:30:00",
     lastUpdated: "2026-03-15 18:05:22",
@@ -87,7 +90,8 @@ const fileListMock: FileAsset[] = [
     fileType: "pdf",
     description: "数字政府核心业务流程及规范文档",
     sourceUnit: "区大数据发展管理局",
-    owner: "赵刚",
+    reporter: "赵刚",
+    reportTime: "2026-03-17 09:12:48",
     updateFrequency: "monthly",
     issueDate: "2023-10-20 14:15:00",
     lastUpdated: "2026-03-17 09:12:48",
@@ -101,7 +105,8 @@ const fileListMock: FileAsset[] = [
     fileType: "xlsx",
     description: null,
     sourceUnit: "区大数据发展管理局",
-    owner: "李伟",
+    reporter: "李伟",
+    reportTime: "2026-03-12 11:30:17",
     updateFrequency: "weekly",
     issueDate: "2023-09-10 11:00:00",
     lastUpdated: "2026-03-12 11:30:17",
@@ -115,7 +120,8 @@ const fileListMock: FileAsset[] = [
     fileType: "docx",
     description: "2024年度标志性成果建设进展与成效汇总",
     sourceUnit: "区大数据发展管理局",
-    owner: "刘洋",
+    reporter: "刘洋",
+    reportTime: "2026-03-11 16:44:05",
     updateFrequency: "monthly",
     issueDate: "2023-08-25 08:45:00",
     lastUpdated: "2026-03-11 16:44:05",
@@ -144,7 +150,6 @@ const frequencyMap: Record<UpdateFrequency, { label: string; color: string }> = 
 interface QueryState {
   kbType?: "unit" | "theme";
   visibility?: string;
-  updateFrequency?: UpdateFrequency;
   sourceUnit?: string;
   dateRange: [string, string] | null;
   keyword: string;
@@ -153,7 +158,6 @@ interface QueryState {
 const defaultQuery: QueryState = {
   kbType: undefined,
   visibility: undefined,
-  updateFrequency: undefined,
   sourceUnit: undefined,
   dateRange: null,
   keyword: "",
@@ -207,12 +211,11 @@ const KnowledgeBaseDetailPage: React.FC = () => {
     return fileList.filter((item) => {
       const matchKbType = !appliedQuery.kbType || item.kbType === appliedQuery.kbType;
       const matchVisibility = !appliedQuery.visibility || item.visibility === appliedQuery.visibility;
-      const matchFrequency = !appliedQuery.updateFrequency || item.updateFrequency === appliedQuery.updateFrequency;
       const matchSourceUnit = !appliedQuery.sourceUnit || item.sourceUnit === appliedQuery.sourceUnit;
 
       const matchDate =
         !appliedQuery.dateRange ||
-        (item.lastUpdated.slice(0, 10) >= appliedQuery.dateRange[0] && item.lastUpdated.slice(0, 10) <= appliedQuery.dateRange[1]);
+        (item.reportTime.slice(0, 10) >= appliedQuery.dateRange[0] && item.reportTime.slice(0, 10) <= appliedQuery.dateRange[1]);
 
       const matchKeyword =
         !keyword ||
@@ -222,7 +225,6 @@ const KnowledgeBaseDetailPage: React.FC = () => {
       return (
         matchKbType &&
         matchVisibility &&
-        matchFrequency &&
         matchSourceUnit &&
         matchDate &&
         matchKeyword
@@ -253,26 +255,12 @@ const KnowledgeBaseDetailPage: React.FC = () => {
       },
     },
     { title: "数据来源单位", dataIndex: "sourceUnit", key: "sourceUnit", width: 180 },
-    { title: "负责人", dataIndex: "owner", key: "owner", width: 100 },
+    { title: "上报人", dataIndex: "reporter", key: "reporter", width: 100 },
     {
-      title: "更新频率",
-      dataIndex: "updateFrequency",
-      key: "updateFrequency",
-      width: 120,
-      render: (value: UpdateFrequency) => <Tag color={frequencyMap[value].color}>{frequencyMap[value].label}</Tag>,
-    },
-    {
-      title: "文件下发时间",
-      dataIndex: "issueDate",
-      key: "issueDate",
-      sorter: (a, b) => dayjs(a.issueDate).valueOf() - dayjs(b.issueDate).valueOf(),
-      width: 180,
-    },
-    {
-      title: "最近更新时间",
-      dataIndex: "lastUpdated",
-      key: "lastUpdated",
-      sorter: (a, b) => dayjs(a.lastUpdated).valueOf() - dayjs(b.lastUpdated).valueOf(),
+      title: "上报时间",
+      dataIndex: "reportTime",
+      key: "reportTime",
+      sorter: (a, b) => dayjs(a.reportTime).valueOf() - dayjs(b.reportTime).valueOf(),
       width: 180,
     },
     {
@@ -282,10 +270,7 @@ const KnowledgeBaseDetailPage: React.FC = () => {
       fixed: "right",
       render: (_value, record) => {
         const menuItems: MenuProps["items"] = [
-          { key: "meta", label: "编辑元数据", onClick: () => message.info("编辑元数据（示例）") },
-          { key: "version", label: "查看版本记录", onClick: () => message.info("查看版本记录（示例）") },
           { key: "relation", label: "建立关联", onClick: () => message.info("建立关联（示例）") },
-          { key: "move", label: "移动到其他知识库", onClick: () => message.info("移动到其他知识库（示例）") },
           {
             key: "delete",
             danger: true,
@@ -341,109 +326,109 @@ const KnowledgeBaseDetailPage: React.FC = () => {
         <div style={{ maxWidth: 1800 }}>
         <Row gutter={[12, 12]}>
           <Col span={3}>
-            <Select
-              allowClear
-              size="middle"
-              placeholder="知识库类型"
-              value={query.kbType}
-              style={{ width: "100%" }}
-              options={[
-                { label: "全部", value: undefined },
-                { label: "单位库", value: "unit" },
-                { label: "主题库", value: "theme" },
-              ]}
-              onChange={(value) => setQuery((prev) => ({ ...prev, kbType: value }))}
-            />
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ whiteSpace: "nowrap" }}>知识库类型：</span>
+              <Select
+                allowClear
+                size="middle"
+                placeholder="知识库类型"
+                value={query.kbType}
+                style={{ width: "100%" }}
+                options={[
+                  { label: "全部", value: undefined },
+                  { label: "单位库", value: "unit" },
+                  { label: "主题库", value: "theme" },
+                ]}
+                onChange={(value) => setQuery((prev) => ({ ...prev, kbType: value }))}
+              />
+            </div>
           </Col>
           <Col span={3}>
-            <Select
-              allowClear
-              size="middle"
-              placeholder="公开方式"
-              value={query.visibility}
-              style={{ width: "100%" }}
-              options={[
-                { label: "全部", value: undefined },
-                { label: "组织内公开", value: "组织内公开" },
-                { label: "指定部门可见", value: "指定部门可见" },
-                { label: "仅本人可见", value: "仅本人可见" },
-              ]}
-              onChange={(value) => setQuery((prev) => ({ ...prev, visibility: value }))}
-            />
-          </Col>
-          <Col span={3}>
-            <Select
-              allowClear
-              size="middle"
-              placeholder="更新频率"
-              value={query.updateFrequency}
-              style={{ width: "100%" }}
-              options={[
-                { label: "全部", value: undefined },
-                { label: "每天更新", value: "daily" },
-                { label: "每周更新", value: "weekly" },
-                { label: "每月更新", value: "monthly" },
-                { label: "不定期更新", value: "irregular" },
-              ]}
-              onChange={(value) => setQuery((prev) => ({ ...prev, updateFrequency: value }))}
-            />
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ whiteSpace: "nowrap" }}>公开方式：</span>
+              <Select
+                allowClear
+                size="middle"
+                placeholder="公开方式"
+                value={query.visibility}
+                style={{ width: "100%" }}
+                options={[
+                  { label: "全部", value: undefined },
+                  { label: "组织内公开", value: "组织内公开" },
+                  { label: "指定部门可见", value: "指定部门可见" },
+                  { label: "仅本人可见", value: "仅本人可见" },
+                ]}
+                onChange={(value) => setQuery((prev) => ({ ...prev, visibility: value }))}
+              />
+            </div>
           </Col>
           <Col span={4}>
-            <Select
-              showSearch
-              allowClear
-              size="middle"
-              placeholder="数据来源单位"
-              value={query.sourceUnit}
-              style={{ width: "100%" }}
-              options={[
-                { label: "全部", value: undefined },
-                { label: "区大数据发展管理局", value: "区大数据发展管理局" },
-                { label: "区发改委", value: "区发改委" },
-                { label: "镇街A", value: "镇街A" },
-                { label: "国企B", value: "国企B" },
-              ]}
-              onChange={(value) => setQuery((prev) => ({ ...prev, sourceUnit: value }))}
-            />
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ whiteSpace: "nowrap" }}>来源单位：</span>
+              <Select
+                showSearch
+                allowClear
+                size="middle"
+                placeholder="数据来源单位"
+                value={query.sourceUnit}
+                style={{ width: "100%" }}
+                options={[
+                  { label: "全部", value: undefined },
+                  { label: "区大数据发展管理局", value: "区大数据发展管理局" },
+                  { label: "区发改委", value: "区发改委" },
+                  { label: "镇街A", value: "镇街A" },
+                  { label: "国企B", value: "国企B" },
+                ]}
+                onChange={(value) => setQuery((prev) => ({ ...prev, sourceUnit: value }))}
+              />
+            </div>
           </Col>
           <Col span={4}>
-            <DatePicker.RangePicker
-              size="middle"
-              style={{ width: "100%" }}
-              placeholder={["开始日期", "结束日期"]}
-              onChange={(value) => {
-                const start = value?.[0]?.format("YYYY-MM-DD");
-                const end = value?.[1]?.format("YYYY-MM-DD");
-                if (!start || !end) {
-                  setQuery((prev) => ({ ...prev, dateRange: null }));
-                  return;
-                }
-                setQuery((prev) => ({ ...prev, dateRange: [start, end] }));
-              }}
-            />
-          </Col>
-          <Col span={4}>
-            <Input.Search
-              size="middle"
-              value={query.keyword}
-              placeholder="文件名、摘要、关键词"
-              enterButton="搜索"
-              onChange={(event) => setQuery((prev) => ({ ...prev, keyword: event.target.value }))}
-              onSearch={() => setAppliedQuery(query)}
-            />
-          </Col>
-          <Col span={3}>
-            <Space>
-              <Button type="primary" icon={<SearchOutlined />} onClick={() => setAppliedQuery(query)}>查询</Button>
-              <Button
-                onClick={() => {
-                  setQuery(defaultQuery);
-                  setAppliedQuery(defaultQuery);
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ whiteSpace: "nowrap" }}>上报时间：</span>
+              <DatePicker.RangePicker
+                size="middle"
+                style={{ width: "100%" }}
+                placeholder={["上报开始", "上报结束"]}
+                onChange={(value) => {
+                  const start = value?.[0]?.format("YYYY-MM-DD");
+                  const end = value?.[1]?.format("YYYY-MM-DD");
+                  if (!start || !end) {
+                    setQuery((prev) => ({ ...prev, dateRange: null }));
+                    return;
+                  }
+                  setQuery((prev) => ({ ...prev, dateRange: [start, end] }));
                 }}
-              >
-                重置
-              </Button>
-            </Space>
+              />
+            </div>
+          </Col>
+          <Col span={4}>
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ whiteSpace: "nowrap" }}>关键词：</span>
+              <Input.Search
+                size="middle"
+                value={query.keyword}
+                placeholder="文件名、摘要、关键词"
+                enterButton="搜索"
+                onChange={(event) => setQuery((prev) => ({ ...prev, keyword: event.target.value }))}
+                onSearch={() => setAppliedQuery(query)}
+              />
+            </div>
+          </Col>
+          <Col flex="auto" style={{ textAlign: "right" }}>
+            <div style={{ display: "flex", justifyContent: "flex-end" }}>
+              <Space>
+                <Button type="primary" icon={<SearchOutlined />} onClick={() => setAppliedQuery(query)}>查询</Button>
+                <Button
+                  onClick={() => {
+                    setQuery(defaultQuery);
+                    setAppliedQuery(defaultQuery);
+                  }}
+                >
+                  重置
+                </Button>
+              </Space>
+            </div>
           </Col>
         </Row>
         </div>
@@ -491,4 +476,5 @@ const KnowledgeBaseDetailPage: React.FC = () => {
 };
 
 export default KnowledgeBaseDetailPage;
+
 

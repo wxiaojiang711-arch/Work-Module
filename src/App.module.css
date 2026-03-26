@@ -27,6 +27,18 @@
   padding: 0;
 }
 
+.navSiderNoHeader {
+  height: 100vh;
+}
+
+.mainLayoutNoHeader {
+  height: 100vh;
+}
+
+.contentNoHeader {
+  height: 100vh;
+}
+
 .placeholderWrap {
   height: 100%;
   padding: 16px;

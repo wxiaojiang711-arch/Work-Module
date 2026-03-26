@@ -1,12 +1,13 @@
 ﻿import React, { useMemo, useState } from "react";
 import { Breadcrumb, Button, Card, Space, Steps, Typography, message } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import FormDesignStep from "./FormDesignStep";
 import PermissionStep from "./PermissionStep";
 import type { FormConfig } from "./constants";
-import { categories } from "../FileTemplateManagement/templateConstants";
+import { categories, templateFormsMock } from "../FileTemplateManagement/templateConstants";
+import { workModulePresetFields } from "./workModulePreset";
 
 const initialFormConfig: FormConfig = {
   formSchema: [],
@@ -15,11 +16,38 @@ const initialFormConfig: FormConfig = {
   viewPermissions: [],
 };
 
+const isWorkModuleTemplate = (formId?: string): boolean => {
+  if (!formId) {
+    return false;
+  }
+  if (formId === "form-work-module") {
+    return true;
+  }
+  const matched = templateFormsMock.find((item) => item.id === formId);
+  return matched?.name?.includes("部门工作模块") ?? false;
+};
+
+const getInitialFormConfig = (formId?: string, preset?: string): FormConfig => {
+  if (preset === "work-module" || isWorkModuleTemplate(formId)) {
+    return {
+      ...initialFormConfig,
+      formSchema: workModulePresetFields,
+    };
+  }
+  return initialFormConfig;
+};
+
 const FormBuilder: React.FC = () => {
   const navigate = useNavigate();
+  const { search } = useLocation();
   const { categoryId, formId } = useParams<{ categoryId?: string; formId?: string }>();
+  const preset = useMemo(() => new URLSearchParams(search).get("preset") ?? undefined, [search]);
   const [currentStep, setCurrentStep] = useState(0);
-  const [formConfig, setFormConfig] = useState<FormConfig>(initialFormConfig);
+  const [formConfig, setFormConfig] = useState<FormConfig>(() => getInitialFormConfig(formId, preset));
+
+  React.useEffect(() => {
+    setFormConfig(getInitialFormConfig(formId, preset));
+  }, [formId, preset]);
 
   const stepItems = useMemo(
     () => [
@@ -65,51 +93,34 @@ const FormBuilder: React.FC = () => {
   const listPath = `/template/${currentCategory?.id ?? "department"}`;
   const isEditMode = Boolean(formId);
   const pageTitle = isEditMode ? "编辑表单" : "创建表单";
+  const showUpdateFrequency = isEditMode || preset === "work-module";
 
   return (
     <div style={{ padding: 16, height: "100%", overflow: "auto", background: "#f3f6fb" }}>
       <Card style={{ marginBottom: 12 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12 }}>
-          <div>
-            <Breadcrumb
-              items={[
-                { title: <Link to="/template">文件模板管理</Link> },
-                { title: <Link to={listPath}>{currentCategory?.title ?? "部门工作模块"}</Link> },
-                { title: pageTitle },
-              ]}
-            />
-            <Typography.Title level={5} style={{ margin: "10px 0 0" }}>
-              {pageTitle}
-            </Typography.Title>
-          </div>
-
-          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate(listPath)}>
-            返回表单列表
-          </Button>
-        </div>
-      </Card>
-
-      <Card>
-        <Steps current={currentStep} items={stepItems} />
+        <Breadcrumb
+          items={[
+            { title: <Link to="/template">文件模板管理</Link> },
+            { title: <Link to={listPath}>{currentCategory?.title ?? "部门工作模块"}</Link> },
+            { title: pageTitle },
+          ]}
+        />
+        <Typography.Title level={5} style={{ margin: "10px 0 0" }}>
+          {pageTitle}
+        </Typography.Title>
       </Card>
 
       <div style={{ marginTop: 16, marginBottom: 88 }}>
-        {currentStep === 0 ? (
-          <FormDesignStep
-            formSchema={formConfig.formSchema}
-            setFormSchema={(updater) =>
-              setFormConfig((prev) => ({
-                ...prev,
-                formSchema: typeof updater === "function" ? updater(prev.formSchema) : updater,
-              }))
-            }
-          />
-        ) : (
-          <PermissionStep
-            formConfig={formConfig}
-            onChange={(patch) => setFormConfig((prev) => ({ ...prev, ...patch }))}
-          />
-        )}
+        <FormDesignStep
+          showUpdateFrequency={showUpdateFrequency}
+          formSchema={formConfig.formSchema}
+          setFormSchema={(updater) =>
+            setFormConfig((prev) => ({
+              ...prev,
+              formSchema: typeof updater === "function" ? updater(prev.formSchema) : updater,
+            }))
+          }
+        />
       </div>
 
       <div
@@ -126,18 +137,9 @@ const FormBuilder: React.FC = () => {
           zIndex: 12,
         }}
       >
-        {currentStep === 0 ? (
-          <Button type="primary" onClick={handleNext}>
-            下一步
-          </Button>
-        ) : (
-          <Space>
-            <Button onClick={() => setCurrentStep(0)}>上一步</Button>
-            <Button type="primary" onClick={handlePublish}>
-              发布表单
-            </Button>
-          </Space>
-        )}
+        <Button type="primary" onClick={handlePublish}>
+          发布表单
+        </Button>
       </div>
     </div>
   );

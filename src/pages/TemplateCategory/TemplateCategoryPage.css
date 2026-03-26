@@ -1,83 +1,66 @@
 ﻿.template-category-page {
   height: 100%;
-  padding: 20px;
   background: #f3f6fb;
   overflow-y: auto;
-  overflow-x: auto;
+  display: flex;
+  flex-direction: column;
 }
 
-.template-category-header {
-  margin-bottom: 20px;
-}
-
-.template-category-title {
-  margin-bottom: 8px !important;
-}
-
-.template-category-desc {
-  color: #8c8c8c;
-  margin: 0;
-}
-
-.template-category-row {
-  min-width: 1950px;
+.template-category-cards {
+  margin-bottom: 4px;
+  padding: 20px 20px 0 20px;
 }
 
 .template-category-card {
-  min-height: 266px;
-  width: 465px;
-  margin: 0;
   border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  padding: 24px 16px;
+  border: 1px solid #f0f0f0;
   position: relative;
   overflow: hidden;
-  transition: all 0.25s ease;
-  cursor: pointer;
-}
-
-.template-category-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 3px;
+  background: white;
 }
 
 .template-category-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
 }
 
-.template-category-body {
-  min-height: 236px;
+.template-category-card-active {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.template-category-card-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 16px;
 }
 
-.template-category-content {
-  text-align: center;
+.template-category-card-title {
+  font-size: 18px;
+  font-weight: 500;
+  color: #262626;
+  margin-bottom: 8px;
 }
 
-.template-category-icon {
-  font-size: 52px;
-  margin-bottom: 10px;
-}
-
-.template-category-icon--soe {
-  transform: scale(1.12);
-}
-
-.template-category-name {
-  margin-bottom: 6px !important;
-}
-
-.template-category-info {
-  font-size: 15px;
+.template-category-card-desc {
+  font-size: 14px;
   color: #8c8c8c;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
-.template-category-col {
-  display: flex;
+.template-category-content-wrapper {
+  flex: 1;
+  overflow: hidden;
+}
+
+.template-category-content-wrapper > div {
+  height: 100%;
 }

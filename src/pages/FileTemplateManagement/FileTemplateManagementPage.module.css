@@ -5,8 +5,47 @@
   overflow-y: auto;
 }
 
+.tabContainer {
+  display: flex;
+  gap: 0;
+  margin-bottom: 16px;
+  background: white;
+  border-radius: 10px 10px 0 0;
+  overflow: hidden;
+}
+
+.tabItem {
+  height: 50px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  background: #f5f5f5;
+  border-right: 1px solid #e8e8e8;
+  font-size: 14px;
+  color: #666;
+  transition: all 0.3s ease;
+  flex: 1;
+  justify-content: center;
+}
+
+.tabItem:last-child {
+  border-right: none;
+}
+
+.tabItem:hover {
+  background: #efefef;
+}
+
+.tabItemActive {
+  background: white;
+  color: #1890ff;
+  border-bottom: 3px solid #1890ff;
+  font-weight: 500;
+}
+
 .card {
-  border-radius: 10px;
+  border-radius: 0 10px 10px 10px;
 }
 
 .filterRow {

@@ -3,14 +3,10 @@ import {
   Breadcrumb,
   Button,
   Card,
-  Col,
   Descriptions,
   Input,
   Modal,
-  Progress,
-  Row,
   Space,
-  Statistic,
   Table,
   Tag,
   Typography,
@@ -70,14 +66,15 @@ const TaskDetailPage: React.FC = () => {
       width: 320,
       render: (_value, record) => (
         <Space size={1}>
-          <Button
-            type="link"
-            style={{ paddingInline: 4 }}
-            disabled={record.fillStatus !== "submitted"}
-            onClick={() => message.info(`查看 ${record.unitName} 数据（示例）`)}
-          >
-            查看数据
-          </Button>
+          <Link to={`/task/${task.id}/view/${record.unitId}`}>
+            <Button
+              type="link"
+              style={{ paddingInline: 4 }}
+              disabled={record.fillStatus !== "submitted"}
+            >
+              查看数据
+            </Button>
+          </Link>
           <Button
             type="link"
             danger
@@ -132,33 +129,17 @@ const TaskDetailPage: React.FC = () => {
             <Descriptions.Item label="开始时间">{task.startTime}</Descriptions.Item>
             <Descriptions.Item label="截止时间">{task.deadline}</Descriptions.Item>
             <Descriptions.Item label="关联表单数">{task.formCount}</Descriptions.Item>
+            <Descriptions.Item label="应填单位数">{totalCount}</Descriptions.Item>
+            <Descriptions.Item label="已完成单位数">
+              <span style={{ color: "#3f8600" }}>{completedCount}</span>
+            </Descriptions.Item>
+            <Descriptions.Item label="未完成单位数">
+              <span style={{ color: "#cf1322" }}>{pendingCount}</span>
+            </Descriptions.Item>
             <Descriptions.Item label="任务描述" span={3}>
               {task.description ?? "-"}
             </Descriptions.Item>
           </Descriptions>
-        </Card>
-
-        <Row gutter={12}>
-          <Col span={8}>
-            <Card>
-              <Statistic title="应填单位数" value={totalCount} />
-            </Card>
-          </Col>
-          <Col span={8}>
-            <Card>
-              <Statistic title="已完成" value={completedCount} valueStyle={{ color: "#3f8600" }} />
-            </Card>
-          </Col>
-          <Col span={8}>
-            <Card>
-              <Statistic title="未完成" value={pendingCount} valueStyle={{ color: "#cf1322" }} />
-            </Card>
-          </Col>
-        </Row>
-
-        <Card>
-          <Typography.Title level={5} style={{ marginTop: 0 }}>整体进度</Typography.Title>
-          <Progress percent={percent} />
         </Card>
 
         <Card title="各单位填报明细">

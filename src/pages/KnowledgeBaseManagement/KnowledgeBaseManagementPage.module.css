@@ -102,3 +102,153 @@
   justify-content: center;
   padding: 60px 0;
 }
+
+.modalSectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.modalSection {
+  margin-bottom: 24px;
+}
+
+.sectionSubTitle {
+  margin-bottom: 8px !important;
+  color: #999 !important;
+  font-size: 13px !important;
+}
+
+.modalInput :global(.ant-select-selector),
+.modalInput {
+  min-height: 40px;
+}
+
+.modalInput :global(.ant-select-selection-placeholder),
+.modalInput :global(.ant-select-selection-item),
+.modalInput :global(.ant-input) {
+  line-height: 40px;
+  font-size: 14px;
+}
+
+.modalInput :global(.ant-input),
+.modalInput :global(.ant-select-selector) {
+  border-radius: 6px !important;
+}
+
+.visibilityGroup {
+  width: 100%;
+}
+
+.visibilityCard {
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  background: #fff;
+  padding: 12px;
+}
+
+.visibilityCardActive {
+  border-color: #2b5cd6;
+  background: #e6f0ff;
+}
+
+.visibilityRadio {
+  width: 100%;
+}
+
+.visibilityRadio :global(.ant-radio) {
+  top: 2px;
+}
+
+.visibilityRadio :global(.ant-radio + *) {
+  width: calc(100% - 24px);
+  padding-inline-start: 8px;
+}
+
+.visibilityTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.visibilityDesc {
+  font-size: 13px;
+  color: #999;
+}
+
+.tagList {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.blueTag,
+.greenTag {
+  height: 28px;
+  padding: 6px 12px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.blueTag {
+  background: #e6f0ff;
+  color: #2b5cd6;
+}
+
+.greenTag {
+  background: #e6f7e6;
+  color: #52c41a;
+}
+
+.tagClose {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  padding: 0;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.tagClose:hover {
+  color: #f5222d;
+}
+
+.fieldHint {
+  display: inline-block;
+  margin-top: 8px;
+  color: #999 !important;
+  font-size: 13px;
+}
+
+.uploadPermissionRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.uploadNested {
+  margin-left: 24px;
+}
+
+.permissionNotice {
+  background: #f5f7fa;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 12px;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.permissionNoticeTitle {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 6px;
+}

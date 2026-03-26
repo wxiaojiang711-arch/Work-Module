@@ -1,0 +1,66 @@
+﻿.pageLayout {
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  display: flex;
+  flex-direction: column;
+}
+
+.contentArea {
+  flex: 1;
+  display: flex;
+  padding: 0;
+  gap: 0;
+  max-width: 100%;
+  margin: 0;
+}
+
+.historySidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: #fff;
+  padding: 16px;
+  height: calc(100vh - 200px);
+  overflow-y: auto;
+  border-right: 1px solid #f0f0f0;
+}
+
+.sessionItem {
+  display: block;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 6px 8px;
+}
+
+.sessionItemActive {
+  background: #e6f4ff;
+  border-left: 3px solid #1677ff;
+}
+
+.sessionTitle {
+  font-size: 13px;
+  font-weight: 500;
+  margin-left: -15px;
+}
+
+.sessionTime {
+  font-size: 12px;
+}
+
+.sidebarLoading {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 1200px) {
+  .contentArea {
+    flex-direction: column;
+  }
+
+  .historySidebar {
+    width: 100%;
+    height: auto;
+    max-height: 300px;
+  }
+}

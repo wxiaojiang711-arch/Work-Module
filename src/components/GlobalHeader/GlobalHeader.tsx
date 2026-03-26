@@ -75,7 +75,7 @@ const GlobalHeader: React.FC = () => {
           <Space align="center">
             <DatabaseOutlined style={{ fontSize: 24, color: "#1890ff" }} />
             <Typography.Title level={5} style={{ marginBottom: 0, marginLeft: 8, color: "#333", whiteSpace: "nowrap" }}>
-              工作模块数据平台
+              工作模块数字化平台
             </Typography.Title>
           </Space>
         </div>

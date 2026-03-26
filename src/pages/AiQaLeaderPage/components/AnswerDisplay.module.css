@@ -1,0 +1,17 @@
+﻿.answerArea {
+  flex: 1;
+  min-width: 0;
+  padding: 16px;
+  background: #f0f2f5;
+  overflow-y: auto;
+  height: calc(100vh - 200px);
+}
+
+.emptyWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: #fff;
+  border-radius: 8px;
+}

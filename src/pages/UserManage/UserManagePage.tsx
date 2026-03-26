@@ -377,69 +377,81 @@ const UserManagePage: React.FC = () => {
           <div className={styles.filterWrap}>
             <Row gutter={[12, 12]} align="middle">
               <Col span={5}>
-                <Input.Search
-                  allowClear
-                  placeholder="姓名/账号"
-                  value={query.keyword}
-                  onChange={(event) => setQuery((prev) => ({ ...prev, keyword: event.target.value }))}
-                  onSearch={() => setAppliedQuery(query)}
-                />
+                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <span style={{ whiteSpace: "nowrap" }}>姓名/账号：</span>
+                  <Input.Search
+                    allowClear
+                    placeholder="姓名/账号"
+                    value={query.keyword}
+                    onChange={(event) => setQuery((prev) => ({ ...prev, keyword: event.target.value }))}
+                    onSearch={() => setAppliedQuery(query)}
+                  />
+                </div>
               </Col>
               <Col span={7}>
-                <Select
-                  mode="multiple"
-                  allowClear
-                  maxTagCount={2}
-                  placeholder="用户角色"
-                  style={{ width: "100%" }}
-                  value={query.roles}
-                  options={roleFilterOptions}
-                  onChange={(value: string[]) => {
-                    if (value.includes("__all__")) {
-                      setQuery((prev) => ({ ...prev, roles: [] }));
-                      return;
-                    }
-                    setQuery((prev) => ({ ...prev, roles: value }));
-                  }}
-                />
+                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <span style={{ whiteSpace: "nowrap" }}>用户角色：</span>
+                  <Select
+                    mode="multiple"
+                    allowClear
+                    maxTagCount={2}
+                    placeholder="用户角色"
+                    style={{ width: "100%" }}
+                    value={query.roles}
+                    options={roleFilterOptions}
+                    onChange={(value: string[]) => {
+                      if (value.includes("__all__")) {
+                        setQuery((prev) => ({ ...prev, roles: [] }));
+                        return;
+                      }
+                      setQuery((prev) => ({ ...prev, roles: value }));
+                    }}
+                  />
+                </div>
               </Col>
               <Col span={4}>
-                <Select
-                  allowClear
-                  placeholder="用户状态"
-                  style={{ width: "100%" }}
-                  value={query.status}
-                  options={[
-                    { label: "全部", value: undefined },
-                    { label: "启用", value: "active" },
-                    { label: "停用", value: "disabled" },
-                  ]}
-                  onChange={(value) => setQuery((prev) => ({ ...prev, status: value }))}
-                />
+                <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                  <span style={{ whiteSpace: "nowrap" }}>用户状态：</span>
+                  <Select
+                    allowClear
+                    placeholder="用户状态"
+                    style={{ width: "100%" }}
+                    value={query.status}
+                    options={[
+                      { label: "全部", value: undefined },
+                      { label: "启用", value: "active" },
+                      { label: "停用", value: "disabled" },
+                    ]}
+                    onChange={(value) => setQuery((prev) => ({ ...prev, status: value }))}
+                  />
+                </div>
               </Col>
-              <Col span={4}>
-                <Space>
-                  <Button type="primary" onClick={() => setAppliedQuery(query)}>
-                    查询
-                  </Button>
-                  <Button onClick={resetFilters}>重置</Button>
-                </Space>
-              </Col>
-              <Col span={4} style={{ textAlign: "right" }}>
-                <Button
-                  type="primary"
-                  icon={<UserAddOutlined />}
-                  onClick={() => {
-                    setFormMode("create");
-                    setEditingUser(null);
-                    setFocusSection("basic");
-                    setFormOpen(true);
-                  }}
-                >
-                  新增用户
-                </Button>
+              <Col span={8} style={{ textAlign: "right" }}>
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <Space>
+                    <Button type="primary" onClick={() => setAppliedQuery(query)}>
+                      查询
+                    </Button>
+                    <Button onClick={resetFilters}>重置</Button>
+                  </Space>
+                </div>
               </Col>
             </Row>
+          </div>
+
+          <div style={{ marginBottom: 12 }}>
+            <Button
+              type="primary"
+              icon={<UserAddOutlined />}
+              onClick={() => {
+                setFormMode("create");
+                setEditingUser(null);
+                setFocusSection("basic");
+                setFormOpen(true);
+              }}
+            >
+              同步用户
+            </Button>
           </div>
 
           <Table<UserItem>
@@ -492,3 +504,4 @@ const UserManagePage: React.FC = () => {
 };
 
 export default UserManagePage;
+

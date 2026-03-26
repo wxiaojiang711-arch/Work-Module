@@ -1,15 +1,11 @@
-﻿import React, { useMemo, useState } from "react";
+﻿import React, { useState } from "react";
 import type { MenuProps, TableProps } from "antd";
 import {
   Button,
-  Col,
-  DatePicker,
   Dropdown,
   Input,
   Popconfirm,
   Progress,
-  Row,
-  Select,
   Space,
   Table,
   Tag,
@@ -31,9 +27,6 @@ const TaskListPage: React.FC = () => {
   const navigate = useNavigate();
 
   const [taskList, setTaskList] = useState<TaskItem[]>(taskListMock);
-  const [keyword, setKeyword] = useState("");
-  const [statusFilter, setStatusFilter] = useState<"all" | TaskStatus>("all");
-  const [rangeText, setRangeText] = useState<[string, string] | null>(null);
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
   const [originalName, setOriginalName] = useState("");
@@ -98,16 +91,6 @@ const TaskListPage: React.FC = () => {
     setOriginalName("");
   };
 
-  const filteredList = useMemo(() => {
-    return taskList.filter((item) => {
-      const matchKeyword = !keyword.trim() || item.name.toLowerCase().includes(keyword.trim().toLowerCase());
-      const matchStatus = statusFilter === "all" || item.status === statusFilter;
-      const matchRange =
-        !rangeText || (item.createdAt.slice(0, 10) >= rangeText[0] && item.createdAt.slice(0, 10) <= rangeText[1]);
-      return matchKeyword && matchStatus && matchRange;
-    });
-  }, [keyword, rangeText, statusFilter, taskList]);
-
   const columns: TableProps<TaskItem>["columns"] = [
     {
       title: "任务名称",
@@ -165,7 +148,7 @@ const TaskListPage: React.FC = () => {
     {
       title: "操作",
       key: "actions",
-      width: 460,
+      width: 280,
       fixed: "right",
       render: (_value, record) => {
         if (record.id === editingRowId) {
@@ -209,7 +192,7 @@ const TaskListPage: React.FC = () => {
         ];
 
         return (
-          <Space size={0}>
+          <Space size={0} wrap>
             <Button type="link" style={{ paddingInline: 4 }} onClick={() => navigate(`/task/detail/${record.id}`)}>
               查看进度
             </Button>
@@ -257,61 +240,14 @@ const TaskListPage: React.FC = () => {
     <div style={{ padding: 20, background: "#f3f6fb", height: "100%", overflow: "auto" }}>
       <Typography.Title level={5} style={{ marginTop: 0 }}>采集任务</Typography.Title>
 
-      <Row gutter={[12, 12]} style={{ marginBottom: 12 }} align="middle" justify="space-between">
-        <Col>
-          <Space wrap>
-            <Input.Search
-              placeholder="请输入任务名称"
-              allowClear
-              style={{ width: 260 }}
-              value={keyword}
-              onChange={(event) => setKeyword(event.target.value)}
-            />
-            <Select
-              style={{ width: 140 }}
-              value={statusFilter}
-              options={[
-                { label: "全部", value: "all" },
-                { label: "待开始", value: "pending" },
-                { label: "采集中", value: "collecting" },
-                { label: "已结束", value: "finished" },
-              ]}
-              onChange={(value) => setStatusFilter(value)}
-            />
-            <DatePicker.RangePicker
-              onChange={(value) => {
-                const start = value?.[0]?.format("YYYY-MM-DD");
-                const end = value?.[1]?.format("YYYY-MM-DD");
-                if (!start || !end) {
-                  setRangeText(null);
-                  return;
-                }
-                setRangeText([start, end]);
-              }}
-            />
-            <Button type="primary">查询</Button>
-            <Button
-              onClick={() => {
-                setKeyword("");
-                setStatusFilter("all");
-                setRangeText(null);
-              }}
-            >
-              重置
-            </Button>
-          </Space>
-        </Col>
-
-        <Col>
-          <Button type="primary" onClick={() => navigate("/task/create")}>创建采集任务</Button>
-        </Col>
-      </Row>
+      <div style={{ marginBottom: 12 }}>
+        <Button type="primary" onClick={() => navigate("/task/create")}>创建采集任务</Button>
+      </div>
 
       <Table<TaskItem>
         rowKey="id"
         columns={columns}
-        dataSource={filteredList}
-        scroll={{ x: 1700 }}
+        dataSource={taskList}
         locale={{ emptyText: "暂无采集任务" }}
         pagination={{
           showSizeChanger: true,
@@ -325,4 +261,3 @@ const TaskListPage: React.FC = () => {
 };
 
 export default TaskListPage;
-

@@ -1,0 +1,58 @@
+.tabContainer {
+  padding-top: 8px;
+}
+
+.tabHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.tabTitle {
+  margin: 0 !important;
+}
+
+.formRow {
+  display: flex;
+  gap: 12px;
+}
+
+.formCol {
+  flex: 1;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.tagWrap {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tagItem {
+  margin-inline-end: 0 !important;
+}
+
+.relationList {
+  margin-top: 10px;
+}
+
+.versionItem {
+  padding-bottom: 4px;
+}
+
+.versionMeta {
+  display: flex;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.versionSummary {
+  margin: 8px 0 !important;
+}
+

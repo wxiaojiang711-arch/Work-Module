@@ -1,7 +1,6 @@
 ﻿import React, { useMemo, useState } from "react";
 import { Breadcrumb, Button, Card, DatePicker, Space, Steps, message } from "antd";
 import dayjs from "dayjs";
-import { ArrowLeftOutlined } from "@ant-design/icons";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import TaskBasicInfoStep from "./TaskBasicInfoStep";
@@ -18,6 +17,7 @@ const TaskFormPage: React.FC = () => {
 
   const [taskConfig, setTaskConfig] = useState<TaskConfig>({
     name: currentTask?.name ?? "",
+    urgency: "normal",
     timeRange: currentTask
       ? [dayjs(currentTask.startTime), dayjs(currentTask.deadline)]
       : [null, null],
@@ -29,8 +29,22 @@ const TaskFormPage: React.FC = () => {
   });
 
   const stepItems = [
-    { title: "基本信息", description: "填写任务名称、时间及说明" },
-    { title: "选择表单模板", description: "关联需要采集的文件模板" },
+    {
+      title: "基本信息",
+      description: (
+        <span style={{ whiteSpace: "nowrap", lineHeight: "20px", display: "inline-block" }}>
+          填写任务名称、时间及说明
+        </span>
+      ),
+    },
+    {
+      title: "选择表单模板",
+      description: (
+        <span style={{ whiteSpace: "nowrap", lineHeight: "20px", display: "inline-block" }}>
+          关联需要采集的文件模板
+        </span>
+      ),
+    },
     { title: "权限配置", description: "设置填写与查看权限" },
   ];
 
@@ -83,22 +97,12 @@ const TaskFormPage: React.FC = () => {
   return (
     <div style={{ padding: 16, background: "#f3f6fb", height: "100%", overflow: "auto" }}>
       <Card style={{ marginBottom: 12 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <div>
-            <Breadcrumb
-              items={[
-                { title: <Link to="/task">采集任务</Link> },
-                { title: taskId ? "编辑采集任务" : "创建采集任务" },
-              ]}
-            />
-            <div style={{ marginTop: 8, fontSize: 24, fontWeight: 600 }}>
-              {taskId ? "编辑采集任务" : "创建采集任务"}
-            </div>
-          </div>
-          <Button icon={<ArrowLeftOutlined />} onClick={() => navigate("/task")}>
-            返回任务列表
-          </Button>
-        </div>
+        <Breadcrumb
+          items={[
+            { title: <Link to="/task">采集任务</Link> },
+            { title: taskId ? "编辑采集任务" : "创建采集任务" },
+          ]}
+        />
       </Card>
 
       <Card>
@@ -109,7 +113,10 @@ const TaskFormPage: React.FC = () => {
         {currentStep === 0 ? (
           <Space direction="vertical" style={{ width: "100%" }} size={16}>
             <div style={{ maxWidth: 700, margin: "0 auto" }}>
-              <div style={{ marginBottom: 8, fontWeight: 500 }}>任务时间</div>
+              <div style={{ marginBottom: 8, fontWeight: 500 }}>
+                <span style={{ color: "#ff4d4f", marginRight: 4 }}>*</span>
+                任务时间
+              </div>
               <DatePicker.RangePicker
                 showTime
                 style={{ width: "100%" }}
@@ -168,3 +175,4 @@ const TaskFormPage: React.FC = () => {
 };
 
 export default TaskFormPage;
+

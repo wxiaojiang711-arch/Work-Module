@@ -1,125 +1,68 @@
-﻿import React from "react";
-import { AppstoreOutlined, BankOutlined, GoldOutlined, HomeOutlined } from "@ant-design/icons";
-import { Card, Col, Row, Tag, Typography } from "antd";
+﻿import React, { useState } from "react";
+import { Suspense } from "react";
+import { AppstoreOutlined, BankOutlined, FileSearchOutlined } from "@ant-design/icons";
+import { Card, Row, Col } from "antd";
 import { useNavigate } from "react-router-dom";
 
-import { categories } from "../FileTemplateManagement/templateConstants";
 import "./TemplateCategoryPage.css";
 
-const iconMap = {
-  department: BankOutlined,
-  town: HomeOutlined,
-  soe: GoldOutlined,
-  theme: AppstoreOutlined,
-};
+const FormListPage = React.lazy(() => import("../FormList"));
+const OrganizationListPage = React.lazy(() => import("../FormList/OrganizationListPage"));
 
-const themeMap = {
-  department: {
-    main: "#2f7ef7",
-    top: "#3f8cff",
-    bg: "linear-gradient(180deg, #f3f8ff 0%, #ffffff 68%)",
-    tagBg: "#e6f4ff",
-  },
-  town: {
-    main: "#3fa64a",
-    top: "#54b560",
-    bg: "linear-gradient(180deg, #f3fbf4 0%, #ffffff 68%)",
-    tagBg: "#eef9ef",
-  },
-  soe: {
-    main: "#d67b17",
-    top: "#eb8f2a",
-    bg: "linear-gradient(180deg, #fff7ef 0%, #ffffff 68%)",
-    tagBg: "#fff2e8",
-  },
-  theme: {
-    main: "#6f3cc2",
-    top: "#8450d3",
-    bg: "linear-gradient(180deg, #f8f3ff 0%, #ffffff 68%)",
-    tagBg: "#f1e9ff",
-  },
-};
+type TabType = "decision" | "department" | "theme";
 
 const TemplateCategoryPage: React.FC = () => {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<TabType>("decision");
+
+  const tabs: Array<{ key: TabType; label: string; desc: string; icon: React.ReactNode; color: string; bgColor: string }> = [
+    { key: "decision", label: "决策库", desc: "管理各类决策相关文件", icon: <FileSearchOutlined />, color: "#13c2c2", bgColor: "#e6fffb" },
+    { key: "department", label: "单位库", desc: "管理各类单位相关文件", icon: <BankOutlined />, color: "#2f7ef7", bgColor: "#f3f8ff" },
+    { key: "theme", label: "主题库", desc: "管理各类主题相关文件", icon: <AppstoreOutlined />, color: "#6f3cc2", bgColor: "#f8f3ff" },
+  ];
 
   return (
     <div className="template-category-page">
-      <div className="template-category-header">
-        <Typography.Title level={5} className="template-category-title">
-          文件模板管理
-        </Typography.Title>
-        <Typography.Paragraph className="template-category-desc">
-          请选择工作模块，进入对应的表单模板列表进行管理。
-        </Typography.Paragraph>
-      </div>
-
-      <Row gutter={[24, 24]} wrap={false} className="template-category-row">
-        {categories.map((category) => {
-          const Icon = iconMap[category.id];
-          const theme = themeMap[category.id];
-
-          return (
-            <Col key={category.id} flex="0 0 465px" className="template-category-col">
-              <Card
-                hoverable
-                className="template-category-card"
-                bodyStyle={{ padding: 16 }}
-                style={{
-                  minHeight: 266,
-                  background: theme.bg,
-                }}
-                onClick={() => navigate(`/template/${category.id}`)}
-              >
-                <div className="template-category-body">
-                  <div className="template-category-content">
-                    <div
-                      className={`template-category-icon ${
-                        category.id === "soe" ? "template-category-icon--soe" : ""
-                      }`}
-                      style={{ color: theme.main }}
-                    >
-                      <Icon />
-                    </div>
-
-                    <Typography.Title level={5} className="template-category-name">
-                      {category.title}
-                    </Typography.Title>
-
-                    <Typography.Paragraph className="template-category-info">
-                      {category.description}
-                    </Typography.Paragraph>
-
-                    <Tag
-                      style={{
-                        color: theme.main,
-                        background: theme.tagBg,
-                        borderColor: "transparent",
-                        fontSize: 14,
-                        paddingInline: 12,
-                        lineHeight: "28px",
-                      }}
-                    >
-                      共 {category.count} 个表单模板
-                    </Tag>
-                  </div>
-                </div>
-
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: 3,
-                    background: theme.top,
-                  }}
-                />
-              </Card>
-            </Col>
-          );
-        })}
+      <Row gutter={[16, 16]} className="template-category-cards">
+        {tabs.map((tab) => (
+          <Col key={tab.key} xs={24} sm={12} md={8} lg={8} xl={8}>
+            <Card
+              hoverable
+              className={`template-category-card ${activeTab === tab.key ? "template-category-card-active" : ""}`}
+              onClick={() => setActiveTab(tab.key)}
+              style={
+                activeTab === tab.key
+                  ? {
+                      background:
+                        tab.key === "decision"
+                          ? "linear-gradient(180deg, #e6fffb 0%, #ffffff 100%)"
+                          : tab.key === "department"
+                            ? "linear-gradient(180deg, #e6f7ff 0%, #ffffff 100%)"
+                            : "linear-gradient(180deg, #f9f0ff 0%, #ffffff 100%)",
+                      borderBottom: `3px solid ${tab.color}`,
+                    }
+                  : { background: "white", borderBottom: "1px solid #f0f0f0" }
+              }
+            >
+              <div className="template-category-card-icon" style={{ background: tab.bgColor, color: tab.color }}>
+                {tab.icon}
+              </div>
+              <div className="template-category-card-title">{tab.label}</div>
+              <div className="template-category-card-desc">{tab.desc}</div>
+            </Card>
+          </Col>
+        ))}
       </Row>
+
+      <div className="template-category-content-wrapper">
+        <Suspense fallback={null}>
+          {activeTab === "department" ? (
+            <OrganizationListPage />
+          ) : (
+            <FormListPage categoryId={activeTab} hideHeader={true} />
+          )}
+        </Suspense>
+      </div>
     </div>
   );
 };

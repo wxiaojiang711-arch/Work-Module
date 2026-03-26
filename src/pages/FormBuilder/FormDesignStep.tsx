@@ -11,9 +11,14 @@ import { createFieldByType, type FieldType, type FormField } from "./constants";
 interface FormDesignStepProps {
   formSchema: FormField[];
   setFormSchema: React.Dispatch<React.SetStateAction<FormField[]>>;
+  showUpdateFrequency?: boolean;
 }
 
-const FormDesignStep: React.FC<FormDesignStepProps> = ({ formSchema, setFormSchema }) => {
+const FormDesignStep: React.FC<FormDesignStepProps> = ({
+  formSchema,
+  setFormSchema,
+  showUpdateFrequency = true,
+}) => {
   const [activeComponentId, setActiveComponentId] = React.useState<string | null>(null);
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
@@ -30,6 +35,12 @@ const FormDesignStep: React.FC<FormDesignStepProps> = ({ formSchema, setFormSche
 
     if (!formSchema.some((item) => item.id === activeComponentId)) {
       setActiveComponentId(null);
+    }
+  }, [activeComponentId, formSchema]);
+
+  React.useEffect(() => {
+    if (!activeComponentId && formSchema.length > 0) {
+      setActiveComponentId(formSchema[0].id);
     }
   }, [activeComponentId, formSchema]);
 
@@ -119,7 +130,11 @@ const FormDesignStep: React.FC<FormDesignStepProps> = ({ formSchema, setFormSche
         </Col>
 
         <Col span={6}>
-          <PropertyInspector activeComponent={activeComponent} onUpdateComponent={onUpdateComponent} />
+          <PropertyInspector
+            activeComponent={activeComponent}
+            onUpdateComponent={onUpdateComponent}
+            showUpdateFrequency={showUpdateFrequency}
+          />
         </Col>
       </Row>
     </DndContext>

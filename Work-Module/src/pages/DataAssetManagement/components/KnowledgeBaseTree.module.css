@@ -1,0 +1,14 @@
+.card {
+  height: 100%;
+  border-radius: 10px;
+}
+
+.title {
+  margin-bottom: 10px !important;
+  color: #1f2a44;
+}
+
+.tree {
+  padding: 6px 2px;
+}
+

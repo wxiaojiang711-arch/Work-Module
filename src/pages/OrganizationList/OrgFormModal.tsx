@@ -1,18 +1,15 @@
 ﻿import React from "react";
-import { Form, Input, InputNumber, Modal, Radio, Select } from "antd";
+import { Form, Input, InputNumber, Modal, Select } from "antd";
 
-import type { OrgStatus, OrgType, OrganizationItem } from "./orgData";
+import type { OrgType, OrganizationItem } from "./orgData";
 import { orgTypeLabelMap } from "./orgData";
 
 export interface OrgFormValues {
   fullName: string;
-  shortName: string;
-  code: string;
   type: OrgType;
   leader?: string;
   phone?: string;
   sort?: number;
-  status: OrgStatus;
   remark?: string;
 }
 
@@ -54,24 +51,15 @@ const OrgFormModal: React.FC<OrgFormModalProps> = ({
         wrapperCol={{ span: 16 }}
         initialValues={{
           fullName: record?.fullName,
-          shortName: record?.shortName,
-          code: record?.code,
           type: record?.type ?? currentType,
           leader: record?.leader,
           phone: record?.phone,
           sort: record?.sort,
-          status: record?.status ?? "active",
           remark: record?.remark,
         }}
       >
         <Form.Item name="fullName" label="组织全称" rules={[{ required: true, message: "请输入组织全称" }]}>
           <Input placeholder="请输入组织全称" />
-        </Form.Item>
-        <Form.Item name="shortName" label="组织简称" rules={[{ required: true, message: "请输入组织简称" }]}>
-          <Input placeholder="请输入组织简称" />
-        </Form.Item>
-        <Form.Item name="code" label="组织编码" rules={[{ required: true, message: "请输入组织编码" }]}>
-          <Input placeholder="请输入组织编码" disabled={mode === "edit"} />
         </Form.Item>
         <Form.Item name="type" label="组织类型" rules={[{ required: true, message: "请选择组织类型" }]}>
           <Select
@@ -90,14 +78,6 @@ const OrgFormModal: React.FC<OrgFormModalProps> = ({
         </Form.Item>
         <Form.Item name="sort" label="排序号">
           <InputNumber min={1} style={{ width: "100%" }} placeholder="数字越小越靠前" />
-        </Form.Item>
-        <Form.Item name="status" label="状态">
-          <Radio.Group
-            options={[
-              { label: "启用", value: "active" },
-              { label: "停用", value: "stopped" },
-            ]}
-          />
         </Form.Item>
         <Form.Item name="remark" label="备注">
           <Input.TextArea maxLength={200} showCount />
