@@ -3,7 +3,6 @@ import {
   Avatar,
   Badge,
   Dropdown,
-  Input,
   Layout,
   Modal,
   Popover,
@@ -17,7 +16,6 @@ import {
   DownOutlined,
   LockOutlined,
   LogoutOutlined,
-  SearchOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
@@ -81,18 +79,6 @@ const GlobalHeader: React.FC = () => {
         </div>
 
         <div className="global-header-right">
-          <Input.Search
-            placeholder="搜索知识库、表单、任务..."
-            style={{ width: 240 }}
-            enterButton={<SearchOutlined />}
-            onSearch={(value) => {
-              if (!value.trim()) {
-                return;
-              }
-              message.info(`搜索：${value}`);
-            }}
-          />
-
           <Popover
             placement="bottomRight"
             trigger="click"

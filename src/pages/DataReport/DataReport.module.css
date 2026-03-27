@@ -165,6 +165,83 @@
   margin-bottom: 12px;
 }
 
+.tabUploadEntry {
+  margin-top: 10px;
+  margin-bottom: 14px;
+  padding: 14px;
+  border: 1px solid #8fb0eb;
+  border-radius: 8px;
+  background: #f5f9ff;
+  box-shadow: inset 0 0 0 1px #bfd1f3;
+}
+
+.tabUploadHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.tabUploadTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.tabUploadHint {
+  font-size: 13px;
+  color: #999;
+}
+
+.tabUploadEntry :global(.ant-upload-list-item-actions) {
+  opacity: 1 !important;
+}
+
+.tabUploadEntry :global(.ant-upload-list-item-action) {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.formSection {
+  position: relative;
+  border-top: 1px solid #d5e2fb;
+  padding-top: 8px;
+}
+
+.formMask {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid #91b5ff;
+  box-shadow: inset 0 0 0 1px #d6e4ff;
+  border-radius: 8px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+}
+
+.formMaskTitle {
+  font-size: 17px;
+  font-weight: 600;
+  color: #1d39c4;
+  margin-bottom: 10px;
+  background: #e6f0ff;
+  border: 1px solid #bfd3ff;
+  border-radius: 20px;
+  padding: 6px 14px;
+}
+
+.formMaskDesc {
+  font-size: 14px;
+  color: #2f3a4a;
+  line-height: 1.7;
+  max-width: 560px;
+}
+
 .actionBar {
   display: flex;
   justify-content: space-between;

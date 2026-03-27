@@ -1,18 +1,16 @@
 ﻿import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
-  Breadcrumb,
   Button,
   Card,
   Collapse,
   DatePicker,
-  Dropdown,
   Form,
   Input,
-  MenuProps,
   Modal,
   Progress,
   Space,
+  Tabs,
   Tag,
   Typography,
   Upload,
@@ -24,7 +22,6 @@ import {
   CloseCircleFilled,
   DeleteOutlined,
   DownloadOutlined,
-  MoreOutlined,
   UploadOutlined,
 } from '@ant-design/icons';
 import type { UploadFile } from 'antd';
@@ -68,6 +65,27 @@ const placeholderMap: Partial<Record<FormFieldKey, string>> = {
   coordinationMatters: '如需上级部门或其他单位协调支持的事项，请具体说明',
 };
 
+interface TaskFormTabConfig {
+  key: string;
+  label: string;
+  groups: string[];
+}
+
+type TabAttachmentFiles = Record<string, UploadFile[]>;
+
+const taskFormTabsMap: Record<string, TaskFormTabConfig[]> = {
+  'task-001': [
+    { key: 'quarter-overview', label: '季度总览表', groups: ['基本信息', '本季度工作完成情况'] },
+    { key: 'highlight-problems', label: '亮点问题表', groups: ['基本信息', '特色亮点', '存在问题与困难'] },
+    { key: 'next-plan', label: '下季度计划表', groups: ['基本信息', '下季度工作计划'] },
+  ],
+  'task-002': [
+    { key: 'quarter-overview', label: '季度总览表', groups: ['基本信息', '本季度工作完成情况'] },
+    { key: 'highlight-problems', label: '亮点问题表', groups: ['基本信息', '特色亮点', '存在问题与困难'] },
+    { key: 'next-plan', label: '下季度计划表', groups: ['基本信息', '下季度工作计划'] },
+  ],
+};
+
 const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }) => {
   const isView = mode === 'view';
   const navigate = useNavigate();
@@ -81,7 +99,8 @@ const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }
   const [parseProgress, setParseProgress] = useState(0);
   const [parsedFieldCount, setParsedFieldCount] = useState(0);
   const [uploadedFile, setUploadedFile] = useState<{ name: string; size: string } | null>(null);
-  const [attachmentFiles, setAttachmentFiles] = useState<UploadFile[]>([]);
+  const [attachmentFilesByTab, setAttachmentFilesByTab] = useState<TabAttachmentFiles>({});
+  const [activeFormTab, setActiveFormTab] = useState('default-form');
 
   const [conflictOpen, setConflictOpen] = useState(false);
   const [pendingPayload, setPendingPayload] = useState<Partial<ReportFormData> | null>(null);
@@ -110,15 +129,29 @@ const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }
     [formData, requiredFields],
   );
   const progressPercent = Math.round((completedRequired / requiredFields.length) * 100);
+  const formTabs = useMemo<TaskFormTabConfig[]>(
+    () => taskFormTabsMap[taskId] ?? [{ key: 'default-form', label: '任务主表', groups: groupOrder }],
+    [taskId],
+  );
+  const activeTabGroups = useMemo(() => {
+    const activeTab = formTabs.find((tab) => tab.key === activeFormTab) ?? formTabs[0];
+    return activeTab?.groups ?? groupOrder;
+  }, [activeFormTab, formTabs]);
+  const activeTabAttachmentFiles = attachmentFilesByTab[activeFormTab] ?? [];
+  const isAttachmentModeActive = !isView && activeTabAttachmentFiles.length > 0;
 
   useEffect(() => {
     const cached = localStorage.getItem(draftKey);
     if (!cached) return;
     try {
-      const parsed = JSON.parse(cached) as { formData: ReportFormData; attachmentFiles: UploadFile[] };
+      const parsed = JSON.parse(cached) as {
+        formData: ReportFormData;
+        attachmentFilesByTab?: TabAttachmentFiles;
+        attachmentFiles?: UploadFile[];
+      };
       if (parsed?.formData) {
         setFormData(parsed.formData);
-        setAttachmentFiles(parsed.attachmentFiles || []);
+        setAttachmentFilesByTab(parsed.attachmentFilesByTab || { 'default-form': parsed.attachmentFiles || [] });
         setSavedSnapshot(JSON.stringify(parsed.formData));
         message.info('已恢复上次保存的草稿');
       }
@@ -128,14 +161,18 @@ const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }
   }, [draftKey]);
 
   useEffect(() => {
+    setActiveFormTab(formTabs[0]?.key ?? 'default-form');
+  }, [formTabs]);
+
+  useEffect(() => {
     const timer = window.setInterval(() => {
-      localStorage.setItem(draftKey, JSON.stringify({ formData, attachmentFiles }));
+      localStorage.setItem(draftKey, JSON.stringify({ formData, attachmentFilesByTab }));
     }, 30000);
     return () => window.clearInterval(timer);
-  }, [draftKey, formData, attachmentFiles]);
+  }, [draftKey, formData, attachmentFilesByTab]);
 
   const saveDraft = (notify = true) => {
-    localStorage.setItem(draftKey, JSON.stringify({ formData, attachmentFiles }));
+    localStorage.setItem(draftKey, JSON.stringify({ formData, attachmentFilesByTab }));
     setSavedSnapshot(JSON.stringify(formData));
     if (notify) message.success('草稿已保存');
   };
@@ -173,41 +210,6 @@ const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }
       ),
     });
   };
-
-  const clearForm = () => {
-    Modal.confirm({
-      title: '确认清空所有已填写的内容？',
-      okText: '确认清空',
-      cancelText: '取消',
-      onOk: () => {
-        setFormData(buildInitialFormData());
-        setAiFilledKeys(new Set());
-        setInvalidKeys(new Set());
-        setParseStatus('idle');
-        setParseProgress(0);
-        setParsedFieldCount(0);
-        setUploadedFile(null);
-      },
-    });
-  };
-
-  const moreItems: MenuProps['items'] = [
-    {
-      key: 'instruction',
-      label: '查看填报说明',
-      onClick: () => Modal.info({ title: '填报说明', content: taskInfo.description }),
-    },
-    {
-      key: 'tpl',
-      label: '下载附件模板',
-      onClick: () => message.info('模板下载功能开发中'),
-    },
-    {
-      key: 'clear',
-      label: <span style={{ color: '#ff4d4f' }}>清空表单</span>,
-      onClick: clearForm,
-    },
-  ];
 
   const applyAiResult = (payload: Partial<ReportFormData>, mode: 'overwrite' | 'fill-empty') => {
     setFormData((prev) => {
@@ -301,20 +303,7 @@ const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }
 
   return (
     <div className={styles.page}>
-      <Breadcrumb items={[{ title: '数据上报' }, { title: taskInfo.name }]} style={{ marginBottom: 12 }} />
-
-      <Card
-        className={styles.formCard}
-        title='数据上报'
-        extra={
-          <Space>
-            <Button onClick={handleBack}>返回</Button>
-            <Dropdown menu={{ items: moreItems }} trigger={['click']}>
-              <Button icon={<MoreOutlined />} />
-            </Dropdown>
-          </Space>
-        }
-      >
+      <Card className={styles.formCard}>
         <Collapse
           items={[
             {
@@ -354,8 +343,46 @@ const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }
           ]}
         />
 
-        <Form layout='vertical' style={{ marginTop: 16 }}>
-          {groupOrder.map((groupName, groupIndex) => (
+        <Tabs
+          activeKey={activeFormTab}
+          onChange={setActiveFormTab}
+          style={{ marginTop: 12 }}
+          items={formTabs.map((tab) => ({
+            key: tab.key,
+            label: tab.label,
+          }))}
+        />
+
+        <div className={styles.tabUploadEntry}>
+          <div className={styles.tabUploadHeader}>
+            <span className={styles.tabUploadTitle}>附件上报（与在线填报二选一）</span>
+            <span className={styles.tabUploadHint}>一键上传附件，AI自动解析</span>
+          </div>
+          <Upload
+            disabled={isView}
+            multiple
+            beforeUpload={() => false}
+            fileList={activeTabAttachmentFiles}
+            onPreview={(file) => {
+              const url = file.url || (file.originFileObj ? URL.createObjectURL(file.originFileObj) : '');
+              if (!url) {
+                message.warning('当前文件暂不支持预览');
+                return;
+              }
+              window.open(url, '_blank', 'noopener,noreferrer');
+            }}
+            showUploadList={{ showPreviewIcon: true, showRemoveIcon: true }}
+            onChange={({ fileList }) => {
+              setAttachmentFilesByTab((prev) => ({ ...prev, [activeFormTab]: fileList }));
+            }}
+          >
+            <Button icon={<UploadOutlined />}>上传附件</Button>
+          </Upload>
+        </div>
+
+        <div className={styles.formSection}>
+          <Form layout='vertical' style={{ marginTop: 16 }}>
+          {activeTabGroups.map((groupName, groupIndex) => (
             <div key={groupName}>
               <div style={{ borderLeft: '3px solid #1890ff', paddingLeft: 10, marginTop: groupIndex === 0 ? 0 : 20, marginBottom: 12, fontSize: 15, fontWeight: 500 }}>
                 {groupIndex + 1 === 1 ? '第一组：' : groupIndex + 1 === 2 ? '第二组：' : groupIndex + 1 === 3 ? '第三组：' : groupIndex + 1 === 4 ? '第四组：' : '第五组：'}
@@ -390,7 +417,7 @@ const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }
                     <div key={key} ref={(el) => { fieldRefs.current[key] = el; }} style={{ position: 'relative' }}>
                       <Form.Item label={<span>{field.required ? <span style={{ color: '#ff4d4f', marginRight: 4 }}>*</span> : null}{field.label}</span>}>
                         <select
-                          disabled={isView}
+                          disabled={isView || isAttachmentModeActive}
                           value={value}
                           onChange={(e) => {
                             setFormData((prev) => ({ ...prev, reportPeriod: e.target.value }));
@@ -428,7 +455,7 @@ const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }
                   <div key={key} ref={(el) => { fieldRefs.current[key] = el; }} style={{ position: 'relative' }}>
                     <Form.Item label={<span>{field.required ? <span style={{ color: '#ff4d4f', marginRight: 4 }}>*</span> : null}{field.label}</span>}>
                       <Input.TextArea
-                        disabled={isView}
+                        disabled={isView || isAttachmentModeActive}
                         autoSize={{ minRows: 4, maxRows: 10 }}
                         maxLength={maxLen}
                         value={value}
@@ -459,23 +486,14 @@ const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }
               })}
             </div>
           ))}
-
-          <div style={{ borderLeft: '3px solid #1890ff', paddingLeft: 10, marginTop: 20, marginBottom: 12, fontSize: 15, fontWeight: 500 }}>
-            第六组：附件上传
-          </div>
-          <Upload
-            disabled={isView}
-            multiple
-            beforeUpload={() => false}
-            fileList={attachmentFiles}
-            onChange={({ fileList }) => setAttachmentFiles(fileList)}
-          >
-            <Button icon={<UploadOutlined />}>上传补充材料</Button>
-          </Upload>
-          <div style={{ fontSize: 12, color: '#999', marginTop: 6 }}>
-            可上传佐证材料、数据表格、图片等补充文件，单文件不超过50MB
-          </div>
-        </Form>
+          </Form>
+          {isAttachmentModeActive ? (
+            <div className={styles.formMask}>
+              <div className={styles.formMaskTitle}>当前为“附件上报”模式</div>
+              <div className={styles.formMaskDesc}>已上传附件后不可继续在线填表；如需恢复填报，请先删除当前标签下的附件。</div>
+            </div>
+          ) : null}
+        </div>
       </Card>
 
       {!isView ? (
