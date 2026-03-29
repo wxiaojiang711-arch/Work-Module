@@ -252,7 +252,7 @@ const TaskDetailPage: React.FC = () => {
                       }
                       setQuery((prev) => ({
                         ...prev,
-                        submitRange: [dates[0].format("YYYY-MM-DD"), dates[1].format("YYYY-MM-DD")],
+                        submitRange: [dates[0]!.format("YYYY-MM-DD"), dates[1]!.format("YYYY-MM-DD")],
                       }));
                     }}
                   />
