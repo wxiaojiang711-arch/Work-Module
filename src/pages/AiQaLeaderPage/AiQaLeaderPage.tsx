@@ -198,16 +198,7 @@ ${currentAnswer.actions.map((a, i) => `${i + 1}. ${a.text}`).join("\n")}
           />
         </div>
 
-        <AnswerDisplay
-          answer={currentAnswer}
-          loading={loading}
-          onGenerateReport={handleGenerateReport}
-          onGenerateTask={handleGenerateTask}
-          onContinueAsk={handleContinueAsk}
-          onCopySummary={handleCopySummary}
-          onShowEvidence={() => setEvidenceVisible(true)}
-          onTaskLinkClick={handleTaskLinkClick}
-        />
+        <AnswerDisplay answer={currentAnswer} loading={loading} />
       </div>
 
       {currentAnswer && (

@@ -81,10 +81,6 @@ const DataReportListPage: React.FC = () => {
       .sort((a, b) => dayjs(b.submitTime).valueOf() - dayjs(a.submitTime).valueOf());
   }, [appliedQuery, submittedList]);
 
-  const handleExport = (id: string) => {
-    message.success(`任务 ${id} 已加入导出队列`);
-  };
-
   const pendingColumns: TableProps<PendingReportItem>["columns"] = [
     {
       title: "任务名称",
@@ -197,9 +193,6 @@ const DataReportListPage: React.FC = () => {
         <Space size={0}>
           <Button type="link" onClick={() => navigate(`/report/view/${record.id}`)}>
             查看详情
-          </Button>
-          <Button type="link" onClick={() => handleExport(record.id)}>
-            导出
           </Button>
         </Space>
       ),

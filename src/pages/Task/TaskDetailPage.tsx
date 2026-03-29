@@ -11,6 +11,7 @@ import {
   Row,
   Select,
   Space,
+  Steps,
   Table,
   Tag,
   Typography,
@@ -56,6 +57,104 @@ const TaskDetailPage: React.FC = () => {
     submitRange: null as [string, string] | null,
   });
   const [appliedQuery, setAppliedQuery] = useState(query);
+  const getAuditSteps = (target: UnitProgressItem | null) => {
+    const submitTime = target?.submitTime ?? "-";
+    const auditTime = target?.auditTime ?? "-";
+    const secondAuditTime = auditTime !== "-" ? auditTime : "2024-03-20 10:00:00";
+    const auditStatus =
+      target?.fillStatus === "approved"
+        ? "通过"
+        : target?.fillStatus === "rejected"
+          ? "退回"
+          : "待审核";
+    const remarkText = target?.auditRemark ?? "-";
+    const reasonText = target?.auditReason ?? "数据填写不完整，请补充缺失字段";
+    return [
+      {
+        title: "数据专员",
+        status: "finish",
+        description: (
+          <div style={{ fontSize: 13, color: "#666" }}>
+            <div>审核状态：通过</div>
+            <div>审核备注：-</div>
+            <div>审核时间：{submitTime}</div>
+          </div>
+        ),
+      },
+      {
+        title: "单位管理员",
+        status: "error",
+        description: (
+          <div style={{ fontSize: 13, color: "#666" }}>
+            <div>审核状态：退回</div>
+            <div>审核备注：{remarkText}</div>
+            <div>退回原因：{reasonText ?? "-"}</div>
+            <div>审核时间：{secondAuditTime}</div>
+          </div>
+        ),
+      },
+      {
+        title: "区委办公室",
+        status: "process",
+        description: (
+          <div style={{ fontSize: 13, color: "#666" }}>
+            <div>审核状态：待审核</div>
+            <div>审核备注：-</div>
+            <div>审核时间：-</div>
+          </div>
+        ),
+      },
+    ];
+  };
+
+  const getAuditDetailSteps = (target: UnitProgressItem | null) => {
+    const submitTime = target?.submitTime ?? "-";
+    const auditTime = target?.auditTime ?? "-";
+    const reasonText = target?.auditReason;
+    const remarkText = target?.auditRemark ?? "-";
+    const auditStatus =
+      target?.fillStatus === "approved"
+        ? "通过"
+        : target?.fillStatus === "rejected"
+          ? "退回"
+          : "待审核";
+    return [
+      {
+        title: "数据专员",
+        status: "finish",
+        description: (
+          <div style={{ fontSize: 13, color: "#666" }}>
+            <div>审核状态：通过</div>
+            <div>审核备注：-</div>
+            <div>审核时间：{submitTime}</div>
+          </div>
+        ),
+      },
+      {
+        title: "单位管理员",
+        status: "error",
+        description: (
+          <div style={{ fontSize: 13, color: "#666" }}>
+            <div>审核状态：{auditStatus}</div>
+            <div>审核备注：{remarkText}</div>
+            {reasonText ? <div>退回原因：{reasonText}</div> : null}
+            <div>审核时间：{auditTime !== "-" ? auditTime : "2024-03-20 10:00:00"}</div>
+          </div>
+        ),
+      },
+      {
+        title: "区委办公室",
+        status: "process",
+        description: (
+          <div style={{ fontSize: 13, color: "#666" }}>
+            <div>审核状态：待审核</div>
+            <div>审核备注：-</div>
+            <div>审核时间：-</div>
+          </div>
+        ),
+      },
+    ];
+  };
 
   const completedCount = unitList.filter((item) => item.fillStatus === "submitted").length;
   const totalCount = unitList.length;
@@ -113,52 +212,65 @@ const TaskDetailPage: React.FC = () => {
       width: 320,
       render: (_value, record) => (
         <Space size={1}>
-          <Link to={`/task/${task.id}/view/${record.unitId}`}>
-            <Button
-              type="link"
-              style={{ paddingInline: 4 }}
-              disabled={record.fillStatus !== "submitted"}
-            >
-              查看数据
-            </Button>
-          </Link>
-          <Button
-            type="link"
-            style={{ paddingInline: 4 }}
-            disabled={record.fillStatus !== "submitted"}
-            onClick={() => {
-              setAuditTarget(record);
-              setAuditResult("");
-              setAuditReason("");
-              setAuditRemark("");
-              setAuditResultError("");
-              setAuditReasonError("");
-              setAuditRemarkError("");
-              setAuditModalOpen(true);
-            }}
-          >
-            审核
-          </Button>
-          {record.fillStatus === "approved" || record.fillStatus === "rejected" ? (
-            <Button
-              type="link"
-              style={{ paddingInline: 4 }}
-              onClick={() => {
-                setAuditDetailTarget(record);
-                setAuditDetailOpen(true);
-              }}
-            >
-              审核详情
-            </Button>
-          ) : null}
-          <Button
-            type="link"
-            style={{ paddingInline: 4 }}
-            disabled={record.fillStatus === "submitted"}
-            onClick={() => message.success(`已向 ${record.unitName} 发送催办`)}
-          >
-            催办
-          </Button>
+          {(() => {
+            const isSecondMock = record.unitId === "u-007";
+            const blueViewIds = new Set(["u-006", "u-003", "u-004", "u-005"]);
+            const viewStyle = blueViewIds.has(record.unitId) ? { paddingInline: 4, color: "#2b5cd6" } : { paddingInline: 4 };
+            return (
+              <>
+                <Link to={`/task/${task.id}/view/${record.unitId}`}>
+                  <Button
+                    type="link"
+                    style={viewStyle}
+                    disabled={record.fillStatus !== "submitted" && record.fillStatus !== "approved" && record.fillStatus !== "rejected"}
+                  >
+                    查看数据
+                  </Button>
+                </Link>
+                {record.fillStatus === "submitted" && !isSecondMock ? (
+                  <Button
+                    type="link"
+                    style={{ paddingInline: 4 }}
+                    onClick={() => {
+                      setAuditTarget(record);
+                      setAuditResult("approve");
+                      setAuditReason("");
+                      setAuditRemark("");
+                      setAuditResultError("");
+                      setAuditReasonError("");
+                      setAuditRemarkError("");
+                      setAuditModalOpen(true);
+                    }}
+                  >
+                    审核
+                  </Button>
+                ) : null}
+                {record.fillStatus === "approved" ||
+                record.fillStatus === "rejected" ||
+                isSecondMock ? (
+                  <Button
+                    type="link"
+                    style={{ paddingInline: 4 }}
+                    onClick={() => {
+                      setAuditDetailTarget(record);
+                      setAuditDetailOpen(true);
+                    }}
+                  >
+                    审核详情
+                  </Button>
+                ) : null}
+                {record.fillStatus === "pending" ? (
+                  <Button
+                    type="link"
+                    style={{ paddingInline: 4 }}
+                    onClick={() => message.success(`已向 ${record.unitName} 发送催办`)}
+                  >
+                    催办
+                  </Button>
+                ) : null}
+              </>
+            );
+          })()}
         </Space>
       ),
     },
@@ -303,10 +415,14 @@ const TaskDetailPage: React.FC = () => {
         </div>
 
         <div style={{ marginBottom: 24 }}>
+          <Steps direction="vertical" size="small" items={getAuditSteps(auditTarget)} />
+        </div>
+
+        <div style={{ marginBottom: 24 }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: "#333", marginBottom: 12 }}>
             <span style={{ color: "#f5222d", marginRight: 4 }}>*</span>审核结果
           </div>
-          <Space direction="vertical" size={16}>
+          <Space direction="horizontal" size={24}>
             <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <input
                 type="radio"
@@ -320,7 +436,7 @@ const TaskDetailPage: React.FC = () => {
                 }}
                 style={{ width: 16, height: 16 }}
               />
-              <span style={{ color: "#52c41a" }}>审核通过</span>
+              <span style={{ color: "#333" }}>审核通过</span>
             </label>
             <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <input
@@ -334,7 +450,7 @@ const TaskDetailPage: React.FC = () => {
                 }}
                 style={{ width: 16, height: 16 }}
               />
-              <span style={{ color: "#f5222d" }}>退回修改</span>
+              <span style={{ color: "#333" }}>退回修改</span>
             </label>
           </Space>
           {auditResultError ? (
@@ -411,30 +527,40 @@ const TaskDetailPage: React.FC = () => {
 
         <div style={{ marginBottom: 8 }}>
           <div style={{ fontSize: 14, fontWeight: 600, color: "#333", marginBottom: 8 }}>审核备注</div>
-          <Input.TextArea
-            value={auditRemark}
-            onChange={(event) => {
-              setAuditRemark(event.target.value);
-              setAuditRemarkError("");
-            }}
-            onFocus={() => setRemarkFocused(true)}
-            onBlur={() => setRemarkFocused(false)}
-            placeholder="可填写审核备注信息（可选）"
-            autoSize={{ minRows: 3, maxRows: 6 }}
-            maxLength={300}
-            style={{
-              borderRadius: 6,
-              borderColor: auditRemarkError ? "#f5222d" : "#d9d9d9",
-              padding: 12,
-              boxShadow: remarkFocused ? "0 0 0 2px rgba(43,92,214,0.1)" : "none",
-            }}
-          />
+          <div style={{ position: "relative" }}>
+            <Input.TextArea
+              value={auditRemark}
+              onChange={(event) => {
+                setAuditRemark(event.target.value);
+                setAuditRemarkError("");
+              }}
+              onFocus={() => setRemarkFocused(true)}
+              onBlur={() => setRemarkFocused(false)}
+              placeholder="可填写审核备注信息（可选）"
+              autoSize={{ minRows: 3, maxRows: 6 }}
+              maxLength={100}
+              style={{
+                borderRadius: 6,
+                borderColor: auditRemarkError ? "#f5222d" : "#d9d9d9",
+                padding: "12px 12px 28px",
+                boxShadow: remarkFocused ? "0 0 0 2px rgba(43,92,214,0.1)" : "none",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                right: 12,
+                bottom: 8,
+                fontSize: 12,
+                color: "#999",
+              }}
+            >
+              {auditRemark.length}/100
+            </div>
+          </div>
           {auditRemarkError ? (
             <div style={{ color: "#f5222d", fontSize: 12, marginTop: 8 }}>{auditRemarkError}</div>
           ) : null}
-          <div style={{ textAlign: "right", fontSize: 13, color: "#999", marginTop: 8 }}>
-            {auditRemark.length}/300
-          </div>
         </div>
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 24 }}>
@@ -455,8 +581,8 @@ const TaskDetailPage: React.FC = () => {
                   setAuditResultError("请选择审核结果");
                   return;
                 }
-                if (auditRemark.length > 300) {
-                  setAuditRemarkError("审核备注最多300个字符");
+                if (auditRemark.length > 100) {
+                  setAuditRemarkError("审核备注最多100个字符");
                   return;
                 }
                 setAuditLoading(true);
@@ -503,8 +629,8 @@ const TaskDetailPage: React.FC = () => {
                   setAuditReasonError("退回原因最多500个字符");
                   return;
                 }
-                if (auditRemark.length > 300) {
-                  setAuditRemarkError("审核备注最多300个字符");
+                if (auditRemark.length > 100) {
+                  setAuditRemarkError("审核备注最多100个字符");
                   return;
                 }
                 setAuditLoading(true);
@@ -542,20 +668,21 @@ const TaskDetailPage: React.FC = () => {
         title="审核详情"
         open={auditDetailOpen}
         onCancel={() => setAuditDetailOpen(false)}
+        width={600}
         footer={[
           <Button key="close" onClick={() => setAuditDetailOpen(false)}>
             关闭
           </Button>,
         ]}
       >
-        <Space direction="vertical" size={8} style={{ width: "100%" }}>
-          <div>单位：{auditDetailTarget?.unitName ?? "-"}</div>
-          <div>状态：{auditDetailTarget ? fillStatusTextMap[auditDetailTarget.fillStatus] : "-"}</div>
-          <div>审核时间：{auditDetailTarget?.auditTime ?? "-"}</div>
-          <div>退回原因：{auditDetailTarget?.auditReason ?? "-"}</div>
-          <div>审核备注：{auditDetailTarget?.auditRemark ?? "-"}</div>
-        </Space>
+        <div style={{ background: "#fafafa", borderRadius: 8, padding: 16, marginBottom: 16 }}>
+          <div style={{ fontSize: 14, color: "#666" }}>上报单位：{auditDetailTarget?.unitName ?? "-"}</div>
+          <div style={{ fontSize: 14, color: "#666", marginTop: 8 }}>上报人：{auditDetailTarget?.submitter ?? "-"}</div>
+          <div style={{ fontSize: 14, color: "#666", marginTop: 8 }}>上报时间：{auditDetailTarget?.submitTime ?? "-"}</div>
+        </div>
+        <Steps direction="vertical" size="small" items={getAuditDetailSteps(auditDetailTarget)} />
       </Modal>
+
     </div>
   );
 };

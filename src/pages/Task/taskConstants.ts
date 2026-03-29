@@ -65,8 +65,8 @@ export const taskStatusColorMap: Record<TaskStatus, string> = {
 };
 
 export const fillStatusTextMap: Record<FillStatus, string> = {
-  submitted: "已提交",
-  pending: "待填写",
+  submitted: "待审核",
+  pending: "待提交",
   rejected: "已退回",
   approved: "已通过",
   urged: "已催办",
@@ -249,8 +249,15 @@ export const unitProgressMock: UnitProgressItem[] = [
     submitter: "王五",
   },
   {
-    unitId: "u-002",
-    unitName: "区发改委",
+    unitId: "u-007",
+    unitName: "区统计局",
+    fillStatus: "submitted",
+    submitTime: "2024-03-15 16:30:00",
+    submitter: "赵六",
+  },
+  {
+    unitId: "u-006",
+    unitName: "区市场监管局",
     fillStatus: "pending",
     submitTime: null,
     submitter: null,

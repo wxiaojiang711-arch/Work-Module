@@ -1,13 +1,9 @@
 ﻿import React from "react";
 import {
-  ArrowLeftOutlined,
-  DownloadOutlined,
   FormOutlined,
-  PrinterOutlined,
-  RollbackOutlined,
   TableOutlined,
 } from "@ant-design/icons";
-import { Breadcrumb, Button, Dropdown, Modal, Space, Tabs, message } from "antd";
+import { Breadcrumb, Tabs } from "antd";
 import type { TabsProps } from "antd";
 import { useNavigate, useParams } from "react-router-dom";
 
@@ -292,24 +288,6 @@ const ReportDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { taskId } = useParams<{ taskId: string }>();
 
-  const exportItems = [
-    {
-      key: "word",
-      label: "导出为Word",
-      onClick: () => message.info("导出功能开发中"),
-    },
-    {
-      key: "pdf",
-      label: "导出为PDF",
-      onClick: () => message.info("导出功能开发中"),
-    },
-    {
-      key: "excel",
-      label: "导出为Excel",
-      onClick: () => message.info("导出功能开发中"),
-    },
-  ];
-
   const tabItems: TabsProps["items"] = [
     {
       key: "form-001",
@@ -375,38 +353,6 @@ const ReportDetailPage: React.FC = () => {
           { title: "查看详情" },
         ]}
       />
-
-      <div className={styles.actionBar}>
-        <Button type="link" icon={<ArrowLeftOutlined />} onClick={() => navigate(-1)}>
-          返回列表
-        </Button>
-        <Space>
-          <Dropdown menu={{ items: exportItems }} trigger={["click"]}>
-            <Button icon={<DownloadOutlined />}>导出</Button>
-          </Dropdown>
-          <Button icon={<PrinterOutlined />} onClick={() => message.info("打印功能开发中")}>
-            打印
-          </Button>
-          <Button
-            danger
-            icon={<RollbackOutlined />}
-            onClick={() => {
-              Modal.confirm({
-                title: "确认撤回此次上报？",
-                content: "撤回后数据将退回至“待上报”状态，可重新编辑后提交。",
-                okText: "确认",
-                cancelText: "取消",
-                onOk: () => {
-                  message.success("已撤回");
-                  navigate("/report");
-                },
-              });
-            }}
-          >
-            撤回
-          </Button>
-        </Space>
-      </div>
 
       <TaskInfoCard task={{ ...taskDetail, id: taskId ?? taskDetail.id }} />
 

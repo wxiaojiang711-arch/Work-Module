@@ -1,0 +1,61 @@
+.page {
+  height: 100%;
+  overflow: auto;
+  padding: 20px;
+  background: #f3f6fb;
+}
+
+.breadcrumb {
+  margin-bottom: 8px;
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.titleWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kbInfo {
+  margin-bottom: 16px;
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid #f0f0f0;
+}
+
+.kbInfoRow {
+  font-size: 14px;
+  color: #666;
+}
+
+.kbInfoRow + .kbInfoRow {
+  margin-top: 8px;
+}
+
+.actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tableWrap :global(.ant-table-tbody > tr:hover > td) {
+  background: #e6f7ff !important;
+}
+
+.modalInput :global(.ant-input) {
+  border-radius: 6px;
+  height: 40px;
+}
+
+.modalTextArea :global(textarea) {
+  border-radius: 6px;
+  min-height: 90px;
+}

@@ -19,6 +19,7 @@ import MobileApp from "./mobile/MobileApp";
 
 const KnowledgeBaseManagementPage = React.lazy(() => import("./pages/KnowledgeBaseManagement"));
 const KnowledgeBaseDetailPage = React.lazy(() => import("./pages/KnowledgeBaseManagement/KnowledgeBaseDetailPage"));
+const CategoryManagementPage = React.lazy(() => import("./pages/KnowledgeBaseManagement/CategoryManagementPage"));
 const TemplateCategoryPage = React.lazy(() => import("./pages/TemplateCategory"));
 const FormListPage = React.lazy(() => import("./pages/FormList"));
 const OrganizationTemplateListPage = React.lazy(() => import("./pages/FormList/OrganizationListPage"));
@@ -221,6 +222,14 @@ const App: React.FC = () => {
   }
 
   const renderPage = () => {
+
+    if (matchPath("/knowledge/base-management/:kbId/categories", pathname)) {
+      return (
+        <Suspense fallback={null}>
+          <CategoryManagementPage />
+        </Suspense>
+      );
+    }
 
     if (matchPath("/knowledge/base-management/:kbId", pathname)) {
       return (

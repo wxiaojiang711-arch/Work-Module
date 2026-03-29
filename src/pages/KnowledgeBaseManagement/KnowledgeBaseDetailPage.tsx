@@ -1,11 +1,12 @@
-﻿import React, { useMemo, useState } from "react";
+﻿import React, { useMemo, useRef, useState } from "react";
 import {
+  Alert,
   Breadcrumb,
   Button,
   Col,
   DatePicker,
-  Dropdown,
   Input,
+  Modal,
   Popconfirm,
   Row,
   Select,
@@ -16,12 +17,13 @@ import {
   Typography,
   message,
 } from "antd";
-import type { MenuProps, TableColumnsType, TablePaginationConfig } from "antd";
+import type { TableColumnsType, TablePaginationConfig } from "antd";
 import {
-  EllipsisOutlined,
   FileExcelOutlined,
   FileImageOutlined,
   FilePdfOutlined,
+  FilePptOutlined,
+  FileUnknownOutlined,
   FileWordOutlined,
   ReloadOutlined,
   SearchOutlined,
@@ -37,6 +39,10 @@ type UpdateFrequency = "daily" | "weekly" | "monthly" | "irregular";
 
 type FileType = "docx" | "xlsx" | "pdf" | "png" | "jpg" | "mp4";
 
+type UploadStatus = "pending" | "uploading" | "success" | "error";
+
+type GovernanceStatus = "pending" | "processing" | "success" | "failed";
+
 interface FileAsset {
   id: string;
   fileName: string;
@@ -50,7 +56,18 @@ interface FileAsset {
   lastUpdated: string;
   visibility: string;
   kbType: "unit" | "theme";
-  fileCategory: "doc" | "report" | "image" | "video" | "other";
+  fileCategory: "work_report" | "meeting_minutes";
+  governanceStatus: GovernanceStatus;
+}
+
+interface UploadItem {
+  id: string;
+  file: File;
+  name: string;
+  sizeText: string;
+  status: UploadStatus;
+  progress: number;
+  error?: string;
 }
 
 const fileListMock: FileAsset[] = [
@@ -67,7 +84,8 @@ const fileListMock: FileAsset[] = [
     lastUpdated: "2026-03-16 14:20:35",
     visibility: "组织内公开",
     kbType: "unit",
-    fileCategory: "doc",
+    fileCategory: "work_report",
+    governanceStatus: "success",
   },
   {
     id: "file-002",
@@ -82,7 +100,8 @@ const fileListMock: FileAsset[] = [
     lastUpdated: "2026-03-15 18:05:22",
     visibility: "组织内公开",
     kbType: "unit",
-    fileCategory: "image",
+    fileCategory: "meeting_minutes",
+    governanceStatus: "processing",
   },
   {
     id: "file-003",
@@ -97,7 +116,8 @@ const fileListMock: FileAsset[] = [
     lastUpdated: "2026-03-17 09:12:48",
     visibility: "组织内公开",
     kbType: "unit",
-    fileCategory: "report",
+    fileCategory: "work_report",
+    governanceStatus: "pending",
   },
   {
     id: "file-004",
@@ -112,7 +132,8 @@ const fileListMock: FileAsset[] = [
     lastUpdated: "2026-03-12 11:30:17",
     visibility: "指定部门可见",
     kbType: "unit",
-    fileCategory: "report",
+    fileCategory: "meeting_minutes",
+    governanceStatus: "failed",
   },
   {
     id: "file-005",
@@ -127,7 +148,8 @@ const fileListMock: FileAsset[] = [
     lastUpdated: "2026-03-11 16:44:05",
     visibility: "组织内公开",
     kbType: "theme",
-    fileCategory: "doc",
+    fileCategory: "work_report",
+    governanceStatus: "success",
   },
 ];
 
@@ -147,18 +169,30 @@ const frequencyMap: Record<UpdateFrequency, { label: string; color: string }> = 
   irregular: { label: "不定期更新", color: "default" },
 };
 
+const categoryLabelMap: Record<FileAsset["fileCategory"], string> = {
+  work_report: "工作汇报",
+  meeting_minutes: "会议纪要",
+};
+
+const governanceStatusMap: Record<GovernanceStatus, { label: string; color: string }> = {
+  pending: { label: "未处理", color: "default" },
+  processing: { label: "处理中", color: "blue" },
+  success: { label: "已完成", color: "green" },
+  failed: { label: "失败", color: "red" },
+};
+
 interface QueryState {
-  kbType?: "unit" | "theme";
-  visibility?: string;
   sourceUnit?: string;
+  reporter?: string;
+  category?: FileAsset["fileCategory"];
   dateRange: [string, string] | null;
   keyword: string;
 }
 
 const defaultQuery: QueryState = {
-  kbType: undefined,
-  visibility: undefined,
   sourceUnit: undefined,
+  reporter: undefined,
+  category: undefined,
   dateRange: null,
   keyword: "",
 };
@@ -179,6 +213,13 @@ const KnowledgeBaseDetailPage: React.FC = () => {
   const unitCategory = location.state?.unitCategory;
   const visibilityText = location.state?.visibility ?? "组织内公开";
 
+  const categorySeed = [
+    { label: "政策文件", value: "政策文件" },
+    { label: "工作汇报", value: "工作汇报" },
+    { label: "会议纪要", value: "会议纪要" },
+    { label: "图片资料", value: "图片资料" },
+  ];
+
   const kbTypeTagMap = {
     "unit-department": { label: "单位库 - 部门", color: "blue" },
     "unit-town": { label: "单位库 - 镇街", color: "cyan" },
@@ -194,9 +235,24 @@ const KnowledgeBaseDetailPage: React.FC = () => {
   const kbTypeTag = kbTypeTagMap[kbTypeTagKey];
 
   const [fileList, setFileList] = useState<FileAsset[]>(fileListMock);
+  const reporterOptions = [
+    { label: "张三", value: "张三" },
+    { label: "赵刚", value: "赵刚" },
+    { label: "李伟", value: "李伟" },
+    { label: "刘洋", value: "刘洋" },
+  ];
   const [query, setQuery] = useState<QueryState>(defaultQuery);
   const [appliedQuery, setAppliedQuery] = useState<QueryState>(defaultQuery);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [uploadOpen, setUploadOpen] = useState(false);
+  const [uploadItems, setUploadItems] = useState<UploadItem[]>([]);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [categoryOptions, setCategoryOptions] = useState(categorySeed);
+  const [categoryValue, setCategoryValue] = useState<string | undefined>(undefined);
+  const [categorySearch, setCategorySearch] = useState("");
+  const [dragActive, setDragActive] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const uploadTimers = useRef<Record<string, number>>({});
   const [pagination, setPagination] = useState<TablePaginationConfig>({
     current: 1,
     pageSize: 10,
@@ -209,9 +265,9 @@ const KnowledgeBaseDetailPage: React.FC = () => {
     const keyword = appliedQuery.keyword.trim().toLowerCase();
 
     return fileList.filter((item) => {
-      const matchKbType = !appliedQuery.kbType || item.kbType === appliedQuery.kbType;
-      const matchVisibility = !appliedQuery.visibility || item.visibility === appliedQuery.visibility;
       const matchSourceUnit = !appliedQuery.sourceUnit || item.sourceUnit === appliedQuery.sourceUnit;
+      const matchReporter = !appliedQuery.reporter || item.reporter.includes(appliedQuery.reporter);
+      const matchCategory = !appliedQuery.category || item.fileCategory === appliedQuery.category;
 
       const matchDate =
         !appliedQuery.dateRange ||
@@ -222,15 +278,199 @@ const KnowledgeBaseDetailPage: React.FC = () => {
         item.fileName.toLowerCase().includes(keyword) ||
         (item.description?.toLowerCase().includes(keyword) ?? false);
 
-      return (
-        matchKbType &&
-        matchVisibility &&
-        matchSourceUnit &&
-        matchDate &&
-        matchKeyword
-      );
+      return matchSourceUnit && matchReporter && matchCategory && matchDate && matchKeyword;
     });
   }, [appliedQuery, fileList]);
+
+  const kbTypeLabel = kbType === "theme" ? "主题库" : "单位库";
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    const kb = bytes / 1024;
+    if (kb < 1024) return `${kb.toFixed(1)} KB`;
+    const mb = kb / 1024;
+    return `${mb.toFixed(1)} MB`;
+  };
+
+  const acceptedExts = [
+    "pdf",
+    "doc",
+    "docx",
+    "xls",
+    "xlsx",
+    "ppt",
+    "pptx",
+    "jpg",
+    "jpeg",
+    "png",
+    "gif",
+  ];
+
+  const getFileExt = (name: string) => {
+    const parts = name.split(".");
+    if (parts.length < 2) return "";
+    return parts[parts.length - 1].toLowerCase();
+  };
+
+  const getFileIcon = (fileName: string) => {
+    const ext = getFileExt(fileName);
+    if (ext === "pdf") return { icon: <FilePdfOutlined />, color: "#f5222d" };
+    if (ext === "doc" || ext === "docx") return { icon: <FileWordOutlined />, color: "#2b5cd6" };
+    if (ext === "xls" || ext === "xlsx") return { icon: <FileExcelOutlined />, color: "#52c41a" };
+    if (ext === "ppt" || ext === "pptx") return { icon: <FilePptOutlined />, color: "#fa8c16" };
+    if (["jpg", "jpeg", "png", "gif"].includes(ext)) return { icon: <FileImageOutlined />, color: "#722ed1" };
+    return { icon: <FileUnknownOutlined />, color: "#8c8c8c" };
+  };
+
+  const resetUploadForm = () => {
+    setUploadItems([]);
+    setUploadError(null);
+    setCategoryOptions(categorySeed);
+    setCategoryValue(undefined);
+    setCategorySearch("");
+    setDragActive(false);
+    setIsUploading(false);
+  };
+
+  const openUploadModal = () => {
+    resetUploadForm();
+    setUploadOpen(true);
+  };
+
+  const closeUploadModal = () => {
+    Object.values(uploadTimers.current).forEach((timer) => window.clearInterval(timer));
+    uploadTimers.current = {};
+    setUploadOpen(false);
+  };
+
+  const validateAndAppendFiles = (files: FileList | File[]) => {
+    const list = Array.from(files);
+    if (!list.length) return;
+
+    let errorMessage: string | null = null;
+
+    setUploadItems((prev) => {
+      const next = [...prev];
+
+      list.forEach((file) => {
+        const ext = getFileExt(file.name);
+        const isSupported = acceptedExts.includes(ext);
+        const isTooLarge = file.size > 100 * 1024 * 1024;
+        const isDuplicate = next.some(
+          (item) =>
+            item.file.name === file.name &&
+            item.file.size === file.size &&
+            item.file.lastModified === file.lastModified
+        );
+
+        if (!isSupported) {
+          errorMessage = "该文件格式不支持，请选择支持的格式";
+          return;
+        }
+        if (isTooLarge) {
+          errorMessage = "文件大小超过100MB，请选择较小的文件";
+          return;
+        }
+        if (isDuplicate) {
+          errorMessage = "该文件已选择，请勿重复选择";
+          return;
+        }
+
+        next.push({
+          id: `${file.name}-${file.size}-${file.lastModified}`,
+          file,
+          name: file.name,
+          sizeText: formatFileSize(file.size),
+          status: "pending",
+          progress: 0,
+        });
+      });
+
+      return next;
+    });
+
+    if (errorMessage) {
+      setUploadError(errorMessage);
+    } else {
+      setUploadError(null);
+    }
+  };
+
+  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      validateAndAppendFiles(event.target.files);
+    }
+    event.target.value = "";
+  };
+
+  const handleDeleteUploadItem = (id: string) => {
+    setUploadItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
+  const handleCategoryEnter = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== "Enter" || !categorySearch.trim()) return;
+    const trimmed = categorySearch.trim();
+    if (!categoryOptions.some((opt) => opt.value === trimmed)) {
+      setCategoryOptions((prev) => [...prev, { label: trimmed, value: trimmed }]);
+    }
+    setCategoryValue(trimmed);
+    setCategorySearch("");
+  };
+
+  const startUploadForItem = (id: string) => {
+    let progress = 0;
+    setUploadItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, status: "uploading", progress: 0, error: undefined } : item
+      )
+    );
+
+    const timer = window.setInterval(() => {
+      progress = Math.min(100, progress + Math.floor(Math.random() * 14) + 6);
+      setUploadItems((prev) =>
+        prev.map((item) =>
+          item.id === id
+            ? {
+                ...item,
+                progress,
+                status: progress >= 100 ? "success" : "uploading",
+              }
+            : item
+        )
+      );
+
+      if (progress >= 100) {
+        window.clearInterval(timer);
+        delete uploadTimers.current[id];
+      }
+    }, 350);
+
+    uploadTimers.current[id] = timer;
+  };
+
+  const handleSubmitUpload = () => {
+    if (uploadItems.length === 0) {
+      setUploadError("请至少选择一个文件");
+      return;
+    }
+    setUploadError(null);
+    setIsUploading(true);
+
+    uploadItems.forEach((item) => startUploadForItem(item.id));
+
+    const checkDone = window.setInterval(() => {
+      setUploadItems((prev) => {
+        const allDone = prev.length > 0 && prev.every((item) => item.status === "success");
+        if (allDone) {
+          window.clearInterval(checkDone);
+          setIsUploading(false);
+          message.success("上传完成，已刷新文件列表");
+          closeUploadModal();
+        }
+        return prev;
+      });
+    }, 500);
+  };
 
   const columns: TableColumnsType<FileAsset> = [
     {
@@ -254,7 +494,24 @@ const KnowledgeBaseDetailPage: React.FC = () => {
         );
       },
     },
-    { title: "数据来源单位", dataIndex: "sourceUnit", key: "sourceUnit", width: 180 },
+    {
+      title: "文件分类",
+      dataIndex: "fileCategory",
+      key: "fileCategory",
+      width: 120,
+      render: (value: FileAsset["fileCategory"]) => categoryLabelMap[value] ?? "其他",
+    },
+    {
+      title: "数据治理状态",
+      dataIndex: "governanceStatus",
+      key: "governanceStatus",
+      width: 140,
+      render: (value: GovernanceStatus) => {
+        const status = governanceStatusMap[value];
+        return <Tag color={status.color}>{status.label}</Tag>;
+      },
+    },
+    { title: "文件来源单位", dataIndex: "sourceUnit", key: "sourceUnit", width: 180 },
     { title: "上报人", dataIndex: "reporter", key: "reporter", width: 100 },
     {
       title: "上报时间",
@@ -269,34 +526,21 @@ const KnowledgeBaseDetailPage: React.FC = () => {
       width: 220,
       fixed: "right",
       render: (_value, record) => {
-        const menuItems: MenuProps["items"] = [
-          { key: "relation", label: "建立关联", onClick: () => message.info("建立关联（示例）") },
-          {
-            key: "delete",
-            danger: true,
-            label: (
-              <Popconfirm
-                title="确认删除该文件吗？"
-                okText="删除"
-                cancelText="取消"
-                onConfirm={() => {
-                  setFileList((prev) => prev.filter((item) => item.id !== record.id));
-                  message.success("已删除");
-                }}
-              >
-                <span>删除</span>
-              </Popconfirm>
-            ),
-          },
-        ];
-
         return (
           <div className={styles.actions}>
             <Button type="link" onClick={() => message.info("预览（示例）")}>预览</Button>
             <Button type="link" onClick={() => message.success("下载任务已加入队列")}>下载</Button>
-            <Dropdown menu={{ items: menuItems }} trigger={["click"]}>
-              <Button type="link" icon={<EllipsisOutlined />} />
-            </Dropdown>
+            <Popconfirm
+              title="确认删除该文件吗？"
+              okText="删除"
+              cancelText="取消"
+              onConfirm={() => {
+                setFileList((prev) => prev.filter((item) => item.id !== record.id));
+                message.success("已删除");
+              }}
+            >
+              <Button type="link" danger>删除</Button>
+            </Popconfirm>
           </div>
         );
       },
@@ -324,52 +568,45 @@ const KnowledgeBaseDetailPage: React.FC = () => {
 
       <div className={styles.filterWrap}>
         <div style={{ maxWidth: 1800 }}>
-        <Row gutter={[12, 12]}>
-          <Col span={3}>
+        <Row gutter={[0, 12]} style={{ columnGap: 24 }}>
+          <Col span={4}>
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ whiteSpace: "nowrap" }}>知识库类型：</span>
-              <Select
-                allowClear
+              <span style={{ whiteSpace: "nowrap" }}>文件名：</span>
+              <Input
                 size="middle"
-                placeholder="知识库类型"
-                value={query.kbType}
-                style={{ width: "100%" }}
-                options={[
-                  { label: "全部", value: undefined },
-                  { label: "单位库", value: "unit" },
-                  { label: "主题库", value: "theme" },
-                ]}
-                onChange={(value) => setQuery((prev) => ({ ...prev, kbType: value }))}
+                value={query.keyword}
+                placeholder="请输入文件名关键词"
+                onChange={(event) => setQuery((prev) => ({ ...prev, keyword: event.target.value }))}
+                onPressEnter={() => setAppliedQuery(query)}
               />
             </div>
           </Col>
           <Col span={3}>
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ whiteSpace: "nowrap" }}>公开方式：</span>
+              <span style={{ whiteSpace: "nowrap" }}>文件分类：</span>
               <Select
                 allowClear
                 size="middle"
-                placeholder="公开方式"
-                value={query.visibility}
+                placeholder="请选择文件分类"
+                value={query.category}
                 style={{ width: "100%" }}
                 options={[
                   { label: "全部", value: undefined },
-                  { label: "组织内公开", value: "组织内公开" },
-                  { label: "指定部门可见", value: "指定部门可见" },
-                  { label: "仅本人可见", value: "仅本人可见" },
+                  { label: "工作汇报", value: "work_report" },
+                  { label: "会议纪要", value: "meeting_minutes" },
                 ]}
-                onChange={(value) => setQuery((prev) => ({ ...prev, visibility: value }))}
+                onChange={(value) => setQuery((prev) => ({ ...prev, category: value }))}
               />
             </div>
           </Col>
           <Col span={4}>
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ whiteSpace: "nowrap" }}>来源单位：</span>
+              <span style={{ whiteSpace: "nowrap" }}>文件来源单位：</span>
               <Select
                 showSearch
                 allowClear
                 size="middle"
-                placeholder="数据来源单位"
+                placeholder="请选择文件来源单位"
                 value={query.sourceUnit}
                 style={{ width: "100%" }}
                 options={[
@@ -383,7 +620,22 @@ const KnowledgeBaseDetailPage: React.FC = () => {
               />
             </div>
           </Col>
-          <Col span={4}>
+          <Col span={3}>
+            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+              <span style={{ whiteSpace: "nowrap" }}>上报人：</span>
+              <Select
+                showSearch
+                allowClear
+                size="middle"
+                value={query.reporter}
+                placeholder="请选择上报人"
+                style={{ width: "100%" }}
+                options={[{ label: "全部", value: undefined }, ...reporterOptions]}
+                onChange={(value) => setQuery((prev) => ({ ...prev, reporter: value }))}
+              />
+            </div>
+          </Col>
+          <Col span={5}>
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
               <span style={{ whiteSpace: "nowrap" }}>上报时间：</span>
               <DatePicker.RangePicker
@@ -399,19 +651,6 @@ const KnowledgeBaseDetailPage: React.FC = () => {
                   }
                   setQuery((prev) => ({ ...prev, dateRange: [start, end] }));
                 }}
-              />
-            </div>
-          </Col>
-          <Col span={4}>
-            <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ whiteSpace: "nowrap" }}>关键词：</span>
-              <Input.Search
-                size="middle"
-                value={query.keyword}
-                placeholder="文件名、摘要、关键词"
-                enterButton="搜索"
-                onChange={(event) => setQuery((prev) => ({ ...prev, keyword: event.target.value }))}
-                onSearch={() => setAppliedQuery(query)}
               />
             </div>
           </Col>
@@ -437,7 +676,7 @@ const KnowledgeBaseDetailPage: React.FC = () => {
       <Row justify="space-between" align="middle" className={styles.operationBar}>
         <Col>
           <Space>
-            <Button type="primary" icon={<UploadOutlined />}>上传文件</Button>
+            <Button type="primary" icon={<UploadOutlined />} onClick={openUploadModal}>上传文件</Button>
             {selectedRowKeys.length > 0 ? (
               <>
                 <Button danger onClick={() => message.info(`批量删除 ${selectedRowKeys.length} 条（示例）`)}>批量删除</Button>
@@ -471,6 +710,154 @@ const KnowledgeBaseDetailPage: React.FC = () => {
         locale={{ emptyText: "暂无文件，请点击上方“上传文件”按钮添加" }}
         onChange={(nextPagination) => setPagination(nextPagination)}
       />
+
+      <Modal
+        open={uploadOpen}
+        title="上传文件"
+        centered
+        width={700}
+        footer={null}
+        onCancel={closeUploadModal}
+        className={styles.uploadModal}
+      >
+        <div className={styles.uploadBody}>
+          <div className={styles.kbInfoCard}>
+            <div className={styles.kbInfoRow}>知识库名称：{kbName}</div>
+            <div className={styles.kbInfoRow}>知识库类型：{kbTypeLabel}</div>
+            <div className={styles.kbInfoRow}>可见范围：{visibilityText}</div>
+          </div>
+
+          <div className={styles.formBlock}>
+            <div className={styles.fieldLabel}>
+              <span className={styles.required}>*</span> 选择文件
+            </div>
+            <div
+              className={`${styles.uploadArea} ${dragActive ? styles.uploadAreaActive : ""}`}
+              role="presentation"
+              onClick={() => document.getElementById("kb-upload-input")?.click()}
+              onDragOver={(event) => {
+                event.preventDefault();
+                setDragActive(true);
+              }}
+              onDragLeave={() => setDragActive(false)}
+              onDrop={(event) => {
+                event.preventDefault();
+                setDragActive(false);
+                if (event.dataTransfer.files) {
+                  validateAndAppendFiles(event.dataTransfer.files);
+                }
+              }}
+            >
+              <div className={styles.uploadIcon}>⭳</div>
+              <div className={styles.uploadText}>点击或拖拽文件到此区域上传</div>
+              <div className={styles.uploadHint}>支持 PDF、Word、Excel、图片等格式，单个文件不超过100MB</div>
+              <input
+                id="kb-upload-input"
+                type="file"
+                multiple
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif"
+                className={styles.hiddenInput}
+                onChange={handleFileInputChange}
+              />
+            </div>
+            {uploadError ? <div className={styles.fieldError}>{uploadError}</div> : null}
+          </div>
+
+          {uploadItems.length > 0 ? (
+            <div className={styles.formBlock}>
+              <div className={styles.sectionTitle}>已选文件</div>
+              <div className={styles.uploadList}>
+                {uploadItems.map((item) => {
+                  const icon = getFileIcon(item.name);
+                  const statusLabel =
+                    item.status === "pending"
+                      ? "待上传"
+                      : item.status === "uploading"
+                        ? `上传中 ${item.progress}%`
+                        : item.status === "success"
+                          ? "✓ 上传成功"
+                          : "✗ 上传失败";
+                  const statusClass =
+                    item.status === "success"
+                      ? styles.statusSuccess
+                      : item.status === "error"
+                        ? styles.statusError
+                        : item.status === "uploading"
+                          ? styles.statusUploading
+                          : styles.statusPending;
+
+                  return (
+                    <div key={item.id} className={styles.uploadItem}>
+                      <div className={styles.uploadItemMain}>
+                        <div className={styles.uploadItemTitle}>
+                          <span className={styles.fileIcon} style={{ color: icon.color }}>{icon.icon}</span>
+                          <Tooltip title={item.name}>
+                            <span className={styles.fileName}>{item.name}</span>
+                          </Tooltip>
+                        </div>
+                        <div className={styles.uploadMetaRow}>
+                          <span className={styles.fileSize}>{item.sizeText}</span>
+                          <span className={statusClass}>{statusLabel}</span>
+                        </div>
+                        {item.status === "uploading" ? (
+                          <div className={styles.progressRow}>
+                            <div className={styles.progressBar}>
+                              <div className={styles.progressFill} style={{ width: `${item.progress}%` }} />
+                            </div>
+                            <span className={styles.progressText}>{item.progress}%</span>
+                          </div>
+                        ) : null}
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.deleteBtn}
+                        onClick={() => handleDeleteUploadItem(item.id)}
+                        aria-label="删除文件"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
+
+          <div className={styles.formBlock}>
+            <div className={styles.fieldLabel}>文件分类</div>
+            <Select
+              showSearch
+              allowClear
+              placeholder="请选择文件分类"
+              value={categoryValue}
+              options={categoryOptions}
+              onChange={(value) => setCategoryValue(value)}
+              onSearch={(value) => setCategorySearch(value)}
+              onInputKeyDown={handleCategoryEnter}
+              className={styles.fullWidth}
+            />
+            <div className={styles.helpText}>为文件选择分类可以更好地组织和查找文件</div>
+          </div>
+
+          {uploadItems.some((item) => item.status === "error") ? (
+            <Alert
+              type="error"
+              showIcon
+              message="部分文件上传失败，请检查后重试"
+              className={styles.alertBox}
+            />
+          ) : null}
+        </div>
+
+        <div className={styles.modalFooter}>
+          <Button className={styles.cancelBtn} onClick={closeUploadModal} disabled={isUploading}>
+            取消
+          </Button>
+          <Button type="primary" className={styles.uploadBtn} onClick={handleSubmitUpload} loading={isUploading}>
+            上传
+          </Button>
+        </div>
+      </Modal>
     </div>
   );
 };

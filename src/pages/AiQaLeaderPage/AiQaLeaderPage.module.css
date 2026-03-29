@@ -8,8 +8,8 @@
 .contentArea {
   flex: 1;
   display: flex;
-  padding: 0;
-  gap: 0;
+  padding: 16px;
+  gap: 16px;
   max-width: 100%;
   margin: 0;
 }

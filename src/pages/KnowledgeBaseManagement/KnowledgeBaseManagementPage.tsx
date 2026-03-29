@@ -589,19 +589,19 @@ const KnowledgeBaseManagementPage: React.FC = () => {
   };
 
   const getCardActions = (kb: KnowledgeBase): MenuProps["items"] => [
-    {
-      key: "edit",
-      icon: <EditOutlined />,
-      label: "编辑",
+      {
+        key: "edit",
+        icon: <EditOutlined />,
+        label: "编辑",
       onClick: (info) => {
         info.domEvent.stopPropagation();
         handleEdit(kb);
       },
     },
-    {
-      key: "view",
-      icon: <EyeOutlined />,
-      label: "查看详情",
+      {
+        key: "view",
+        icon: <EyeOutlined />,
+        label: "查看详情",
       onClick: (info) => {
         info.domEvent.stopPropagation();
         navigate(`/knowledge/base-management/${kb.id}`, {
@@ -613,10 +613,26 @@ const KnowledgeBaseManagementPage: React.FC = () => {
           },
         });
       },
-    },
-    { type: "divider" },
-    {
-      key: "delete",
+      },
+      {
+        key: "category",
+        icon: <FileTextOutlined />,
+        label: "分类管理",
+        onClick: (info) => {
+          info.domEvent.stopPropagation();
+          navigate(`/knowledge/base-management/${kb.id}/categories`, {
+            state: {
+              kbName: kb.title,
+              kbType: kb.type,
+              unitCategory: kb.unitCategory,
+              visibility: kb.visibility,
+            },
+          });
+        },
+      },
+      { type: "divider" },
+      {
+        key: "delete",
       icon: <DeleteOutlined />,
       label: "删除",
       danger: true,

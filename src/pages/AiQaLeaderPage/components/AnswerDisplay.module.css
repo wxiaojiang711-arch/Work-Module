@@ -1,8 +1,10 @@
-﻿.answerArea {
+.answerArea {
   flex: 1;
   min-width: 0;
   padding: 16px;
-  background: #f0f2f5;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
   overflow-y: auto;
   height: calc(100vh - 200px);
 }
@@ -14,4 +16,12 @@
   height: 100%;
   background: #fff;
   border-radius: 8px;
+}
+
+.summaryText {
+  white-space: pre-wrap;
+  padding: 8px 4px;
+  font-size: 14px;
+  color: #333;
+  line-height: 2;
 }

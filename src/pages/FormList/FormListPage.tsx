@@ -267,6 +267,8 @@ const FormListPage: React.FC<FormListPageProps> = ({ categoryId: categoryIdProp,
       width: 320,
       fixed: "right",
       render: (_value, record) => {
+        const isDepartmentWorkModule =
+          categoryId === "department" && record.name.includes("部门工作模块");
         if (record.id === editingRowId) {
           return (
             <Space size={0}>
@@ -299,16 +301,22 @@ const FormListPage: React.FC<FormListPageProps> = ({ categoryId: categoryIdProp,
             <Button type="link" className={styles.actionBtn} onClick={() => openInNewTab(`/template/${categoryId}/form/preview/${record.id}`)}>
               预览
             </Button>
-            <Popconfirm
-              title="确认删除该表单吗？删除后不可恢复。"
-              okText="删除"
-              cancelText="取消"
-              onConfirm={() => handleDelete(record)}
-            >
-              <Button danger type="link" className={styles.actionBtn} loading={Boolean(actionLoadingIds[record.id])}>
+            {isDepartmentWorkModule ? (
+              <Button danger type="link" className={styles.actionBtn} disabled>
                 删除
               </Button>
-            </Popconfirm>
+            ) : (
+              <Popconfirm
+                title="确认删除该表单吗？删除后不可恢复。"
+                okText="删除"
+                cancelText="取消"
+                onConfirm={() => handleDelete(record)}
+              >
+                <Button danger type="link" className={styles.actionBtn} loading={Boolean(actionLoadingIds[record.id])}>
+                  删除
+                </Button>
+              </Popconfirm>
+            )}
             <Button type="link" className={styles.actionBtn} onClick={() => handleCopyForm(record)}>
               复制模板
             </Button>
