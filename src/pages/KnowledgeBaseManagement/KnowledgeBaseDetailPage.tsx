@@ -407,7 +407,7 @@ const KnowledgeBaseDetailPage: React.FC = () => {
     setUploadItems((prev) => prev.filter((item) => item.id !== id));
   };
 
-  const handleCategoryEnter = (event: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleCategoryEnter: React.KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event) => {
     if (event.key !== "Enter" || !categorySearch.trim()) return;
     const trimmed = categorySearch.trim();
     if (!categoryOptions.some((opt) => opt.value === trimmed)) {

@@ -17,7 +17,7 @@ import {
   Typography,
   message,
 } from "antd";
-import type { TableProps } from "antd";
+import type { StepsProps, TableProps } from "antd";
 import { Link, useParams } from "react-router-dom";
 import dayjs from "dayjs";
 
@@ -57,7 +57,7 @@ const TaskDetailPage: React.FC = () => {
     submitRange: null as [string, string] | null,
   });
   const [appliedQuery, setAppliedQuery] = useState(query);
-  const getAuditSteps = (target: UnitProgressItem | null) => {
+  const getAuditSteps = (target: UnitProgressItem | null): StepsProps["items"] => {
     const submitTime = target?.submitTime ?? "-";
     const auditTime = target?.auditTime ?? "-";
     const secondAuditTime = auditTime !== "-" ? auditTime : "2024-03-20 10:00:00";
@@ -107,7 +107,7 @@ const TaskDetailPage: React.FC = () => {
     ];
   };
 
-  const getAuditDetailSteps = (target: UnitProgressItem | null) => {
+  const getAuditDetailSteps = (target: UnitProgressItem | null): StepsProps["items"] => {
     const submitTime = target?.submitTime ?? "-";
     const auditTime = target?.auditTime ?? "-";
     const reasonText = target?.auditReason;
