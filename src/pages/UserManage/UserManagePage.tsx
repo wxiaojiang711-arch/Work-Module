@@ -3,6 +3,7 @@ import {
   Button,
   Col,
   Input,
+  Modal,
   Popconfirm,
   Row,
   Select,
@@ -19,23 +20,21 @@ import dayjs from "dayjs";
 
 import OrgTreePanel from "./OrgTreePanel";
 import UserFormDrawer, { type UserFormValues } from "./UserFormDrawer";
-import UserPermissionDrawer from "./UserPermissionDrawer";
+import UserPositionAssignModal from "./UserPositionAssignModal";
 import styles from "./UserManagePage.module.css";
 import {
-  buildUserPermissionDetail,
   calcDataScopeText,
   orgNameMap,
   orgTreeMap,
-  roleColorMap,
-  roleNameMap,
+  positionOptions,
   roleOptions,
   statusMap,
   userListMock,
   type OrgTreeNode,
   type OrgType,
-  type RoleCode,
   type UserItem,
   type UserStatus,
+  type UserPositionAssignment,
 } from "./userData";
 
 const findPath = (nodes: OrgTreeNode[], key: string, path: string[] = []): string[] => {
@@ -66,21 +65,35 @@ const collectKeys = (nodes: OrgTreeNode[]): string[] => {
   return keys;
 };
 
-const pickRoleColor = (roleCode: RoleCode) => roleColorMap[roleCode] ?? "#722ed1";
-
-const renderRoleTags = (roles: RoleCode[]) => {
-  const visible = roles.slice(0, 2);
-  const hidden = roles.slice(2);
+const renderPositionTags = (positions: UserPositionAssignment[]) => {
+  if (!positions.length) {
+    return <span style={{ color: "#999" }}>-</span>;
+  }
+  const sorted = [...positions].sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
+  const visible = sorted.slice(0, 2);
+  const hidden = sorted.slice(2);
+  const fullList = sorted.map((item) => item.name).join("、");
 
   return (
     <Space size={[4, 4]} wrap>
-      {visible.map((role) => (
-        <Tag key={role} color={pickRoleColor(role)} style={{ marginInlineEnd: 0 }}>
-          {roleNameMap[role] ?? role}
+      {visible.map((item) => (
+        <Tag
+          key={item.id}
+          style={{
+            marginInlineEnd: 0,
+            background: item.isPrimary ? "#e6f7e6" : "#e6f0ff",
+            color: item.isPrimary ? "#52c41a" : "#2b5cd6",
+            border: "none",
+            borderRadius: 4,
+            padding: "4px 12px",
+            fontSize: 13,
+          }}
+        >
+          {item.name}
         </Tag>
       ))}
       {hidden.length ? (
-        <Tooltip title={hidden.map((role) => roleNameMap[role] ?? role).join("、")}>
+        <Tooltip title={fullList}>
           <Tag style={{ marginInlineEnd: 0 }}>+{hidden.length}</Tag>
         </Tooltip>
       ) : null}
@@ -106,8 +119,8 @@ const UserManagePage: React.FC = () => {
   const [editingUser, setEditingUser] = useState<UserItem | null>(null);
   const [focusSection, setFocusSection] = useState<"basic" | "org" | "permission">("basic");
 
-  const [permissionOpen, setPermissionOpen] = useState(false);
-  const [permissionUser, setPermissionUser] = useState<UserItem | null>(null);
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [assignUser, setAssignUser] = useState<UserItem | null>(null);
 
   const tree = orgTreeMap[activeType];
   const orgKeysByType = useMemo(() => collectKeys(tree), [tree]);
@@ -137,41 +150,26 @@ const UserManagePage: React.FC = () => {
     { title: "姓名", dataIndex: "name", key: "name", width: 100 },
     { title: "账号", dataIndex: "account", key: "account", width: 120 },
     { title: "所属组织", dataIndex: "orgName", key: "orgName", width: 140 },
-    { title: "手机号", dataIndex: "phone", key: "phone", width: 130 },
-    { title: "邮箱", dataIndex: "email", key: "email", width: 180 },
+    {
+      title: "手机号",
+      dataIndex: "phone",
+      key: "phone",
+      width: 130,
+      render: (phone: string) => phone.replace("****", "0000"),
+    },
+    {
+      title: "职务",
+      dataIndex: "positions",
+      key: "positions",
+      width: 170,
+      render: (positions: UserPositionAssignment[] = []) => renderPositionTags(positions),
+    },
     {
       title: "状态",
       dataIndex: "status",
       key: "status",
       width: 90,
       render: (value: UserStatus) => <Tag color={statusMap[value].color}>{statusMap[value].label}</Tag>,
-    },
-    {
-      title: "角色",
-      dataIndex: "roles",
-      key: "roles",
-      width: 220,
-      render: (roles: RoleCode[]) => renderRoleTags(roles),
-    },
-    {
-      title: "数据范围",
-      key: "dataScope",
-      width: 180,
-      render: (_value, record) => {
-        if (record.roles.includes("system_admin")) {
-          return <Tag color="blue">全区</Tag>;
-        }
-
-        if (!record.extraDataAuth.length) {
-          return <span style={{ color: "#595959" }}>{record.orgName}</span>;
-        }
-
-        return (
-          <Tooltip title={record.extraDataAuth.map((orgId) => orgNameMap[orgId] ?? orgId).join("、")}>
-            <span style={{ color: "#595959" }}>{`${record.orgName} +${record.extraDataAuth.length}`}</span>
-          </Tooltip>
-        );
-      },
     },
     {
       title: "最后登录时间",
@@ -183,44 +181,19 @@ const UserManagePage: React.FC = () => {
     {
       title: "操作",
       key: "actions",
-      width: 310,
-      fixed: "right",
+      width: 240,
       render: (_value, record) => (
         <Space size={0}>
           <Button
             type="link"
             style={{ paddingInline: 4 }}
             onClick={() => {
-              setFormMode("edit");
-              setEditingUser(record);
-              setFocusSection("basic");
-              setFormOpen(true);
+              setAssignUser(record);
+              setAssignOpen(true);
             }}
           >
-            编辑
+            分配职务
           </Button>
-
-          <Button
-            type="link"
-            style={{ paddingInline: 4 }}
-            onClick={() => {
-              setPermissionUser(record);
-              setPermissionOpen(true);
-            }}
-          >
-            权限
-          </Button>
-
-          <Popconfirm
-            title="确认将该用户密码重置为默认密码？"
-            okText="确认"
-            cancelText="取消"
-            onConfirm={() => message.success(`已重置 ${record.name} 的密码为默认密码`)}
-          >
-            <Button type="link" style={{ paddingInline: 4 }}>
-              重置密码
-            </Button>
-          </Popconfirm>
 
           <Popconfirm
             title={`确认${record.status === "active" ? "停用" : "启用"}该用户？`}
@@ -242,20 +215,6 @@ const UserManagePage: React.FC = () => {
           >
             <Button type="link" style={{ paddingInline: 4 }}>
               {record.status === "active" ? "停用" : "启用"}
-            </Button>
-          </Popconfirm>
-
-          <Popconfirm
-            title="确认删除该用户？"
-            okText="删除"
-            cancelText="取消"
-            onConfirm={() => {
-              setUsers((prev) => prev.filter((item) => item.id !== record.id));
-              message.success("已删除用户");
-            }}
-          >
-            <Button type="link" danger style={{ paddingInline: 4 }}>
-              删除
             </Button>
           </Popconfirm>
         </Space>
@@ -444,10 +403,15 @@ const UserManagePage: React.FC = () => {
               type="primary"
               icon={<UserAddOutlined />}
               onClick={() => {
-                setFormMode("create");
-                setEditingUser(null);
-                setFocusSection("basic");
-                setFormOpen(true);
+                Modal.confirm({
+                  title: "确认同步",
+                  content: "是否确定同步协同平台的用户数据？",
+                  okText: "确定",
+                  cancelText: "取消",
+                  onOk: () => {
+                    message.success("已触发同步任务");
+                  },
+                });
               }}
             >
               同步用户
@@ -458,7 +422,6 @@ const UserManagePage: React.FC = () => {
             rowKey="id"
             columns={columns}
             dataSource={filteredUsers}
-            scroll={{ x: 1900 }}
             pagination={{
               showQuickJumper: true,
               showSizeChanger: true,
@@ -482,21 +445,28 @@ const UserManagePage: React.FC = () => {
         onSubmit={handleSaveUser}
       />
 
-      <UserPermissionDrawer
-        open={permissionOpen}
-        detail={permissionUser ? buildUserPermissionDetail(permissionUser) : null}
-        onClose={() => {
-          setPermissionOpen(false);
-          setPermissionUser(null);
+      <UserPositionAssignModal
+        open={assignOpen}
+        userName={assignUser?.name ?? ""}
+        orgName={assignUser?.orgName ?? ""}
+        orgId={assignUser?.orgId ?? ""}
+        positions={assignUser?.positions ?? []}
+        positionOptions={positionOptions}
+        orgOptions={Object.entries(orgNameMap)
+          .filter(([key]) => key.startsWith("dept-") || key.startsWith("town-") || key.startsWith("soe-"))
+          .map(([key, label]) => ({ value: key, label }))}
+        onCancel={() => {
+          setAssignOpen(false);
+          setAssignUser(null);
         }}
-        onEdit={() => {
-          if (!permissionUser) {
-            return;
-          }
-          setEditingUser(permissionUser);
-          setFormMode("edit");
-          setFocusSection("permission");
-          setFormOpen(true);
+        onSave={(nextPositions) => {
+          if (!assignUser) return;
+          setUsers((prev) =>
+            prev.map((item) =>
+              item.id === assignUser.id ? { ...item, positions: nextPositions } : item,
+            ),
+          );
+          setAssignUser((prev) => (prev ? { ...prev, positions: nextPositions } : prev));
         }}
       />
     </div>

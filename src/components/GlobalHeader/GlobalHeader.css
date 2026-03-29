@@ -25,6 +25,18 @@
   gap: 16px;
 }
 
+.header-date-text {
+  font-size: 13px;
+  color: #666 !important;
+  white-space: nowrap;
+}
+
+.header-divider {
+  width: 2px;
+  height: 20px;
+  background: #cfd6e4;
+}
+
 .platform-logo {
   width: 32px;
   height: 32px;
@@ -42,6 +54,10 @@
   color: #595959;
   cursor: pointer;
   transition: color 0.2s;
+}
+
+.notice-wrap {
+  margin-right: 18px;
 }
 
 .notify-trigger:hover {

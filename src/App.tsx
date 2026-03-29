@@ -1,5 +1,6 @@
 ﻿import React, { Suspense, useEffect, useMemo, useState } from "react";
 import {
+  HomeOutlined,
   BookOutlined,
   FolderOpenOutlined,
   SettingOutlined,
@@ -8,7 +9,7 @@ import {
   FileSearchOutlined,
   FundViewOutlined,
 } from "@ant-design/icons";
-import { Card, Layout, Menu, Typography } from "antd";
+import { Card, Layout, Menu, Typography, message } from "antd";
 import type { MenuProps } from "antd";
 import { matchPath, useLocation, useNavigate } from "react-router-dom";
 
@@ -29,16 +30,20 @@ const TaskDataViewPage = React.lazy(() => import("./pages/Task/TaskDataViewPage"
 const OrganizationListPage = React.lazy(() => import("./pages/OrganizationList"));
 const UserManagePage = React.lazy(() => import("./pages/UserManage"));
 const RoleManagePage = React.lazy(() => import("./pages/RoleManage"));
+const PositionManagePage = React.lazy(() => import("./pages/PositionManage"));
 const DataReportListPage = React.lazy(() => import("./pages/DataReport/DataReportListPage"));
 const DataReportFormPage = React.lazy(() => import("./pages/DataReport/DataReportFormPage"));
+const FileTemplatePreviewPage = React.lazy(() => import("./pages/FileTemplateManagement/FileTemplatePreviewPage"));
 const WorkModuleFillPage = React.lazy(() => import("./pages/DataReport/WorkModuleFillPage"));
 const WorkModuleColumnPage = React.lazy(() => import("./pages/DataReport/WorkModuleColumnPage"));
 const ReportDetailPage = React.lazy(() => import("./pages/DataReport/ReportDetailPage"));
+const DashboardPage = React.lazy(() => import("./pages/Dashboard"));
 const AiQaLeaderPage = React.lazy(() => import("./pages/AiQaLeaderPage"));
 const SmartReportPage = React.lazy(() => import("./pages/SmartReport"));
 const LoginPage = React.lazy(() => import("./pages/Login"));
 
 type SubMenuKey =
+  | "workbench"
   | "knowledge-base-management"
   | "knowledge-tags"
   | "knowledge-data-report"
@@ -49,9 +54,11 @@ type SubMenuKey =
   | "sharing-intelligent-report"
   | "settings-user-management"
   | "settings-role-management"
+  | "settings-position-management"
   | "settings-organization";
 
 const menuPathMap: Record<SubMenuKey, string> = {
+  workbench: "/dashboard",
   "knowledge-base-management": "/knowledge/base-management",
   "knowledge-tags": "/knowledge/tags",
   "knowledge-data-report": "/report",
@@ -62,10 +69,16 @@ const menuPathMap: Record<SubMenuKey, string> = {
   "sharing-intelligent-report": "/sharing/intelligent-report",
   "settings-user-management": "/settings/users",
   "settings-role-management": "/settings/roles",
+  "settings-position-management": "/settings/positions",
   "settings-organization": "/settings/organizations",
 };
 
 const menuItems: MenuProps["items"] = [
+  {
+    key: "workbench",
+    icon: <HomeOutlined />,
+    label: "工作台",
+  },
   {
     key: "knowledge-collection",
     icon: <FolderOpenOutlined />,
@@ -101,6 +114,7 @@ const menuItems: MenuProps["items"] = [
     children: [
       { key: "settings-user-management", label: "用户管理" },
       { key: "settings-role-management", label: "角色管理" },
+      { key: "settings-position-management", label: "职务管理" },
       { key: "settings-organization", label: "组织机构" },
     ],
   },
@@ -124,6 +138,9 @@ const PlaceholderPage: React.FC<{ title: string; icon: React.ReactNode; descript
 );
 
 const resolveMenuKeyByPath = (pathname: string): SubMenuKey => {
+  if (pathname.startsWith("/dashboard") || pathname.startsWith("/workbench")) {
+    return "workbench";
+  }
   if (pathname.startsWith("/knowledge/base-management")) {
     return "knowledge-base-management";
   }
@@ -154,6 +171,9 @@ const resolveMenuKeyByPath = (pathname: string): SubMenuKey => {
   if (pathname.startsWith("/settings/roles") || pathname.startsWith("/settings/role-management")) {
     return "settings-role-management";
   }
+  if (pathname.startsWith("/settings/positions") || pathname.startsWith("/settings/position-management")) {
+    return "settings-position-management";
+  }
   if (pathname.startsWith("/settings/organizations") || pathname.startsWith("/settings/organization")) {
     return "settings-organization";
   }
@@ -182,7 +202,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     if (pathname === "/") {
-      navigate(menuPathMap["knowledge-base-management"], { replace: true });
+      navigate(menuPathMap.workbench, { replace: true });
     }
   }, [navigate, pathname]);
 
@@ -214,6 +234,14 @@ const App: React.FC = () => {
       return (
         <Suspense fallback={null}>
           <KnowledgeBaseManagementPage />
+        </Suspense>
+      );
+    }
+
+    if (pathname.startsWith("/dashboard") || pathname.startsWith("/workbench")) {
+      return (
+        <Suspense fallback={null}>
+          <DashboardPage />
         </Suspense>
       );
     }
@@ -296,13 +324,19 @@ const App: React.FC = () => {
       );
     }
 
+    if (matchPath("/form/preview/:id", pathname)) {
+      return (
+        <Suspense fallback={null}>
+          <FileTemplatePreviewPage />
+        </Suspense>
+      );
+    }
+
     if (matchPath("/template/:categoryId/form/preview/:formId", pathname)) {
       return (
-        <PlaceholderPage
-          title="表单预览"
-          icon={<FolderOpenOutlined />}
-          description="此路由已打通。你可以在这里接入表单预览页面。"
-        />
+        <Suspense fallback={null}>
+          <FileTemplatePreviewPage />
+        </Suspense>
       );
     }
 
@@ -417,6 +451,14 @@ const App: React.FC = () => {
       );
     }
 
+    if (pathname.startsWith("/settings/positions") || pathname.startsWith("/settings/position-management")) {
+      return (
+        <Suspense fallback={null}>
+          <PositionManagePage />
+        </Suspense>
+      );
+    }
+
     if (pathname.startsWith("/settings/organizations") || pathname.startsWith("/settings/organization")) {
       return (
         <Suspense fallback={null}>
@@ -450,6 +492,10 @@ const App: React.FC = () => {
             onOpenChange={(keys) => setOpenKeys(keys)}
             onClick={(info) => {
               const key = info.key as SubMenuKey;
+              if (key === "knowledge-tags") {
+                message.info("该功能正在建设中，敬请期待");
+                return;
+              }
               navigate(menuPathMap[key]);
             }}
           />

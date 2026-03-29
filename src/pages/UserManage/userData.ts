@@ -26,12 +26,30 @@ export interface UserItem {
   phone: string;
   email: string;
   position: string;
+  positions?: UserPositionAssignment[];
   status: UserStatus;
   roles: RoleCode[];
   extraDataAuth: string[];
   dataScope: string;
   isDataOfficer: boolean;
   lastLoginAt: string;
+}
+
+export interface PositionOption {
+  id: string;
+  name: string;
+  code: string;
+  status: "enabled" | "disabled";
+}
+
+export interface UserPositionAssignment {
+  id: string;
+  name: string;
+  code: string;
+  orgId: string;
+  orgName: string;
+  isPrimary: boolean;
+  validRange?: [string, string];
 }
 
 export interface AccessibleKnowledgeBase {
@@ -182,6 +200,25 @@ export const userListMock: UserItem[] = [
     phone: "138****1001",
     email: "zhangsan@gov.cn",
     position: "信息化专员",
+    positions: [
+      {
+        id: "assign-001",
+        name: "系统管理员",
+        code: "SYS_ADMIN",
+        orgId: "dept-001",
+        orgName: "区大数据局",
+        isPrimary: true,
+        validRange: ["2026-01-01", "2026-12-31"],
+      },
+      {
+        id: "assign-002",
+        name: "数据专员",
+        code: "DATA_SPECIALIST",
+        orgId: "dept-001",
+        orgName: "区大数据局",
+        isPrimary: false,
+      },
+    ],
     status: "active",
     roles: ["system_admin"],
     extraDataAuth: [],
@@ -198,6 +235,16 @@ export const userListMock: UserItem[] = [
     phone: "138****1002",
     email: "lisi@gov.cn",
     position: "副局长",
+    positions: [
+      {
+        id: "assign-003",
+        name: "单位负责人",
+        code: "UNIT_OWNER",
+        orgId: "dept-001",
+        orgName: "区大数据局",
+        isPrimary: true,
+      },
+    ],
     status: "active",
     roles: ["unit_admin"],
     extraDataAuth: [],
@@ -214,6 +261,7 @@ export const userListMock: UserItem[] = [
     phone: "138****1003",
     email: "wangwu@gov.cn",
     position: "科员",
+    positions: [],
     status: "active",
     roles: ["user"],
     extraDataAuth: [],
@@ -230,6 +278,16 @@ export const userListMock: UserItem[] = [
     phone: "138****1004",
     email: "zhaoliu@gov.cn",
     position: "数据管理员",
+    positions: [
+      {
+        id: "assign-004",
+        name: "数据专员",
+        code: "DATA_SPECIALIST",
+        orgId: "dept-002",
+        orgName: "区发改委",
+        isPrimary: true,
+      },
+    ],
     status: "active",
     roles: ["unit_admin", "data_officer"],
     extraDataAuth: [],
@@ -246,6 +304,7 @@ export const userListMock: UserItem[] = [
     phone: "138****1005",
     email: "qianqi@gov.cn",
     position: "科员",
+    positions: [],
     status: "disabled",
     roles: ["user"],
     extraDataAuth: [],
@@ -262,6 +321,25 @@ export const userListMock: UserItem[] = [
     phone: "138****1006",
     email: "sunba@gov.cn",
     position: "局长",
+    positions: [
+      {
+        id: "assign-005",
+        name: "业务负责人",
+        code: "BIZ_OWNER",
+        orgId: "dept-003",
+        orgName: "区文旅局",
+        isPrimary: true,
+      },
+      {
+        id: "assign-006",
+        name: "审核专员",
+        code: "REVIEWER",
+        orgId: "dept-003",
+        orgName: "区文旅局",
+        isPrimary: false,
+        validRange: ["2026-02-01", "2026-06-30"],
+      },
+    ],
     status: "active",
     roles: ["unit_admin"],
     extraDataAuth: ["dept-001", "dept-002"],
@@ -278,6 +356,7 @@ export const userListMock: UserItem[] = [
     phone: "138****1007",
     email: "zhoujiu@gov.cn",
     position: "信息化专员",
+    positions: [],
     status: "active",
     roles: ["data_officer"],
     extraDataAuth: [],
@@ -294,6 +373,16 @@ export const userListMock: UserItem[] = [
     phone: "138****1008",
     email: "wushi@gov.cn",
     position: "党政办主任",
+    positions: [
+      {
+        id: "assign-007",
+        name: "办公室主任",
+        code: "OFFICE_DIRECTOR",
+        orgId: "town-001",
+        orgName: "新塘镇",
+        isPrimary: true,
+      },
+    ],
     status: "active",
     roles: ["unit_admin", "data_officer"],
     extraDataAuth: [],
@@ -310,6 +399,16 @@ export const userListMock: UserItem[] = [
     phone: "138****1009",
     email: "zhengyi@gov.cn",
     position: "综合部经理",
+    positions: [
+      {
+        id: "assign-008",
+        name: "综合部经理",
+        code: "ADMIN_MANAGER",
+        orgId: "soe-001",
+        orgName: "区城投集团",
+        isPrimary: true,
+      },
+    ],
     status: "active",
     roles: ["unit_admin"],
     extraDataAuth: [],
@@ -326,6 +425,16 @@ export const userListMock: UserItem[] = [
     phone: "138****1010",
     email: "fenger@gov.cn",
     position: "数据专员",
+    positions: [
+      {
+        id: "assign-009",
+        name: "数据专员",
+        code: "DATA_SPECIALIST",
+        orgId: "soe-001",
+        orgName: "区城投集团",
+        isPrimary: true,
+      },
+    ],
     status: "active",
     roles: ["data_officer"],
     extraDataAuth: [],
@@ -333,6 +442,17 @@ export const userListMock: UserItem[] = [
     isDataOfficer: true,
     lastLoginAt: "2024-03-19 16:00:00",
   },
+];
+
+export const positionOptions: PositionOption[] = [
+  { id: "pos-001", name: "系统管理员", code: "SYS_ADMIN", status: "enabled" },
+  { id: "pos-002", name: "数据专员", code: "DATA_SPECIALIST", status: "enabled" },
+  { id: "pos-003", name: "单位负责人", code: "UNIT_OWNER", status: "enabled" },
+  { id: "pos-004", name: "业务负责人", code: "BIZ_OWNER", status: "enabled" },
+  { id: "pos-005", name: "审核专员", code: "REVIEWER", status: "enabled" },
+  { id: "pos-006", name: "办公室主任", code: "OFFICE_DIRECTOR", status: "enabled" },
+  { id: "pos-007", name: "综合部经理", code: "ADMIN_MANAGER", status: "enabled" },
+  { id: "pos-008", name: "项目专员", code: "PROJECT_STAFF", status: "disabled" },
 ];
 
 export const permissionTree: PermissionTreeNode[] = [

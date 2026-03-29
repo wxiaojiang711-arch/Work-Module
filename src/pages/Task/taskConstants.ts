@@ -1,7 +1,7 @@
 ﻿import type { Dayjs } from "dayjs";
 
 export type TaskStatus = "pending" | "collecting" | "finished";
-export type FillStatus = "submitted" | "pending" | "rejected";
+export type FillStatus = "submitted" | "pending" | "rejected" | "approved" | "urged";
 
 export interface TaskItem {
   id: string;
@@ -27,18 +27,20 @@ export interface UnitProgressItem {
   unitName: string;
   fillStatus: FillStatus;
   submitTime: string | null;
+  auditTime?: string | null;
+  auditReason?: string;
+  auditRemark?: string;
   submitter: string | null;
 }
 
 export interface TaskConfig {
   name: string;
-  urgency: "normal" | "urgent";
+  urgency: "normal" | "urgent" | "very_urgent";
   timeRange: [Dayjs | null, Dayjs | null];
   description: string;
   attachments: any[];
   selectedTemplates: string[];
   fillPermissions: string[];
-  viewPermissions: string[];
   fillUnitScope?: string;
   fillUnitCustom?: string[];
   fillRoles?: string[];
@@ -66,12 +68,16 @@ export const fillStatusTextMap: Record<FillStatus, string> = {
   submitted: "已提交",
   pending: "待填写",
   rejected: "已退回",
+  approved: "已通过",
+  urged: "已催办",
 };
 
 export const fillStatusColorMap: Record<FillStatus, string> = {
   submitted: "success",
   pending: "warning",
   rejected: "error",
+  approved: "processing",
+  urged: "volcano",
 };
 
 export const permissionTreeData = [
@@ -254,6 +260,25 @@ export const unitProgressMock: UnitProgressItem[] = [
     unitName: "区文旅委",
     fillStatus: "rejected",
     submitTime: null,
+    auditTime: "2024-03-19 09:20:00",
+    auditReason: "数据填写不完整，请补充完整信息",
+    auditRemark: "请补充关键指标",
     submitter: null,
+  },
+  {
+    unitId: "u-004",
+    unitName: "区住建委",
+    fillStatus: "urged",
+    submitTime: null,
+    submitter: null,
+  },
+  {
+    unitId: "u-005",
+    unitName: "区交通局",
+    fillStatus: "approved",
+    submitTime: "2024-03-16 11:10:00",
+    auditTime: "2024-03-18 15:40:00",
+    auditRemark: "数据完整，审核通过",
+    submitter: "李四",
   },
 ];

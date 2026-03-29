@@ -56,6 +56,17 @@ export const roleList: RoleItem[] = [
     permissions: ['all'],
   },
   {
+    id: 'role-006',
+    name: '区委办公室',
+    code: 'party_committee_office',
+    description: '拥有全区数据的查看权限、任务的发布权限、以及对所有单位数据的监督和催办权限。',
+    type: 'preset',
+    color: '#faad14',
+    userCount: 0,
+    permissionModules: ['知识库管理', '数据上报', '智能报告', '智能问数', '系统管理'],
+    permissions: [],
+  },
+  {
     id: 'role-002',
     name: '单位管理员',
     code: 'unit_admin',

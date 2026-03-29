@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Breadcrumb, Card, Divider, Empty, Tabs, Tag } from "antd";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Breadcrumb, Button, Card, Divider, Empty, Input, Modal, Space, Tabs, Tag, message } from "antd";
 import { Link, useParams } from "react-router-dom";
 
-import { availableTemplates, taskTemplateMap, unitProgressMock } from "./taskConstants";
+import { availableTemplates, taskTemplateMap, unitProgressMock, type UnitProgressItem } from "./taskConstants";
 import styles from "./TaskDataViewPage.module.css";
+import reportStyles from "../DataReport/DataReport.module.css";
 
 type StepOneData = {
   职能职责: string;
@@ -164,6 +165,18 @@ const unitAliasToName: Record<string, string> = {
 const TaskDataViewPage: React.FC = () => {
   const { taskId, unitId } = useParams<{ taskId: string; unitId: string }>();
   const [activeTabKey, setActiveTabKey] = useState<string>("file-0");
+  const [auditModalOpen, setAuditModalOpen] = useState(false);
+  const [auditResult, setAuditResult] = useState<"approve" | "reject" | "">("");
+  const [auditReason, setAuditReason] = useState("");
+  const [auditRemark, setAuditRemark] = useState("");
+  const [auditTarget, setAuditTarget] = useState<UnitProgressItem | null>(null);
+  const [auditLoading, setAuditLoading] = useState(false);
+  const [auditResultError, setAuditResultError] = useState("");
+  const [auditReasonError, setAuditReasonError] = useState("");
+  const [auditRemarkError, setAuditRemarkError] = useState("");
+  const [reasonFocused, setReasonFocused] = useState(false);
+  const [remarkFocused, setRemarkFocused] = useState(false);
+  const reasonRef = useRef<any>(null);
 
   const templateNameById = useMemo(
     () => availableTemplates.reduce<Record<string, string>>((acc, item) => {
@@ -233,7 +246,7 @@ const TaskDataViewPage: React.FC = () => {
   }
 
   return (
-    <div style={{ padding: 20, background: "#f3f6fb", height: "100%", overflow: "auto" }}>
+    <div style={{ padding: "20px 20px 0", background: "#f3f6fb", height: "100%", overflow: "auto" }}>
       <div style={{ marginBottom: 16 }}>
         <Breadcrumb
           items={[
@@ -386,6 +399,260 @@ const TaskDataViewPage: React.FC = () => {
           </div>
         </div>
       </Card>
+
+      <div className={reportStyles.stickyFooter}>
+        <Space>
+          <Button
+            type="primary"
+            style={{ width: 100 }}
+            onClick={() => {
+              const safeUnitId = unitId ?? "";
+              const fallbackTarget: UnitProgressItem = {
+                unitId: safeUnitId || "unknown",
+                unitName: unitData.unitName,
+                fillStatus: "submitted",
+                submitTime: null,
+                submitter: null,
+              };
+              setAuditTarget(unitProgressMock.find((item) => item.unitId === safeUnitId) ?? fallbackTarget);
+              setAuditResult("");
+              setAuditReason("");
+              setAuditRemark("");
+              setAuditResultError("");
+              setAuditReasonError("");
+              setAuditRemarkError("");
+              setAuditModalOpen(true);
+            }}
+          >
+            审核
+          </Button>
+        </Space>
+      </div>
+
+      <Modal
+        title="上报数据审核"
+        open={auditModalOpen}
+        onCancel={() => setAuditModalOpen(false)}
+        width={600}
+        footer={null}
+        destroyOnClose
+        bodyStyle={{ maxHeight: "70vh", overflow: "auto", paddingInline: 24 }}
+      >
+        <div style={{ background: "#fafafa", borderRadius: 8, padding: 16, marginBottom: 24 }}>
+          <div style={{ fontSize: 14, color: "#666" }}>上报单位：{auditTarget?.unitName ?? "-"}</div>
+          <div style={{ fontSize: 14, color: "#666", marginTop: 8 }}>上报人：{auditTarget?.submitter ?? "-"}</div>
+          <div style={{ fontSize: 14, color: "#666", marginTop: 8 }}>上报时间：{auditTarget?.submitTime ?? "-"}</div>
+        </div>
+
+        <div style={{ marginBottom: 24 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#333", marginBottom: 12 }}>
+            <span style={{ color: "#f5222d", marginRight: 4 }}>*</span>审核结果
+          </div>
+          <Space direction="vertical" size={16}>
+            <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <input
+                type="radio"
+                name="auditResult"
+                value="approve"
+                checked={auditResult === "approve"}
+                onChange={() => {
+                  setAuditResult("approve");
+                  setAuditResultError("");
+                  setAuditReasonError("");
+                }}
+                style={{ width: 16, height: 16 }}
+              />
+              <span style={{ color: "#52c41a" }}>审核通过</span>
+            </label>
+            <label style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <input
+                type="radio"
+                name="auditResult"
+                value="reject"
+                checked={auditResult === "reject"}
+                onChange={() => {
+                  setAuditResult("reject");
+                  setAuditResultError("");
+                }}
+                style={{ width: 16, height: 16 }}
+              />
+              <span style={{ color: "#f5222d" }}>退回修改</span>
+            </label>
+          </Space>
+          {auditResultError ? (
+            <div style={{ color: "#f5222d", fontSize: 12, marginTop: 8 }}>{auditResultError}</div>
+          ) : null}
+        </div>
+
+        {auditResult === "reject" ? (
+          <>
+            <div style={{ marginBottom: 12 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "#333", marginBottom: 8 }}>
+                <span style={{ color: "#f5222d", marginRight: 4 }}>*</span>退回原因
+              </div>
+              <Input.TextArea
+                ref={reasonRef}
+                value={auditReason}
+                onChange={(event) => {
+                  setAuditReason(event.target.value);
+                  setAuditReasonError("");
+                }}
+                onFocus={() => setReasonFocused(true)}
+                onBlur={() => setReasonFocused(false)}
+                placeholder="请输入退回原因，说明需要修改的内容"
+                autoSize={{ minRows: 4, maxRows: 7 }}
+                maxLength={500}
+                style={{
+                  borderRadius: 6,
+                  borderColor: auditReasonError ? "#f5222d" : "#d9d9d9",
+                  padding: 12,
+                  boxShadow: reasonFocused ? "0 0 0 2px rgba(43,92,214,0.1)" : "none",
+                }}
+              />
+              {auditReasonError ? (
+                <div style={{ color: "#f5222d", fontSize: 12, marginTop: 8 }}>{auditReasonError}</div>
+              ) : null}
+              <div style={{ textAlign: "right", fontSize: 13, color: "#999", marginTop: 8, marginBottom: 12 }}>
+                {auditReason.length}/500
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 24 }}>
+              <div style={{ fontSize: 13, color: "#666", marginBottom: 8 }}>常用退回原因</div>
+              <Space size={[8, 8]} wrap>
+                {[
+                  "数据填写不完整，请补充完整信息",
+                  "上传的文件格式不正确，请重新上传",
+                  "数据内容与实际情况不符，请核实后修改",
+                  "缺少必要的附件材料，请补充上传",
+                  "数据填写有误，请仔细核对后修改",
+                  "其他原因",
+                ].map((text) => (
+                  <Button
+                    key={text}
+                    type="default"
+                    size="small"
+                    style={{
+                      borderRadius: 4,
+                      borderColor: "#d9d9d9",
+                      color: "#666",
+                    }}
+                    onClick={() => {
+                      setAuditReason(text === "其他原因" ? "" : text);
+                      setAuditReasonError("");
+                      window.setTimeout(() => reasonRef.current?.focus(), 0);
+                    }}
+                  >
+                    {text}
+                  </Button>
+                ))}
+              </Space>
+            </div>
+          </>
+        ) : null}
+
+        <div style={{ marginBottom: 8 }}>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#333", marginBottom: 8 }}>审核备注</div>
+          <Input.TextArea
+            value={auditRemark}
+            onChange={(event) => {
+              setAuditRemark(event.target.value);
+              setAuditRemarkError("");
+            }}
+            onFocus={() => setRemarkFocused(true)}
+            onBlur={() => setRemarkFocused(false)}
+            placeholder="可填写审核备注信息（可选）"
+            autoSize={{ minRows: 3, maxRows: 6 }}
+            maxLength={300}
+            style={{
+              borderRadius: 6,
+              borderColor: auditRemarkError ? "#f5222d" : "#d9d9d9",
+              padding: 12,
+              boxShadow: remarkFocused ? "0 0 0 2px rgba(43,92,214,0.1)" : "none",
+            }}
+          />
+          {auditRemarkError ? (
+            <div style={{ color: "#f5222d", fontSize: 12, marginTop: 8 }}>{auditRemarkError}</div>
+          ) : null}
+          <div style={{ textAlign: "right", fontSize: 13, color: "#999", marginTop: 8 }}>
+            {auditRemark.length}/300
+          </div>
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 12, marginTop: 24 }}>
+          <Button
+            onClick={() => setAuditModalOpen(false)}
+            style={{ width: 100, height: 40, color: "#666", borderColor: "#d9d9d9" }}
+            disabled={auditLoading}
+          >
+            取消
+          </Button>
+          {auditResult === "approve" ? (
+            <Button
+              type="primary"
+              loading={auditLoading}
+              style={{ width: 120, height: 40, background: "#52c41a" }}
+              onClick={() => {
+                if (!auditResult) {
+                  setAuditResultError("请选择审核结果");
+                  return;
+                }
+                if (auditRemark.length > 300) {
+                  setAuditRemarkError("审核备注最多300个字符");
+                  return;
+                }
+                setAuditLoading(true);
+                window.setTimeout(() => {
+                  message.success("审核成功");
+                  setAuditLoading(false);
+                  setAuditModalOpen(false);
+                }, 600);
+              }}
+            >
+              审核通过
+            </Button>
+          ) : null}
+          {auditResult === "reject" ? (
+            <Button
+              danger
+              type="primary"
+              loading={auditLoading}
+              style={{ width: 120, height: 40 }}
+              onClick={() => {
+                if (!auditResult) {
+                  setAuditResultError("请选择审核结果");
+                  return;
+                }
+                const trimmed = auditReason.trim();
+                if (!trimmed) {
+                  setAuditReasonError("请输入退回原因");
+                  return;
+                }
+                if (trimmed.length < 10) {
+                  setAuditReasonError("退回原因至少10个字符");
+                  return;
+                }
+                if (trimmed.length > 500) {
+                  setAuditReasonError("退回原因最多500个字符");
+                  return;
+                }
+                if (auditRemark.length > 300) {
+                  setAuditRemarkError("审核备注最多300个字符");
+                  return;
+                }
+                setAuditLoading(true);
+                window.setTimeout(() => {
+                  message.success("审核成功");
+                  setAuditLoading(false);
+                  setAuditModalOpen(false);
+                }, 600);
+              }}
+            >
+              退回修改
+            </Button>
+          ) : null}
+        </div>
+      </Modal>
     </div>
   );
 };

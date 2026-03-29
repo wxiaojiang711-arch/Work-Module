@@ -1,0 +1,494 @@
+.page {
+  width: 100%;
+  min-height: calc(100vh - 60px);
+  background: #f5f7fa;
+  padding: 24px;
+}
+
+.loadingWrap {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.block {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 24px;
+  margin-top: 24px;
+}
+
+.blockTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.welcomeCard {
+  height: 60px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.welcomeText {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.welcomeDate {
+  margin-top: 8px;
+  font-size: 14px;
+  color: #999;
+}
+
+.quickGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  min-height: 140px;
+}
+
+.quickAction {
+  height: 100px;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+
+.quickAction:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #2b5cd6;
+  background: #f8f9ff;
+}
+
+.quickAction:active {
+  transform: scale(0.98);
+  transition-duration: 0.1s;
+}
+
+.quickIcon {
+  font-size: 32px;
+}
+
+.reportTodoRow {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 24px;
+  margin-top: 24px;
+}
+
+.reportTodoRow .block {
+  margin-top: 0;
+}
+
+.reportGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  min-height: 398px;
+}
+
+.reportCard {
+  height: 190px;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.reportCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: #f8f9ff;
+}
+
+.taskStatsMerged {
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e8e8e8;
+}
+
+.taskSubTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.reportTitle {
+  margin-top: 16px;
+  font-size: 16px;
+  color: #666;
+}
+
+.reportValue {
+  margin-top: 14px;
+  font-size: 36px;
+  font-weight: 700;
+  color: #333;
+  line-height: 1;
+}
+
+.reportValueUnit {
+  margin-left: 4px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.todoBlock {
+  min-height: 160px;
+}
+
+.todoContent {
+  max-height: 400px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.todoGroup {
+  margin-top: 24px;
+}
+
+.todoGroup:first-child {
+  margin-top: 0;
+}
+
+.todoGroupTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.todoItem {
+  min-height: 50px;
+  background: #fafafa;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 8px;
+  transition: background 0.3s ease-in-out;
+}
+
+.todoItem:hover {
+  background: #f0f0f0;
+}
+
+.todoRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.todoTaskName {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  flex: 1;
+}
+
+.todoMeta {
+  margin-top: 4px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13px;
+  color: #999;
+}
+
+.todoDeadlineOverdue {
+  margin-top: 4px;
+  font-size: 13px;
+  color: #f5222d;
+}
+
+.ellipsisText {
+  display: inline-block;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.expandBtn {
+  border: 0;
+  background: transparent;
+  color: #2b5cd6;
+  font-size: 13px;
+  margin-top: 12px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.taskStatsRow {
+  display: grid;
+  grid-template-columns: 25% 35% 40%;
+  gap: 20px;
+}
+
+.taskStatsLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.statItem {
+  cursor: default;
+}
+
+.statItem[role="button"] {
+  cursor: pointer;
+}
+
+.statLabel {
+  font-size: 14px;
+  color: #666;
+}
+
+.statValueBlue,
+.statValueGreen,
+.statValue {
+  margin-top: 8px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.statValueBlue {
+  color: #2b5cd6;
+}
+
+.statValueGreen {
+  color: #52c41a;
+}
+
+.statValue {
+  font-size: 32px;
+  color: #333;
+}
+
+.taskStatsHint {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #999;
+}
+
+.taskStatsMiddle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.taskStatsRight {
+  min-height: 150px;
+}
+
+.trendSvg {
+  width: 100%;
+  height: 150px;
+}
+
+.gridLine {
+  stroke: #e8e8e8;
+  stroke-width: 1;
+}
+
+.trendLine {
+  fill: none;
+  stroke: #2b5cd6;
+  stroke-width: 2;
+}
+
+.trendDot {
+  fill: #2b5cd6;
+}
+
+.trendAxisText {
+  fill: #999;
+  font-size: 11px;
+}
+
+.blockHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.rankRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.rankTableWrap {
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.rankSubTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  padding: 12px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.rankTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.rankTable th {
+  height: 40px;
+  background: #fafafa;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  text-align: left;
+}
+
+.rankTable td {
+  height: 50px;
+  padding: 0 12px;
+  font-size: 13px;
+  color: #333;
+  border-top: 1px solid #e8e8e8;
+}
+
+.rankTable tbody tr:hover {
+  background: #f5f7fa;
+}
+
+.rankTop1 {
+  background: #fffbe6;
+}
+
+.rankTop2 {
+  background: #f5f5f5;
+}
+
+.rankTop3 {
+  background: #fef3e6;
+}
+
+.boldText {
+  font-weight: 700;
+}
+
+.blueText {
+  color: #2b5cd6;
+}
+
+.greenText {
+  color: #52c41a;
+}
+
+.mutedText {
+  color: #999;
+}
+
+.linkBtn,
+.linkBtnEllipsis {
+  border: 0;
+  background: transparent;
+  color: #333;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+
+.linkBtn:hover,
+.linkBtnEllipsis:hover {
+  color: #2b5cd6;
+}
+
+.linkBtnEllipsis {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.scrollTable {
+  max-height: 400px;
+  overflow: auto;
+}
+
+.rankingLoading {
+  margin-top: 8px;
+  color: #999;
+}
+
+@media (max-width: 1199px) {
+  .quickGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .reportTodoRow {
+    grid-template-columns: 1fr;
+  }
+
+  .reportGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .taskStatsRow {
+    grid-template-columns: 1fr;
+  }
+
+  .rankRow {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}
+
+@media (max-width: 767px) {
+  .page {
+    padding: 16px;
+  }
+
+  .quickGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .reportGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .block {
+    padding: 16px;
+  }
+
+  .linkBtnEllipsis {
+    max-width: 140px;
+  }
+}

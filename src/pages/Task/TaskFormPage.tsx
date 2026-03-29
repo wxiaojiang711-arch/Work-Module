@@ -25,7 +25,7 @@ const TaskFormPage: React.FC = () => {
     attachments: [],
     selectedTemplates: currentTask ? ["tpl-001", "tpl-002"] : [],
     fillPermissions: [],
-    viewPermissions: [],
+    fillUnitScope: "all",
   });
 
   const stepItems = [
@@ -83,10 +83,6 @@ const TaskFormPage: React.FC = () => {
     }
     if (taskConfig.fillPermissions.length === 0) {
       message.warning("请选择填写权限");
-      return;
-    }
-    if (taskConfig.viewPermissions.length === 0) {
-      message.warning("请选择查看权限");
       return;
     }
 

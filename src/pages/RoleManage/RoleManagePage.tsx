@@ -1,9 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { Button, Col, Input, Popconfirm, Row, Select, Space, Table, Tag, Typography, message } from "antd";
-import { DeleteOutlined, EditOutlined, PlusOutlined, SettingOutlined, TeamOutlined } from "@ant-design/icons";
+import { DeleteOutlined, EditOutlined, PlusOutlined, TeamOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 
-import PermissionDrawer from "./PermissionDrawer";
 import RoleFormModal from "./RoleFormModal";
 import RoleUsersModal from "./RoleUsersModal";
 import { roleList as initRoleList, roleUsers as initRoleUsers, type RoleItem, type RoleUser } from "./roleMockData";
@@ -21,8 +20,6 @@ const RoleManagePage: React.FC = () => {
   const [formMode, setFormMode] = useState<"create" | "edit">("create");
   const [editingRole, setEditingRole] = useState<RoleItem | null>(null);
 
-  const [permissionRole, setPermissionRole] = useState<RoleItem | null>(null);
-  const [permissionOpen, setPermissionOpen] = useState(false);
 
   const [userRole, setUserRole] = useState<RoleItem | null>(null);
   const [userOpen, setUserOpen] = useState(false);
@@ -114,17 +111,6 @@ const RoleManagePage: React.FC = () => {
       fixed: "right",
       render: (_, role) => (
         <Space size={0}>
-          <Button
-            type="link"
-            icon={<SettingOutlined />}
-            style={{ paddingInline: 4 }}
-            onClick={() => {
-              setPermissionRole(role);
-              setPermissionOpen(true);
-            }}
-          >
-            配置权限
-          </Button>
 
           <Button
             type="link"
@@ -256,16 +242,6 @@ const RoleManagePage: React.FC = () => {
         role={editingRole}
         onCancel={() => setFormOpen(false)}
         onSubmit={onSaveRole}
-      />
-
-      <PermissionDrawer
-        open={permissionOpen}
-        role={permissionRole}
-        onClose={() => setPermissionOpen(false)}
-        onSave={(permissions) => {
-          if (!permissionRole) return;
-          setRoles((prev) => prev.map((r) => (r.id === permissionRole.id ? { ...r, permissions } : r)));
-        }}
       />
 
       <RoleUsersModal

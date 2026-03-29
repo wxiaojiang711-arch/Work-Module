@@ -1,5 +1,5 @@
 import React from "react";
-import { Checkbox, Collapse, Form, Select, Space, Tree } from "antd";
+import { Collapse, Form, Select, Space, Tree, Typography } from "antd";
 import type { TreeProps } from "antd";
 import type { TaskConfig } from "./taskConstants";
 
@@ -40,17 +40,15 @@ const unitTreeData: TreeProps["treeData"] = [
 ];
 
 const TaskPermissionStep: React.FC<TaskPermissionStepProps> = ({ taskConfig, onChange }) => {
-  const roleOptions = [
-    { label: "数据专员", value: "data_specialist" },
-    { label: "单位管理员", value: "unit_admin" },
-    { label: "其他", value: "other" },
-  ];
+  const fillScope = taskConfig.fillUnitScope ?? "all";
+  const selectedFillUnits = taskConfig.fillUnitCustom ?? [];
+  const isFillCustom = fillScope === "custom";
 
-  const selectedUnits = taskConfig.fillUnitCustom ?? [];
-  const isPartial = taskConfig.fillUnitScope === "custom";
+  const normalizeChecked = (checked: React.Key[] | { checked: React.Key[] }) =>
+    Array.isArray(checked) ? checked : checked.checked;
 
   return (
-    <Form layout="vertical" style={{ maxWidth: 800, margin: "0 auto" }}>
+    <Form layout="vertical" style={{ maxWidth: 800, margin: "0 auto", height: 520, overflow: "auto" }}>
       <Collapse
         defaultActiveKey={["fill_permission"]}
         items={[
@@ -58,74 +56,72 @@ const TaskPermissionStep: React.FC<TaskPermissionStepProps> = ({ taskConfig, onC
             key: "fill_permission",
             label: <span style={{ fontSize: 16, fontWeight: 600 }}>【填报权限】</span>,
             children: (
-              <Space direction="vertical" size={12} style={{ width: "100%" }}>
-                <Form.Item
-                  label={
-                    <span>
-                      填报单位范围
-                      <span style={{ color: "#8c8c8c" }}>（选择“部分单位填报”时可按层级展开并勾选具体单位）</span>
-                    </span>
-                  }
-                  required
-                  style={{ marginBottom: 12 }}
-                >
-                  <Space direction="vertical" size={8} style={{ width: "100%" }}>
-                    <Select
-                      value={taskConfig.fillUnitScope}
-                      placeholder="请选择填报单位范围"
-                      options={[
-                        { label: "全部单位填报", value: "all" },
-                        { label: "部分单位填报", value: "custom" },
-                      ]}
-                      onChange={(value) => {
-                        if (value === "all") {
-                          onChange({ fillUnitScope: "all", fillUnitCustom: [] });
-                          return;
-                        }
-                        onChange({ fillUnitScope: "custom" });
-                      }}
-                    />
-
-                    {isPartial ? (
-                      <div
-                        style={{
-                          border: "1px solid #e6eaf0",
-                          borderRadius: 8,
-                          padding: 12,
-                          height: 260,
-                          overflowY: "auto",
-                          background: "#fafbfc",
-                        }}
-                      >
-                        <Tree
-                          checkable
-                          defaultExpandAll
-                          treeData={unitTreeData}
-                          checkedKeys={selectedUnits}
-                          onCheck={(checkedKeys) => onChange({ fillUnitCustom: checkedKeys as string[] })}
-                        />
-                      </div>
-                    ) : null}
-                  </Space>
-
-                </Form.Item>
-
-                <Form.Item
-                  label={
-                    <span>
-                      填报人员角色
-                      <span style={{ color: "#8c8c8c" }}>（选择哪些角色可以进行数据填报）</span>
-                    </span>
-                  }
-                  required
-                  style={{ marginBottom: 0 }}
-                >
-                  <Checkbox.Group
-                    value={taskConfig.fillRoles}
-                    onChange={(value) => onChange({ fillRoles: value as string[] })}
-                    options={roleOptions}
+              <Space direction="vertical" size={0} style={{ width: "100%" }}>
+                <div style={{ marginBottom: 20, lineHeight: "22px" }}>
+                  <span>
+                    填报单位范围
+                    <Typography.Text type="secondary" style={{ marginLeft: 0 }}>
+                      （选择“部分单位填报”时可按层级展开并勾选具体单位）
+                    </Typography.Text>
+                  </span>
+                </div>
+                <Form.Item style={{ marginTop: 0, marginBottom: 5 }}>
+                  <Select
+                    value={fillScope}
+                    style={{ width: 655 }}
+                    options={[
+                      { value: "all", label: "全部单位可填报" },
+                      { value: "custom", label: "部分单位可填报" },
+                    ]}
+                    placeholder="请选择填报单位范围"
+                    onChange={(value) => {
+                      if (value === "all") {
+                        onChange({
+                          fillUnitScope: "all",
+                          fillUnitCustom: [],
+                          fillPermissions: ["all"],
+                        });
+                        return;
+                      }
+                      onChange({
+                        fillUnitScope: "custom",
+                        fillUnitCustom: [],
+                        fillPermissions: [],
+                      });
+                    }}
                   />
                 </Form.Item>
+                {isFillCustom ? (
+                  <div
+                    style={{
+                      border: "1px solid #f0f0f0",
+                      borderRadius: 6,
+                      padding: 12,
+                      height: 320,
+                      overflow: "auto",
+                    }}
+                  >
+                    <Tree
+                      checkable
+                      defaultExpandAll
+                      selectable={false}
+                      treeData={unitTreeData}
+                      checkedKeys={selectedFillUnits}
+                      onCheck={(checkedKeys) => {
+                        const keys = normalizeChecked(checkedKeys).map(String);
+                        onChange({
+                          fillUnitCustom: keys,
+                          fillPermissions: keys,
+                        });
+                      }}
+                    />
+                  </div>
+                ) : null}
+                <div style={{ marginTop: 10 }}>
+                  <Typography.Text type="secondary">
+                    {isFillCustom ? `已选择 ${selectedFillUnits.length} 个单位` : "当前为全部单位"}
+                  </Typography.Text>
+                </div>
               </Space>
             ),
           },

@@ -1,0 +1,75 @@
+.infoCard {
+  background: #f5f7fa;
+  border-radius: 8px;
+  padding: 16px;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.positionCard {
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  padding: 12px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.3s ease-in-out;
+}
+
+.positionCard:hover {
+  background: #f0f0f0;
+}
+
+.cardMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.primaryTag {
+  background: #e6f7e6;
+  color: #52c41a;
+  border: none;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 12px;
+}
+
+.deleteBtn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  color: #999;
+  cursor: pointer;
+}
+
+.deleteBtn:hover {
+  color: #f5222d;
+}
+
+.tag {
+  border: none;
+  border-radius: 4px;
+  padding: 4px 12px;
+  font-size: 13px;
+}
+
+.tagPrimary {
+  background: #e6f7e6;
+  color: #52c41a;
+}
+
+.tagNormal {
+  background: #e6f0ff;
+  color: #2b5cd6;
+}

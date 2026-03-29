@@ -36,27 +36,32 @@ const TaskFormSelectStep: React.FC<TaskFormSelectStepProps> = ({ taskConfig, onC
 
   return (
     <div style={{ marginTop: 12 }}>
-      <Space align="start" size={16} style={{ width: "100%" }}>
-        <Card title="可选表单模板" style={{ flex: 1, minHeight: 520 }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "flex-start", gap: 16 }}>
+        <Card title="可选表单模板" style={{ width: 500, minHeight: 520 }}>
           <Space direction="vertical" style={{ width: "100%" }} size={12}>
-            <Input.Search
-              placeholder="请输入模板名称"
-              allowClear
-              value={searchText}
-              onChange={(event) => setSearchText(event.target.value)}
-            />
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <Select
+                value={categoryFilter}
+                style={{ width: 130 }}
+                options={[
+                  { value: "all", label: "全部" },
+                  { value: "decision", label: "决策库" },
+                  { value: "department", label: "单位库-部门" },
+                  { value: "town", label: "单位库-镇街" },
+                  { value: "soe", label: "单位库-国企" },
+                  { value: "theme", label: "主题库" },
+                ]}
+                onChange={(value) => setCategoryFilter(value)}
+              />
 
-            <Select
-              value={categoryFilter}
-              options={[
-                { value: "all", label: "全部" },
-                { value: "department", label: "部门工作模块" },
-                { value: "town", label: "镇街工作模块" },
-                { value: "soe", label: "国企工作模块" },
-                { value: "theme", label: "主题库" },
-              ]}
-              onChange={(value) => setCategoryFilter(value)}
-            />
+              <Input.Search
+                placeholder="请输入模板名称"
+                allowClear
+                value={searchText}
+                onChange={(event) => setSearchText(event.target.value)}
+                style={{ flex: 1 }}
+              />
+            </div>
 
             <List
               bordered
@@ -91,7 +96,7 @@ const TaskFormSelectStep: React.FC<TaskFormSelectStepProps> = ({ taskConfig, onC
           </Space>
         </Card>
 
-        <Card title={`已选表单模板 (${selectedTemplates.length}个)`} style={{ flex: 1, minHeight: 520 }}>
+        <Card title={`已选表单模板 (${selectedTemplates.length}个)`} style={{ width: 500, minHeight: 520 }}>
           {selectedTemplates.length === 0 ? (
             <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="请从左侧添加表单模板" />
           ) : (
@@ -122,7 +127,7 @@ const TaskFormSelectStep: React.FC<TaskFormSelectStepProps> = ({ taskConfig, onC
             />
           )}
         </Card>
-      </Space>
+      </div>
     </div>
   );
 };

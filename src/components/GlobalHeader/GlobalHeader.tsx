@@ -1,6 +1,5 @@
 ﻿import React, { useMemo, useState } from "react";
 import {
-  Avatar,
   Badge,
   Dropdown,
   Layout,
@@ -13,12 +12,12 @@ import {
 import {
   BellOutlined,
   DatabaseOutlined,
-  DownOutlined,
   LockOutlined,
   LogoutOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import type { MenuProps } from "antd";
+import dayjs from "dayjs";
 import { useNavigate } from "react-router-dom";
 
 import ChangePasswordModal from "./ChangePasswordModal";
@@ -32,6 +31,11 @@ const GlobalHeader: React.FC = () => {
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
 
   const unreadCount = useMemo(() => notificationList.filter((item) => !item.isRead).length, [notificationList]);
+  const todayText = useMemo(() => {
+    const now = dayjs();
+    const week = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"][now.day()];
+    return `${now.format("YYYY年MM月DD日")}，${week}`;
+  }, []);
 
   const menuItems: MenuProps["items"] = [
     {
@@ -79,41 +83,38 @@ const GlobalHeader: React.FC = () => {
         </div>
 
         <div className="global-header-right">
-          <Popover
-            placement="bottomRight"
-            trigger="click"
-            content={
-              <NotificationPopover
-                list={notificationList}
-                onMarkAllRead={() => {
-                  setNotificationList((prev) => prev.map((item) => ({ ...item, isRead: true })));
-                  message.success("已全部标记为已读");
-                }}
-                onViewAll={() => message.info("通知列表页路由预留")}
-              />
-            }
-          >
-            <Badge count={unreadCount} size="small">
-              <BellOutlined className="notify-trigger" />
-            </Badge>
-          </Popover>
+          <Typography.Text className="header-date-text">{todayText}</Typography.Text>
+          <span className="header-divider" />
 
           <Dropdown menu={{ items: menuItems }} placement="bottomRight" trigger={["click"]}>
             <div className="user-trigger">
-              <Avatar
-                size={32}
-                src={currentUser.avatar ?? undefined}
-                style={{ background: "#1890ff" }}
-              >
-                {currentUser.name.slice(-1)}
-              </Avatar>
               <div className="user-info">
-                <Typography.Text style={{ fontSize: 14, color: "#333" }}>{currentUser.name}</Typography.Text>
+                <Typography.Text style={{ fontSize: 14, color: "#333" }}>你好，{currentUser.name}！</Typography.Text>
                 <Typography.Text style={{ fontSize: 12, color: "#999" }}>{currentUser.orgName}</Typography.Text>
               </div>
-              <DownOutlined style={{ fontSize: 10, color: "#999" }} />
             </div>
           </Dropdown>
+
+          <div className="notice-wrap">
+            <Popover
+              placement="bottomRight"
+              trigger="click"
+              content={
+                <NotificationPopover
+                  list={notificationList}
+                  onMarkAllRead={() => {
+                    setNotificationList((prev) => prev.map((item) => ({ ...item, isRead: true })));
+                    message.success("已全部标记为已读");
+                  }}
+                  onViewAll={() => message.info("通知列表页路由预留")}
+                />
+              }
+            >
+              <Badge count={unreadCount} size="small">
+                <BellOutlined className="notify-trigger" />
+              </Badge>
+            </Popover>
+          </div>
         </div>
       </Layout.Header>
 

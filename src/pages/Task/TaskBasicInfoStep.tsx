@@ -26,6 +26,7 @@ const TaskBasicInfoStep: React.FC<TaskBasicInfoStepProps> = ({ taskConfig, onCha
         >
           <Radio value="normal">普通</Radio>
           <Radio value="urgent">紧急</Radio>
+          <Radio value="very_urgent">特急</Radio>
         </Radio.Group>
       </Form.Item>
 
