@@ -137,18 +137,15 @@ const renderPreview = (field: FormField) => {
       const levels = field.props.treeLevel ?? 2;
       return (
         <div className={styles["org-tree-container"]}>
-          <div className={styles["org-tree-title"]}>{field.label}</div>
           <div className={styles["org-tree-level-1"]}>
             <div className={styles["org-tree-level-1-item"]}>
               <div className={styles["org-tree-level-1-header"]}>
                 <span className={styles["org-tree-icon"]}>📁</span>
                 <span className={styles["org-tree-name"]}>一级业务</span>
                 <div className={styles["org-tree-actions"]}>
-                  {field.props.showDeleteButton && (
-                    <button className={`${styles["org-tree-btn"]} ${styles.delete}`}>
-                      <DeleteOutlined />
-                    </button>
-                  )}
+                  <button className={`${styles["org-tree-btn"]} ${styles.delete}`}>
+                    <DeleteOutlined />
+                  </button>
                 </div>
               </div>
               <div className={styles["org-tree-level-2"]}>
@@ -156,16 +153,14 @@ const renderPreview = (field: FormField) => {
                   <span className={styles["org-tree-level-2-icon"]}>📄</span>
                   <span className={styles["org-tree-level-2-name"]}>二级业务</span>
                   <div className={styles["org-tree-level-2-actions"]}>
-                    {field.props.showAddButton && (
+                    {field.props.allowAddLevel2 && (
                       <button className={styles["org-tree-level-2-btn"]}>
                         <PlusOutlined />
                       </button>
                     )}
-                    {field.props.showDeleteButton && (
-                      <button className={`${styles["org-tree-level-2-btn"]} ${styles.delete}`}>
-                        <DeleteOutlined />
-                      </button>
-                    )}
+                    <button className={`${styles["org-tree-level-2-btn"]} ${styles.delete}`}>
+                      <DeleteOutlined />
+                    </button>
                   </div>
                 </div>
                 {levels === 3 && (
@@ -174,11 +169,9 @@ const renderPreview = (field: FormField) => {
                       <span className={styles["org-tree-level-3-icon"]}>📝</span>
                       <span className={styles["org-tree-level-3-name"]}>三级业务</span>
                       <div className={styles["org-tree-level-3-actions"]}>
-                        {field.props.showDeleteButton && (
-                          <button className={`${styles["org-tree-level-3-btn"]} ${styles.delete}`}>
-                            <DeleteOutlined />
-                          </button>
-                        )}
+                        <button className={`${styles["org-tree-level-3-btn"]} ${styles.delete}`}>
+                          <DeleteOutlined />
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -186,45 +179,180 @@ const renderPreview = (field: FormField) => {
               </div>
             </div>
           </div>
-          {field.props.showAddButton && (
+          {field.props.allowAddLevel1 && (
             <button className={styles["org-tree-add-btn"]}>
               <PlusOutlined /> 添加一级业务
             </button>
           )}
         </div>
       );
-    case "indicatorTable":
-      const rows = field.props.tableRows ?? 2;
-      const cols = field.props.tableCols ?? 3;
+    case "coreBusiness":
       return (
-        <div className={styles["indicator-data-container"]}>
-          <div className={styles["indicator-data-title"]}>{field.label}</div>
-          <div className={styles["indicator-data-table-wrap"]}>
-            <table className={styles["indicator-data-table"]}>
+        <div className={styles["core-biz-container"]}>
+          <div className={styles["core-biz-level-1"]}>
+            <div className={styles["core-biz-level-1-item"]}>
+              <div className={styles["core-biz-level-1-header"]}>
+                <span className={styles["core-biz-icon"]}>📁</span>
+                <span className={styles["core-biz-name"]}>{"一级业务"}</span>
+                <div className={styles["core-biz-actions"]}>
+                  <button className={styles["core-biz-btn"]}>
+                    <DeleteOutlined />
+                  </button>
+                </div>
+              </div>
+              <div className={styles["core-biz-level-2"]}>
+                {[0, 1].map((idx) => (
+                  <div key={idx} className={styles["core-biz-level-2-item"]}>
+                    <span className={styles["core-biz-level-2-icon"]}>📄</span>
+                    <span className={styles["core-biz-level-2-name"]}>{"二级业务"}</span>
+                    <div className={styles["core-biz-level-2-actions"]}>
+                      {field.props.allowAddLevel2 && (
+                        <button className={styles["core-biz-level-2-btn"]}>
+                          <PlusOutlined />
+                        </button>
+                      )}
+                      <button className={`${styles["core-biz-level-2-btn"]} ${styles.delete}`}>
+                        <DeleteOutlined />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className={styles["core-biz-desc"]}>
+                <div className={styles["core-biz-desc-label"]}>{"业务说明"}</div>
+                <div className={styles["core-biz-desc-box"]} />
+              </div>
+            </div>
+          </div>
+          {field.props.allowAddLevel1 && (
+            <button className={styles["core-biz-add-btn"]}>
+              <PlusOutlined /> {"添加一级业务"}
+            </button>
+          )}
+        </div>
+      );
+    case "taskBreakdownTable": {
+      const taskRows = field.props.tableRows ?? 2;
+      const quarterHeaders = field.props.colHeaders ?? ["第一季度", "第二季度", "第三季度", "第四季度"];
+      return (
+        <div className={styles["task-breakdown-container"]}>
+          <div className={styles["task-breakdown-table-wrap"]}>
+            <table className={styles["task-breakdown-table"]}>
               <thead>
                 <tr>
-                  <th>指标名称</th>
-                  {Array.from({ length: cols }).map((_, i) => (
-                    <th key={i}>{field.props.colHeaders?.[i] ?? `列${i + 1}`}</th>
+                  <th>{"任务名称"}</th>
+                  {quarterHeaders.map((h) => (
+                    <th key={h}>{h}</th>
                   ))}
-                  <th>操作</th>
+                  <th>{"责任人"}</th>
+                  <th className={styles["center-cell"]}>{"操作"}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Array.from({ length: taskRows }).map((_, i) => (
+                  <tr key={i}>
+                    <td>
+                      <Input.TextArea rows={3} placeholder={"请输入"} disabled />
+                    </td>
+                    {quarterHeaders.map((q) => (
+                      <td key={q}>
+                        <Input.TextArea rows={3} placeholder={"请输入"} disabled />
+                      </td>
+                    ))}
+                    <td>
+                      <Input.TextArea rows={3} placeholder={"请输入"} disabled />
+                    </td>
+                    <td className={styles["center-cell"]}>
+                      <button className={styles["table-delete-btn"]} disabled>
+                        <DeleteOutlined />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          {field.props.allowAddRow && (
+            <button className={styles["task-breakdown-add-btn"]} disabled>
+              <PlusOutlined /> {"添加任务"}
+            </button>
+          )}
+        </div>
+      );
+    }
+    case "indicatorTable":
+      const rows = field.props.tableRows ?? 2;
+      const yearHeaders = ["2021年", "2022年", "2023年", "2024年", "2025年", "2026年目标", "2030年目标"];
+      const showType = field.props.showIndicatorType !== false;
+      return (
+        <div className={styles["indicator-data-container"]}>
+          <div className={styles["indicator-data-table-wrap"]}>
+            <table className={styles["indicator-data-table"]}>
+              <colgroup>
+                {showType ? <col className={styles["col-type"]} /> : null}
+                <col className={styles["col-name"]} />
+                <col className={styles["col-year"]} />
+                <col className={styles["col-year"]} />
+                <col className={styles["col-year"]} />
+                <col className={styles["col-year"]} />
+                <col className={styles["col-year"]} />
+                <col className={styles["col-target"]} />
+                <col className={styles["col-target"]} />
+                <col className={styles["col-op"]} />
+              </colgroup>
+              <thead>
+                <tr>
+                  {showType ? <th className={styles["center-cell"]}>{"指标类型"}</th> : null}
+                  <th className={styles["center-cell"]}>{"指标名称"}</th>
+                  {yearHeaders.map((h) =>
+                    ["2021?", "2022?", "2023?", "2024?", "2025?"].includes(h) ? (
+                      <th key={h} className={`${styles["split-col"]} ${styles["year-header-shift"]}`}>
+                        <div className={styles["year-header"]}>
+                          <div>{h}</div>
+                          <div className={`${styles["split-grid"]} ${styles["year-header-divider"]}`}>
+                            <div className={`${styles["split-grid-col"]} ${styles["split-grid-col-header"]}`}>{"我区情况"}</div>
+                            <div className={`${styles["split-grid-col"]} ${styles["split-grid-col-header"]}`}>{"全市排名"}</div>
+                          </div>
+                        </div>
+                      </th>
+                    ) : (
+                      <th key={h} className={styles["center-cell"]}>{h}</th>
+                    ),
+                  )}
+                  <th className={`${styles["center-cell"]} ${styles["op-col"]}`}>{"操作"}</th>
                 </tr>
               </thead>
               <tbody>
                 {Array.from({ length: rows }).map((_, i) => (
                   <tr key={i}>
-                    <td className={styles["label-col"]}>{field.props.rowHeaders?.[i] ?? `指标${i + 1}`}</td>
-                    {Array.from({ length: cols }).map((_, j) => (
-                      <td key={j}>
-                        <input type="text" placeholder="请输入" disabled />
+                    {showType ? (
+                      <td className={styles["center-cell"]}>
+                        <input type="text" placeholder={"请输入"} disabled />
+                      </td>
+                    ) : null}
+                    <td className={styles["center-cell"]}>
+                      <input type="text" placeholder={"请输入"} disabled />
+                    </td>
+                    {yearHeaders.map((_, j) => (
+                      <td key={j} className={j <= 4 ? styles["split-col"] : styles["center-cell"]}>
+                        {j <= 4 ? (
+                          <div className={styles["split-grid"]}>
+                            <div className={styles["split-grid-col"]}>
+                              <input type="text" placeholder={"请输入"} disabled />
+                            </div>
+                            <div className={styles["split-grid-col"]}>
+                              <input type="text" placeholder={"请输入"} disabled />
+                            </div>
+                          </div>
+                        ) : (
+                          <input type="text" placeholder={"请输入"} disabled />
+                        )}
                       </td>
                     ))}
-                    <td>
-                      <div className={styles["indicator-data-row-actions"]}>
-                        <button className={styles["indicator-data-row-btn"]}>
-                          <DeleteOutlined />
-                        </button>
-                      </div>
+                    <td className={`${styles["center-cell"]} ${styles["op-col"]}`}>
+                      <button className={styles["indicator-data-row-btn"]} disabled>
+                        <DeleteOutlined />
+                      </button>
                     </td>
                   </tr>
                 ))}
@@ -233,7 +361,7 @@ const renderPreview = (field: FormField) => {
           </div>
           {field.props.allowAddRow && (
             <button className={styles["indicator-data-add-btn"]}>
-              <PlusOutlined /> 添加行
+              <PlusOutlined /> {"添加行"}
             </button>
           )}
         </div>
@@ -279,7 +407,9 @@ const SortableItem: React.FC<SortableItemProps> = ({ field, active, onSelect, on
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
         <Space size={4}>
           {field.validation.required && <span style={{ color: "#ff4d4f", fontSize: 16, lineHeight: 1 }}>*</span>}
-          <Typography.Text strong>{field.label}</Typography.Text>
+          <Typography.Text strong>
+            {field.type === "orgTree" && field.label === "组织树" ? "业务树" : field.label}
+          </Typography.Text>
         </Space>
 
         <Space size={4}>

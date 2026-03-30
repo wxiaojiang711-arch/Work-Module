@@ -361,9 +361,9 @@ const PropertyInspector: React.FC<PropertyInspectorProps> = ({
           </>
         ) : null}
 
-        {activeComponent.type === "orgTree" ? (
+        {activeComponent.type === "orgTree" || activeComponent.type === "coreBusiness" ? (
           <>
-            <Form.Item label="树级别">
+            <Form.Item label={activeComponent.type === "coreBusiness" ? "业务层级" : "树级别"}>
               <Select
                 value={activeComponent.props.treeLevel}
                 onChange={(value) =>
@@ -392,24 +392,24 @@ const PropertyInspector: React.FC<PropertyInspectorProps> = ({
                 <Select.Option value="none">全部收起</Select.Option>
               </Select>
             </Form.Item>
-            <Form.Item label="显示添加按钮" valuePropName="checked">
+            <Form.Item label="允许添加一级业务" valuePropName="checked">
               <Switch
-                checked={activeComponent.props.showAddButton}
+                checked={activeComponent.props.allowAddLevel1}
                 onChange={(checked) =>
                   patchComponent((field) => ({
                     ...field,
-                    props: { ...field.props, showAddButton: checked },
+                    props: { ...field.props, allowAddLevel1: checked },
                   }))
                 }
               />
             </Form.Item>
-            <Form.Item label="显示删除按钮" valuePropName="checked">
+            <Form.Item label="允许添加二级业务" valuePropName="checked">
               <Switch
-                checked={activeComponent.props.showDeleteButton}
+                checked={activeComponent.props.allowAddLevel2}
                 onChange={(checked) =>
                   patchComponent((field) => ({
                     ...field,
-                    props: { ...field.props, showDeleteButton: checked },
+                    props: { ...field.props, allowAddLevel2: checked },
                   }))
                 }
               />
@@ -419,19 +419,33 @@ const PropertyInspector: React.FC<PropertyInspectorProps> = ({
 
         {activeComponent.type === "indicatorTable" ? (
           <>
-            <Form.Item label="行数">
-              <InputNumber
-                min={1}
-                max={20}
-                value={activeComponent.props.tableRows}
-                onChange={(value) =>
+            <Form.Item label="是否显示指标类型" valuePropName="checked">
+              <Switch
+                checked={activeComponent.props.showIndicatorType}
+                onChange={(checked) =>
                   patchComponent((field) => ({
                     ...field,
-                    props: { ...field.props, tableRows: value ?? 2 },
+                    props: { ...field.props, showIndicatorType: checked },
                   }))
                 }
               />
             </Form.Item>
+            <Form.Item label="允许添加行" valuePropName="checked">
+              <Switch
+                checked={activeComponent.props.allowAddRow}
+                onChange={(checked) =>
+                  patchComponent((field) => ({
+                    ...field,
+                    props: { ...field.props, allowAddRow: checked },
+                  }))
+                }
+              />
+            </Form.Item>
+          </>
+        ) : null}
+
+        {activeComponent.type === "taskBreakdownTable" ? (
+          <>
             <Form.Item label="列数">
               <InputNumber
                 min={1}

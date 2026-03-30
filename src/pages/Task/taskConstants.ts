@@ -275,13 +275,6 @@ export const unitProgressMock: UnitProgressItem[] = [
   {
     unitId: "u-004",
     unitName: "区住建委",
-    fillStatus: "urged",
-    submitTime: null,
-    submitter: null,
-  },
-  {
-    unitId: "u-005",
-    unitName: "区交通局",
     fillStatus: "approved",
     submitTime: "2024-03-16 11:10:00",
     auditTime: "2024-03-18 15:40:00",

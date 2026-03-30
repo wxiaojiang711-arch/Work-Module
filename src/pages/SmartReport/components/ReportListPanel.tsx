@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import { Button, Divider, Input, Modal, Select, Space, Spin, Tag, Tooltip, Typography } from "antd";
+import { Button, Divider, Input, Modal, Space, Spin, Tag, Tooltip, Typography } from "antd";
 import { DeleteOutlined, DownloadOutlined, ThunderboltOutlined } from "@ant-design/icons";
 
 import { reportStatusMap, type ReportItem } from "../smartReportMockData";
@@ -60,16 +60,6 @@ const ReportListPanel: React.FC<Props> = ({
         showCount
         style={{ borderRadius: 8 }}
         onChange={(e) => onTopicChange(e.target.value)}
-      />
-
-      <Select
-        mode="multiple"
-        value={selectedKbIds}
-        maxTagCount={2}
-        placeholder="选择数据来源知识库（可多选）"
-        style={{ width: "100%", marginTop: 8 }}
-        options={kbOptions}
-        onChange={onKbChange}
       />
 
       <Button

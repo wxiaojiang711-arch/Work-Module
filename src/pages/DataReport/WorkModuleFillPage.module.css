@@ -116,7 +116,7 @@
   align-items: center;
   border-bottom: 1px solid #f0f0f0;
   padding-bottom: 12px;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .formTitleRow {
@@ -293,6 +293,7 @@
 .table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed;
 }
 
 .table th,
@@ -300,12 +301,132 @@
   border: 1px solid #e8e8e8;
   padding: 8px;
   min-width: 110px;
+  vertical-align: middle;
 }
 
 .table th {
   background: #fafafa;
   text-align: left;
   white-space: nowrap;
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.centerCell {
+  text-align: center;
+}
+
+.table th.centerCell {
+  text-align: center;
+}
+
+.tableDeleteBtn {
+  border: none;
+  background: transparent;
+  color: #999;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+
+.tableDeleteBtn:disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.tableDeleteBtn:not(:disabled):hover {
+  background: #f5f5f5;
+}
+
+.opCol {
+  width: 80px;
+  min-width: 80px;
+  max-width: 80px;
+}
+
+.colType {
+  width: 8%;
+}
+
+.colName {
+  width: 14%;
+}
+
+.colYear {
+  width: 12%;
+}
+
+.colTarget {
+  width: 6%;
+}
+
+.colOp {
+  width: 60px;
+}
+
+.yearHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: center;
+}
+
+.yearHeaderDivider {
+  border-top: 1px solid #d9d9d9;
+  padding-top: 4px;
+  margin-top: 2px;
+}
+.splitCol {
+  padding: 0 !important;
+  position: relative;
+  background-image: linear-gradient(
+    to right,
+    transparent calc(50% - 0.5px),
+    #d9d9d9 calc(50% - 0.5px),
+    #d9d9d9 calc(50% + 0.5px),
+    transparent calc(50% + 0.5px)
+  );
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.yearHeaderShift {
+  padding-top: 6px !important;
+}
+
+.splitGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 0;
+}
+
+.splitGridCol {
+  padding: 0 8px;
+}
+
+.splitCol .splitGridCol {
+  font-size: 12px;
+  color: #000;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.splitCol .splitGridCol {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.splitGridColHeader {
+  text-align: center;
+  align-items: center;
+  justify-content: center;
+}
+
+.splitGridColHeader + .splitGridColHeader {
+  border-left: 1px solid #d9d9d9;
+  margin-left: -1px;
 }
 
 .footer {
@@ -329,4 +450,167 @@
 .footerRight {
   display: flex;
   gap: 10px;
+}
+
+/* ========== 组织树组件 ========== */
+.orgTreeContainer {
+  background: #fff;
+  padding: 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+}
+
+.orgTreeLevel1 {
+  margin-bottom: 12px;
+}
+
+.orgTreeLevel1Item {
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.orgTreeLevel1Header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background: #f5f7fa;
+  border-radius: 6px;
+  margin-bottom: 12px;
+}
+
+.orgTreeIcon {
+  width: 20px;
+  height: 20px;
+  color: #2b5cd6;
+  flex-shrink: 0;
+}
+
+.orgTreeActions {
+  display: flex;
+  gap: 8px;
+}
+
+.orgTreeBtn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 16px;
+  transition: all 0.3s;
+}
+
+.orgTreeBtn.delete:hover {
+  background: #fee;
+  color: #f5222d;
+}
+
+.orgTreeLevel2 {
+  padding-left: 24px;
+}
+
+.orgTreeLevel2Item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background: #fafafa;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  transition: all 0.3s;
+}
+
+.orgTreeLevel2Item:hover {
+  border-color: #2b5cd6;
+  box-shadow: 0 2px 8px rgba(43, 92, 214, 0.1);
+}
+
+.orgTreeLevel2Icon {
+  width: 18px;
+  height: 18px;
+  color: #999;
+  flex-shrink: 0;
+}
+
+.orgTreeLevel2Actions {
+  display: flex;
+  gap: 4px;
+}
+
+.orgTreeLevel2Btn {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.orgTreeLevel2Btn.delete:hover {
+  background: #fee;
+  color: #f5222d;
+}
+
+.orgTreeLevel2Btn.add:hover {
+  background: #f0f5ff;
+  color: #2b5cd6;
+}
+
+.orgTreeInput {
+  flex: 1;
+  height: 32px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  padding: 0 12px;
+  font-size: 14px;
+  background: #fff;
+}
+
+.orgTreeInput :global(.ant-input) {
+  border: none;
+  box-shadow: none;
+  height: 100%;
+}
+
+.orgTreeInput :global(.ant-input:focus) {
+  box-shadow: none;
+}
+
+.orgTreeContainer + .addBtn {
+  margin-top: 12px;
+}
+
+.richHint {
+  margin-top: 4px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  color: #999;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.richHintTop {
+  margin-top: 4px;
+  margin-bottom: 16px;
+}
+
+.stepIntroHint {
+  margin-top: 0;
 }

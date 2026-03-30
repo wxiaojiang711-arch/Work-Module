@@ -178,7 +178,6 @@ const governanceStatusMap: Record<GovernanceStatus, { label: string; color: stri
   pending: { label: "未处理", color: "default" },
   processing: { label: "处理中", color: "blue" },
   success: { label: "已完成", color: "green" },
-  failed: { label: "失败", color: "red" },
 };
 
 interface QueryState {
@@ -507,7 +506,7 @@ const KnowledgeBaseDetailPage: React.FC = () => {
       key: "governanceStatus",
       width: 140,
       render: (value: GovernanceStatus) => {
-        const status = governanceStatusMap[value];
+        const status = governanceStatusMap[value] ?? governanceStatusMap.pending;
         return <Tag color={status.color}>{status.label}</Tag>;
       },
     },
@@ -687,14 +686,7 @@ const KnowledgeBaseDetailPage: React.FC = () => {
           </Space>
         </Col>
 
-        <Col>
-          <Space>
-            <Typography.Text type="secondary">共 {filteredList.length} 条记录</Typography.Text>
-            <Tooltip title="刷新">
-              <Button icon={<ReloadOutlined />} onClick={() => message.success("已刷新")} />
-            </Tooltip>
-          </Space>
-        </Col>
+        <Col />
       </Row>
 
       <Table<FileAsset>
@@ -721,6 +713,11 @@ const KnowledgeBaseDetailPage: React.FC = () => {
         className={styles.uploadModal}
       >
         <div className={styles.uploadBody}>
+          {kbType === "theme" ? (
+            <div className={styles.kbNotice}>
+              注：上传至主题库的文件将同步至对应单位库；后续若删除主题库内文件，不影响单位库文件。
+            </div>
+          ) : null}
           <div className={styles.kbInfoCard}>
             <div className={styles.kbInfoRow}>知识库名称：{kbName}</div>
             <div className={styles.kbInfoRow}>知识库类型：{kbTypeLabel}</div>

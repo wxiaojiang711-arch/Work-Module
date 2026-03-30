@@ -219,12 +219,8 @@ const TaskDetailPage: React.FC = () => {
             return (
               <>
                 <Link to={`/task/${task.id}/view/${record.unitId}`}>
-                  <Button
-                    type="link"
-                    style={viewStyle}
-                    disabled={record.fillStatus !== "submitted" && record.fillStatus !== "approved" && record.fillStatus !== "rejected"}
-                  >
-                    查看数据
+                  <Button type="link" style={viewStyle}>
+                    查看详情
                   </Button>
                 </Link>
                 {record.fillStatus === "submitted" && !isSecondMock ? (
@@ -340,10 +336,12 @@ const TaskDetailPage: React.FC = () => {
                     allowClear
                     style={{ width: "100%" }}
                     onChange={(value) => setQuery((prev) => ({ ...prev, status: value }))}
-                    options={Object.entries(fillStatusTextMap).map(([value, label]) => ({
-                      value,
-                      label,
-                    }))}
+                    options={Object.entries(fillStatusTextMap)
+                      .filter(([value]) => value !== "urged")
+                      .map(([value, label]) => ({
+                        value,
+                        label,
+                      }))}
                   />
                 </div>
               </Col>

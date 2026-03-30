@@ -44,6 +44,16 @@
   margin-bottom: 8px;
 }
 
+.kbNotice {
+  font-size: 13px;
+  color: #2b5cd6;
+  margin-bottom: 8px;
+  background: #f0f5ff;
+  border: 1px solid #d6e4ff;
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
 .kbInfoRow {
   font-size: 14px;
   color: #666;

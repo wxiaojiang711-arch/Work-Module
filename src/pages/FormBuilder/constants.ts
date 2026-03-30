@@ -31,6 +31,8 @@ export type FieldType =
   | "richText"
   | "group"
   | "orgTree"
+  | "coreBusiness"
+  | "taskBreakdownTable"
   | "indicatorTable";
 
 export interface FormField {
@@ -65,17 +67,19 @@ export interface FormField {
     borderColor?: string;
     backgroundColor?: string;
     padding?: number;
-    // 组织树
+    // 业务树 / 核心业务
     treeLevel?: 2 | 3;
-    showAddButton?: boolean;
-    showDeleteButton?: boolean;
+    allowAddLevel1?: boolean;
+    allowAddLevel2?: boolean;
     defaultExpandLevel?: "all" | "first" | "none";
     // 指标数据
     tableRows?: number;
     tableCols?: number;
+    typeHeaders?: string[];
     rowHeaders?: string[];
     colHeaders?: string[];
     allowAddRow?: boolean;
+    showIndicatorType?: boolean;
     // 更新频率
     updateFrequency?: "daily" | "weekly" | "monthly" | "quarterly" | "irregular";
   };
@@ -176,8 +180,10 @@ export const componentGroups: Array<{
       { type: "upload", label: "文件上传", icon: React.createElement(UploadOutlined) },
       { type: "location", label: "地理位置", icon: React.createElement(RadarChartOutlined) },
       { type: "group", label: "分组控件", icon: React.createElement(GroupOutlined) },
-      { type: "orgTree", label: "组织树", icon: React.createElement(TeamOutlined) },
-      { type: "indicatorTable", label: "指标数据", icon: React.createElement(TableOutlined) },
+      { type: "orgTree", label: "业务树", icon: React.createElement(TeamOutlined) },
+      { type: "coreBusiness", label: "核心业务", icon: React.createElement(RadarChartOutlined) },
+      { type: "taskBreakdownTable", label: "任务分解表", icon: React.createElement(TableOutlined) },
+      { type: "indicatorTable", label: "指标数据表", icon: React.createElement(TableOutlined) },
     ],
   },
 ];
@@ -196,8 +202,10 @@ const typeLabelMap: Record<FieldType, string> = {
   image: "图片",
   richText: "富文本",
   group: "分组",
-  orgTree: "组织树",
-  indicatorTable: "指标数据",
+  orgTree: "业务树",
+  coreBusiness: "核心业务",
+  taskBreakdownTable: "任务分解表",
+  indicatorTable: "指标数据表",
 };
 
 export const createFieldByType = (type: FieldType): FormField => {
@@ -240,14 +248,27 @@ export const createFieldByType = (type: FieldType): FormField => {
     baseField.props.padding = 16;
   } else if (type === "orgTree") {
     baseField.props.treeLevel = 2;
-    baseField.props.showAddButton = true;
-    baseField.props.showDeleteButton = true;
+    baseField.props.allowAddLevel1 = true;
+    baseField.props.allowAddLevel2 = true;
+    baseField.props.defaultExpandLevel = "all";
+  } else if (type === "coreBusiness") {
+    baseField.props.treeLevel = 2;
+    baseField.props.allowAddLevel1 = true;
+    baseField.props.allowAddLevel2 = true;
     baseField.props.defaultExpandLevel = "all";
   } else if (type === "indicatorTable") {
     baseField.props.tableRows = 2;
     baseField.props.tableCols = 3;
+    baseField.props.typeHeaders = ["类型A", "类型B"];
     baseField.props.rowHeaders = ["指标1", "指标2"];
     baseField.props.colHeaders = ["列1", "列2", "列3"];
+    baseField.props.allowAddRow = false;
+    baseField.props.showIndicatorType = true;
+  } else if (type === "taskBreakdownTable") {
+    baseField.props.tableRows = 2;
+    baseField.props.tableCols = 4;
+    baseField.props.rowHeaders = ["任务1", "任务2"];
+    baseField.props.colHeaders = ["第一季度", "第二季度", "第三季度", "第四季度", "责任人"];
     baseField.props.allowAddRow = false;
   }
 
