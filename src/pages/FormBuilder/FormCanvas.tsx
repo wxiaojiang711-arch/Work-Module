@@ -305,7 +305,7 @@ const renderPreview = (field: FormField) => {
                   {showType ? <th className={styles["center-cell"]}>{"指标类型"}</th> : null}
                   <th className={styles["center-cell"]}>{"指标名称"}</th>
                   {yearHeaders.map((h) =>
-                    ["2021?", "2022?", "2023?", "2024?", "2025?"].includes(h) ? (
+                    ["2021年", "2022年", "2023年", "2024年", "2025年"].includes(h) ? (
                       <th key={h} className={`${styles["split-col"]} ${styles["year-header-shift"]}`}>
                         <div className={styles["year-header"]}>
                           <div>{h}</div>
