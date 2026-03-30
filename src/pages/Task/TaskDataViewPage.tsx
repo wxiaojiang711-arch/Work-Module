@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+﻿import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Breadcrumb, Button, Card, Divider, Empty, Input, Modal, Space, Steps, Tabs, Tag, message } from "antd";
+import type { StepsProps } from "antd";
 import { Link, useParams } from "react-router-dom";
 
 import { availableTemplates, taskTemplateMap, unitProgressMock, type UnitProgressItem } from "./taskConstants";
@@ -178,18 +179,30 @@ const TaskDataViewPage: React.FC = () => {
   const [remarkFocused, setRemarkFocused] = useState(false);
   const reasonRef = useRef<any>(null);
 
-  const getAuditSteps = (target: UnitProgressItem | null) => {
+  const getAuditSteps = (target: UnitProgressItem | null): StepsProps["items"] => {
     const submitTime = target?.submitTime ?? "-";
     const auditTime = target?.auditTime ?? "-";
     const secondAuditTime = auditTime !== "-" ? auditTime : "2024-03-20 10:00:00";
-    const auditStatus =
+    const auditStatusText =
       target?.fillStatus === "approved"
         ? "通过"
         : target?.fillStatus === "rejected"
           ? "退回"
-          : "待审核";
+          : target?.fillStatus === "submitted"
+            ? "审核中"
+            : "待提交";
     const remarkText = target?.auditRemark ?? "-";
-    const reasonText = target?.auditReason ?? "数据填写不完整，请补充缺失字段";
+    const reasonText = target?.auditReason ?? "数据填写不完整，请补充缺失字段。";
+    const secondStatus =
+      target?.fillStatus === "approved"
+        ? "finish"
+        : target?.fillStatus === "rejected"
+          ? "error"
+          : target?.fillStatus === "submitted"
+            ? "process"
+            : "wait";
+    const finalStatus = target?.fillStatus === "approved" ? "process" : "wait";
+
     return [
       {
         title: "数据专员",
@@ -204,10 +217,10 @@ const TaskDataViewPage: React.FC = () => {
       },
       {
         title: "单位管理员",
-        status: "error",
+        status: secondStatus,
         description: (
           <div style={{ fontSize: 13, color: "#666" }}>
-            <div>审核状态：{auditStatus}</div>
+            <div>审核状态：{auditStatusText}</div>
             <div>审核备注：{remarkText}</div>
             <div>退回原因：{reasonText}</div>
             <div>审核时间：{secondAuditTime}</div>
@@ -216,7 +229,7 @@ const TaskDataViewPage: React.FC = () => {
       },
       {
         title: "区委办公室",
-        status: "process",
+        status: finalStatus,
         description: (
           <div style={{ fontSize: 13, color: "#666" }}>
             <div>审核状态：待审核</div>
@@ -722,3 +735,4 @@ const TaskDataViewPage: React.FC = () => {
 };
 
 export default TaskDataViewPage;
+

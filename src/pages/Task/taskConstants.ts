@@ -1,7 +1,7 @@
 ﻿import type { Dayjs } from "dayjs";
 
 export type TaskStatus = "pending" | "collecting" | "finished";
-export type FillStatus = "submitted" | "pending" | "rejected" | "approved" | "urged";
+export type FillStatus = "submitted" | "pending" | "rejected" | "approved";
 
 export interface TaskItem {
   id: string;
@@ -69,7 +69,6 @@ export const fillStatusTextMap: Record<FillStatus, string> = {
   pending: "待提交",
   rejected: "已退回",
   approved: "已通过",
-  urged: "已催办",
 };
 
 export const fillStatusColorMap: Record<FillStatus, string> = {
@@ -77,7 +76,6 @@ export const fillStatusColorMap: Record<FillStatus, string> = {
   pending: "warning",
   rejected: "error",
   approved: "processing",
-  urged: "volcano",
 };
 
 export const permissionTreeData = [

@@ -41,7 +41,7 @@ type FileType = "docx" | "xlsx" | "pdf" | "png" | "jpg" | "mp4";
 
 type UploadStatus = "pending" | "uploading" | "success" | "error";
 
-type GovernanceStatus = "pending" | "processing" | "success" | "failed";
+type GovernanceStatus = "pending" | "processing" | "success";
 
 interface FileAsset {
   id: string;
@@ -133,7 +133,7 @@ const fileListMock: FileAsset[] = [
     visibility: "指定部门可见",
     kbType: "unit",
     fileCategory: "meeting_minutes",
-    governanceStatus: "failed",
+    governanceStatus: "processing",
   },
   {
     id: "file-005",

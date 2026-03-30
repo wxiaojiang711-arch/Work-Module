@@ -336,12 +336,10 @@ const TaskDetailPage: React.FC = () => {
                     allowClear
                     style={{ width: "100%" }}
                     onChange={(value) => setQuery((prev) => ({ ...prev, status: value }))}
-                    options={Object.entries(fillStatusTextMap)
-                      .filter(([value]) => value !== "urged")
-                      .map(([value, label]) => ({
-                        value,
-                        label,
-                      }))}
+                    options={Object.entries(fillStatusTextMap).map(([value, label]) => ({
+                      value,
+                      label,
+                    }))}
                   />
                 </div>
               </Col>
