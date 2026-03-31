@@ -114,8 +114,8 @@ const menuItems: MenuProps["items"] = [
     label: "基础设置",
     children: [
       { key: "settings-user-management", label: "用户管理" },
-      { key: "settings-role-management", label: "角色管理" },
       { key: "settings-position-management", label: "职务管理" },
+      { key: "settings-role-management", label: "角色管理" },
       { key: "settings-organization", label: "组织机构" },
     ],
   },
