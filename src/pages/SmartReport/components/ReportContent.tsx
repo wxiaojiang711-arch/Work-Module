@@ -21,9 +21,7 @@ import {
   ArrowDownOutlined,
   ArrowUpOutlined,
   FilePdfOutlined,
-  FileWordOutlined,
   MinusOutlined,
-  PrinterOutlined,
   ReloadOutlined,
 } from "@ant-design/icons";
 
@@ -99,9 +97,7 @@ const ReportContent: React.FC<Props> = ({ report, content, onRegenerate }) => {
       <div style={{ position: "sticky", top: 0, zIndex: 5, padding: "12px 20px", borderBottom: "1px solid #f0f0f0", background: "#fff", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Typography.Title level={5} style={{ marginBottom: 0 }}>{report.title}</Typography.Title>
         <Space>
-          <Button icon={<FileWordOutlined />} onClick={() => message.info("功能开发中，敬请期待")}>导出Word</Button>
-          <Button icon={<FilePdfOutlined />} onClick={() => message.info("功能开发中，敬请期待")}>导出PDF</Button>
-          <Button icon={<PrinterOutlined />} onClick={() => message.info("功能开发中，敬请期待")}>打印</Button>
+          <Button icon={<FilePdfOutlined />} onClick={() => message.info("功能开发中，敬请期待")}>下载PDF报告</Button>
           <Button
             icon={<ReloadOutlined />}
             onClick={() => {
