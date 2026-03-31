@@ -104,7 +104,7 @@ const menuItems: MenuProps["items"] = [
     icon: <ShareAltOutlined />,
     label: "知识共享",
     children: [
-      { key: "sharing-data-recall", label: "智能问数" },
+      { key: "sharing-data-recall", label: "AI问答" },
       { key: "sharing-intelligent-report", label: "智能报告" },
     ],
   },
