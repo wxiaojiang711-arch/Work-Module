@@ -17,11 +17,11 @@ import {
 import type { TableProps } from "antd";
 import { BellFilled, ClockCircleOutlined, RollbackOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import RejectReasonModal from "./RejectReasonModal";
 import styles from "./DataReport.module.css";
-import { pendingStatusMap, urgencyMap } from "./reportConstants";
+import { pendingStatusMap, reviewStatusMap, urgencyMap } from "./reportConstants";
 import {
   issuerOptions,
   pendingReportList,
@@ -35,6 +35,8 @@ const now = dayjs("2024-03-21 12:00:00");
 
 const DataReportListPage: React.FC = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const basePath = pathname.startsWith("/report/structured") ? "/report/structured" : "/report";
   const [tab, setTab] = useState<"pending" | "submitted">("pending");
   const [pendingList] = useState<PendingReportItem[]>(pendingReportList);
   const [submittedList] = useState<SubmittedReportItem[]>(submittedReportList);
@@ -49,7 +51,7 @@ const DataReportListPage: React.FC = () => {
   const workModuleStatusMeta = workModuleStatusMap[workModuleOverviewMock.currentStatus];
 
   const openWorkModuleColumn = (period: string, taskId: string) => {
-    navigate(`/report/work-module?period=${period}&taskId=${taskId}`);
+    navigate(`${basePath}/work-module?period=${period}&taskId=${taskId}`);
   };
 
   const filteredPending = useMemo(() => {
@@ -97,7 +99,7 @@ const DataReportListPage: React.FC = () => {
             onClick={() =>
               record.taskName === "工作模块"
                 ? openWorkModuleColumn(workModuleOverviewMock.currentPeriod, record.id)
-                : navigate(`/report/fill/${record.id}`)
+                : navigate(`${basePath}/fill/${record.id}`)
             }
           >
             {record.taskName}
@@ -156,7 +158,7 @@ const DataReportListPage: React.FC = () => {
       width: 220,
       render: (_value, record) => (
         <Space size={0}>
-          <Button type="primary" size="small" onClick={() => navigate(`/report/fill/${record.id}`)}>
+          <Button type="primary" size="small" onClick={() => navigate(`${basePath}/fill/${record.id}`)}>
             {record.status === "rejected" ? "重新上报" : "去上报"}
           </Button>
           {record.status === "rejected" ? (
@@ -176,7 +178,7 @@ const DataReportListPage: React.FC = () => {
       key: "taskName",
       width: 320,
       render: (v, r) => (
-        <Button type="link" className={styles.taskNameLink} onClick={() => navigate(`/report/view/${r.id}`)}>
+        <Button type="link" className={styles.taskNameLink} onClick={() => navigate(`${basePath}/view/${r.id}`)}>
           {v}
         </Button>
       ),
@@ -186,12 +188,21 @@ const DataReportListPage: React.FC = () => {
     { title: "提交时间", dataIndex: "submitTime", key: "submitTime", width: 180 },
     { title: "提交人", dataIndex: "submitter", key: "submitter", width: 110 },
     {
+      title: "任务状态",
+      dataIndex: "reviewStatus",
+      key: "reviewStatus",
+      width: 110,
+      render: (v: SubmittedReportItem["reviewStatus"]) => (
+        <Tag color={reviewStatusMap[v].color}>{reviewStatusMap[v].label}</Tag>
+      ),
+    },
+    {
       title: "操作",
       key: "actions",
       width: 180,
       render: (_value, record) => (
         <Space size={0}>
-          <Button type="link" onClick={() => navigate(`/report/view/${record.id}`)}>
+          <Button type="link" onClick={() => navigate(`${basePath}/view/${record.id}`)}>
             查看详情
           </Button>
         </Space>
@@ -214,7 +225,7 @@ const DataReportListPage: React.FC = () => {
             <div className={styles.workModuleEntrySubTitle}>按季度更新｜用于持续维护各单位工作模块内容</div>
           </div>
           <Space>
-            <Button type="primary" onClick={() => navigate(`/report/fill/${workModuleOverviewMock.currentTaskId}`)}>
+            <Button type="primary" onClick={() => navigate(`${basePath}/fill/${workModuleOverviewMock.currentTaskId}`)}>
               去填报
             </Button>
             <Button onClick={() => openWorkModuleColumn(workModuleOverviewMock.currentPeriod, workModuleOverviewMock.currentTaskId)}>

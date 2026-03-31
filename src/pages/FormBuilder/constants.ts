@@ -32,6 +32,7 @@ export type FieldType =
   | "group"
   | "orgTree"
   | "coreBusiness"
+  | "advantageCards"
   | "taskBreakdownTable"
   | "indicatorTable";
 
@@ -182,6 +183,7 @@ export const componentGroups: Array<{
       { type: "group", label: "分组控件", icon: React.createElement(GroupOutlined) },
       { type: "orgTree", label: "业务树", icon: React.createElement(TeamOutlined) },
       { type: "coreBusiness", label: "核心业务", icon: React.createElement(RadarChartOutlined) },
+      { type: "advantageCards", label: "特色优势", icon: React.createElement(TagsOutlined) },
       { type: "taskBreakdownTable", label: "任务分解表", icon: React.createElement(TableOutlined) },
       { type: "indicatorTable", label: "指标数据表", icon: React.createElement(TableOutlined) },
     ],
@@ -204,6 +206,7 @@ const typeLabelMap: Record<FieldType, string> = {
   group: "分组",
   orgTree: "业务树",
   coreBusiness: "核心业务",
+  advantageCards: "特色优势",
   taskBreakdownTable: "任务分解表",
   indicatorTable: "指标数据表",
 };

@@ -1,4 +1,4 @@
-/* ========== 组织树组件样式（层级卡片形式） ========== */
+﻿/* ========== 组织树组件样式（层级卡片形式） ========== */
 .org-tree-container {
     background: #fff;
     padding: 16px 0;
@@ -426,6 +426,65 @@
     background: #f8f9ff;
 }
 
+/* ========== 特色优势组件样式 ========== */
+.advantage-container {
+    background: #fff;
+    padding: 8px 0 4px;
+}
+
+.advantage-card {
+    margin: 0 16px 12px;
+    border: 1px solid #e8e8e8;
+    border-radius: 8px;
+    padding: 16px;
+    background: #fff;
+}
+
+.advantage-field {
+    margin-bottom: 12px;
+}
+
+.advantage-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 6px;
+}
+
+.advantage-input {
+    height: 32px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #fafafa;
+}
+
+.advantage-textarea {
+    height: 120px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: #fafafa;
+}
+
+.advantage-add-btn {
+    width: calc(100% - 32px);
+    margin: 0 16px 8px;
+    border: 1px dashed #d9d9d9;
+    border-radius: 8px;
+    height: 42px;
+    background: transparent;
+    color: #2b5cd6;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.advantage-add-btn:hover {
+    border-color: #2b5cd6;
+    background: #f8f9ff;
+}
+
 /* ========== 任务分解表样式 ========== */
 .task-breakdown-container {
     background: #fff;
@@ -756,6 +815,27 @@
     color: #999;
     font-size: 14px;
     padding: 40px 0;
+}
+
+.form-group-add-btn {
+    width: 100%;
+    height: 40px;
+    border: 1px dashed #d9d9d9;
+    background: transparent;
+    border-radius: 6px;
+    cursor: not-allowed;
+    font-size: 14px;
+    color: #2b5cd6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.3s;
+}
+
+.form-group-add-btn:hover {
+    border-color: #2b5cd6;
+    background: #f8f9ff;
 }
 
 /* ========== 文本标签组件样式 ========== */

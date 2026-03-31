@@ -1,4 +1,4 @@
-import type { FormField } from "./constants";
+﻿import type { FormField } from "./constants";
 
 export const workModulePresetFields: FormField[] = [
   {
@@ -55,49 +55,22 @@ export const workModulePresetFields: FormField[] = [
   },
   {
     id: "field_core_business_group",
-    type: "group",
+    type: "coreBusiness",
     label: "核心业务",
     props: {
-      groupTitle: "核心业务",
-      borderStyle: "solid",
-      borderColor: "#d9d9d9",
-      backgroundColor: "#ffffff",
-      padding: 16,
+      treeLevel: 2,
+      allowAddLevel1: true,
+      allowAddLevel2: true,
+      defaultExpandLevel: "all",
       updateFrequency: "irregular",
     },
     validation: { required: false },
-    children: [
-      {
-        id: "field_core_business_title",
-        type: "input",
-        label: "业务名称",
-        props: {
-          placeholder: "请输入业务名称",
-          updateFrequency: "irregular",
-        },
-        validation: { required: false },
-      },
-      {
-        id: "field_core_business_desc",
-        type: "textarea",
-        label: "业务详细说明",
-        props: {
-          placeholder: "请输入业务详细说明",
-          updateFrequency: "irregular",
-        },
-        validation: { required: false },
-      },
-    ],
   },
   {
     id: "field_advantages",
-    type: "richText",
+    type: "advantageCards",
     label: "特色优势",
     props: {
-      editorHeight: 300,
-      toolbarFeatures: ["bold", "italic", "underline"],
-      showWordCount: true,
-      maxWords: 500,
       updateFrequency: "irregular",
     },
     validation: { required: false },
@@ -179,10 +152,8 @@ export const workModulePresetFields: FormField[] = [
     type: "indicatorTable",
     label: "主要指标数据表",
     props: {
-      tableRows: 5,
-      tableCols: 7,
-      rowHeaders: ["2021年", "2022年", "2023年", "2024年", "2025年"],
-      colHeaders: ["2021年", "2022年", "2023年", "2024年", "2025年", "2026目标", "2030目标"],
+      tableRows: 2,
+      colHeaders: ["2021年", "2022年", "2023年", "2024年", "2025年", "2026年目标", "2030年目标"],
       allowAddRow: true,
       updateFrequency: "monthly",
     },
@@ -190,13 +161,11 @@ export const workModulePresetFields: FormField[] = [
   },
   {
     id: "field_quarterly_tasks",
-    type: "indicatorTable",
+    type: "taskBreakdownTable",
     label: "季度主要目标任务分解表",
     props: {
-      tableRows: 5,
-      tableCols: 5,
-      rowHeaders: ["任务1", "任务2", "任务3", "任务4", "任务5"],
-      colHeaders: ["第一季度", "第二季度", "第三季度", "第四季度", "责任人"],
+      tableRows: 2,
+      colHeaders: ["第一季度", "第二季度", "第三季度", "第四季度"],
       allowAddRow: true,
       updateFrequency: "quarterly",
     },

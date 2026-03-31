@@ -71,7 +71,7 @@ export const pendingReportList: PendingReportItem[] = [
     urgency: "normal",
     formCount: 1,
     deadline: "2024-04-15 23:59:59",
-    status: "draft",
+    status: "pending",
     urgeCount: 0,
     lastUrgeTime: null,
     rejectReason: null,

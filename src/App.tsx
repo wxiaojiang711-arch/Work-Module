@@ -36,6 +36,7 @@ const DataReportListPage = React.lazy(() => import("./pages/DataReport/DataRepor
 const DataReportFormPage = React.lazy(() => import("./pages/DataReport/DataReportFormPage"));
 const FileTemplatePreviewPage = React.lazy(() => import("./pages/FileTemplateManagement/FileTemplatePreviewPage"));
 const WorkModuleFillPage = React.lazy(() => import("./pages/DataReport/WorkModuleFillPage"));
+const WorkModuleFillStandardPage = React.lazy(() => import("./pages/DataReport/WorkModuleFillStandardPage"));
 const WorkModuleColumnPage = React.lazy(() => import("./pages/DataReport/WorkModuleColumnPage"));
 const ReportDetailPage = React.lazy(() => import("./pages/DataReport/ReportDetailPage"));
 const DashboardPage = React.lazy(() => import("./pages/Dashboard"));
@@ -48,6 +49,7 @@ type SubMenuKey =
   | "knowledge-base-management"
   | "knowledge-tags"
   | "knowledge-data-report"
+  | "knowledge-data-report-structured"
   | "knowledge-params-config"
   | "knowledge-templates"
   | "collection-tasks"
@@ -63,6 +65,7 @@ const menuPathMap: Record<SubMenuKey, string> = {
   "knowledge-base-management": "/knowledge/base-management",
   "knowledge-tags": "/knowledge/tags",
   "knowledge-data-report": "/report",
+  "knowledge-data-report-structured": "/report/structured",
   "knowledge-params-config": "/collection/params-config",
   "knowledge-templates": "/template",
   "collection-tasks": "/task",
@@ -147,6 +150,9 @@ const resolveMenuKeyByPath = (pathname: string): SubMenuKey => {
   }
   if (pathname.startsWith("/knowledge/tags")) {
     return "knowledge-tags";
+  }
+  if (pathname === "/report/structured" || pathname.startsWith("/report/structured/")) {
+    return "knowledge-data-report-structured";
   }
   if (pathname === "/report" || pathname.startsWith("/report/")) {
     return "knowledge-data-report";
@@ -259,21 +265,61 @@ const App: React.FC = () => {
       return <PlaceholderPage title="知识标签" icon={<TagsOutlined />} />;
     }
 
-    if (pathname === "/report") {
-      return (
-        <Suspense fallback={null}>
-          <DataReportListPage />
-        </Suspense>
-      );
-    }
+  if (pathname === "/report") {
+    return (
+      <Suspense fallback={null}>
+        <DataReportListPage />
+      </Suspense>
+    );
+  }
 
-    if (pathname === "/report/fill/task-000") {
-      return (
-        <Suspense fallback={null}>
-          <WorkModuleFillPage />
-        </Suspense>
-      );
-    }
+  if (pathname === "/report/structured") {
+    return (
+      <Suspense fallback={null}>
+        <DataReportListPage />
+      </Suspense>
+    );
+  }
+
+  if (pathname === "/report/structured/fill/task-000") {
+    return (
+      <Suspense fallback={null}>
+        <WorkModuleFillPage />
+      </Suspense>
+    );
+  }
+
+  if (pathname === "/report/structured/work-module") {
+    return (
+      <Suspense fallback={null}>
+        <WorkModuleColumnPage />
+      </Suspense>
+    );
+  }
+
+  if (matchPath("/report/structured/fill/:taskId", pathname)) {
+    return (
+      <Suspense fallback={null}>
+        <DataReportFormPage mode="edit" />
+      </Suspense>
+    );
+  }
+
+  if (matchPath("/report/structured/view/:taskId", pathname)) {
+    return (
+      <Suspense fallback={null}>
+        <ReportDetailPage />
+      </Suspense>
+    );
+  }
+
+  if (pathname === "/report/fill/task-000") {
+    return (
+      <Suspense fallback={null}>
+        <WorkModuleFillStandardPage />
+      </Suspense>
+    );
+  }
 
     if (pathname === "/report/work-module") {
       return (

@@ -13,7 +13,8 @@ import {
 
 const WorkModuleColumnPage: React.FC = () => {
   const navigate = useNavigate();
-  const { search } = useLocation();
+  const { pathname, search } = useLocation();
+  const basePath = pathname.startsWith("/report/structured") ? "/report/structured" : "/report";
   const query = useMemo(() => new URLSearchParams(search), [search]);
 
   const defaultPeriod = query.get("period") ?? workModuleOverviewMock.currentPeriod;
@@ -33,12 +34,12 @@ const WorkModuleColumnPage: React.FC = () => {
     [selectedPeriod],
   );
 
-  const goFill = (taskId: string) => navigate(`/report/fill/${taskId}`);
+  const goFill = (taskId: string) => navigate(`${basePath}/fill/${taskId}`);
 
   const openPeriod = (period: string, taskId: string) => {
     setSelectedPeriod(period);
     setSelectedTaskId(taskId);
-    navigate(`/report/work-module?period=${period}&taskId=${taskId}`);
+    navigate(`${basePath}/work-module?period=${period}&taskId=${taskId}`);
   };
 
   const historyColumns: TableProps<(typeof historyPeriods)[number]>["columns"] = [
@@ -75,24 +76,27 @@ const WorkModuleColumnPage: React.FC = () => {
     <div className={styles.page}>
       <Breadcrumb items={[{ title: "数据上报" }, { title: "工作模块专栏" }]} style={{ marginBottom: 12 }} />
 
-      <Card className={`${styles.workModuleEntryCard} ${styles.workModuleEntryCardCompact}`}>
+      <Card className={styles.workModuleEntryCard}>
         <div className={styles.workModuleEntryHeader}>
-          <Typography.Title level={5} style={{ margin: 0 }}>
-            工作模块专栏
-          </Typography.Title>
-          <Button type="primary" onClick={() => goFill(selectedTaskId)}>
-            {currentStatusMeta.primaryText}
-          </Button>
+          <div>
+            <h3 className={styles.workModuleEntryTitle}>{"\u5de5\u4f5c\u6a21\u5757\u4e13\u680f"}</h3>
+            <div className={styles.workModuleEntrySubTitle}>{"\u6309\u5b63\u5ea6\u66f4\u65b0\uff5c\u7528\u4e8e\u6301\u7eed\u7ef4\u62a4\u5404\u5355\u4f4d\u5de5\u4f5c\u6a21\u5757\u5185\u5bb9"}</div>
+          </div>
+          <Space>
+            <Button type="primary" onClick={() => goFill(selectedTaskId)}>
+              {currentStatusMeta.primaryText}
+            </Button>
+          </Space>
         </div>
         <div className={styles.workModuleEntryBody}>
           <div className={styles.workModuleMainInfo} style={{ minWidth: "100%" }}>
-            <div className={styles.workModuleInfoGrid}>
+            <div className={`${styles.workModuleInfoGrid} ${styles.workModuleInfoGridFour}`}>
               <div className={styles.workModuleInfoItem}>
-                期次选择：
-                <strong>
+                {"\u5f53\u524d\u671f\u6b21\uff1a"}
+                <span style={{ marginLeft: 6 }}>
                   <Select
                     value={selectedPeriod}
-                    style={{ width: 140, marginLeft: 6 }}
+                    style={{ width: 140 }}
                     options={workModulePeriods.map((item) => ({ label: item.period, value: item.period }))}
                     onChange={(period) => {
                       const target = workModulePeriods.find((item) => item.period === period);
@@ -100,18 +104,23 @@ const WorkModuleColumnPage: React.FC = () => {
                       openPeriod(target.period, target.taskId);
                     }}
                   />
-                </strong>
+                </span>
               </div>
               <div className={styles.workModuleInfoItem}>
-                状态：
-                <strong>
+                {"\u72b6\u6001\uff1a"}
+                <span>
                   <Tag color={currentStatusMeta.color} style={{ marginLeft: 6 }}>
                     {currentStatusMeta.label}
                   </Tag>
-                </strong>
+                </span>
               </div>
               <div className={styles.workModuleInfoItem}>
-                截止时间：<strong>{currentPeriodMeta.deadlineTime}</strong>
+                {"\u622a\u6b62\u65f6\u95f4\uff1a"}
+                <span>{currentPeriodMeta.deadlineTime}</span>
+              </div>
+              <div className={styles.workModuleInfoItem}>
+                {"\u4e0b\u53d1\u5355\u4f4d\uff1a"}
+                <span>{workModuleOverviewMock.issuerOrgName}</span>
               </div>
             </div>
           </div>

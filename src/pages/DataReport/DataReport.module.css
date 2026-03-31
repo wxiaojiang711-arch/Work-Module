@@ -23,7 +23,7 @@
   background: #fff;
   border: 1px solid #e8edf5;
   border-radius: 10px;
-  padding: 16px;
+  padding: 12px;
   margin-bottom: 16px;
   box-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 }
@@ -32,7 +32,7 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 14px;
+  margin-bottom: 10px;
 }
 
 .workModuleEntryTitle {
@@ -42,7 +42,7 @@
 }
 
 .workModuleEntrySubTitle {
-  margin-top: 20px;
+  margin-top: 10px;
   font-size: 13px;
   color: #6b7280;
 }

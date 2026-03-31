@@ -106,6 +106,8 @@ const renderPreview = (field: FormField) => {
       );
     case "group":
       const groupChildren = field.children ?? [];
+      const showAchievementAdd = field.label === "标志性成果打造情况";
+      const showProblemAdd = field.label === "存在的主要问题";
       return (
         <div
           className={styles["form-group-container"]}
@@ -131,6 +133,16 @@ const renderPreview = (field: FormField) => {
               ))
             )}
           </div>
+          {showAchievementAdd ? (
+            <button className={styles["form-group-add-btn"]}>
+              <PlusOutlined /> 添加成果
+            </button>
+          ) : null}
+          {showProblemAdd ? (
+            <button className={styles["form-group-add-btn"]}>
+              <PlusOutlined /> 添加问题
+            </button>
+          ) : null}
         </div>
       );
     case "orgTree":
@@ -231,8 +243,26 @@ const renderPreview = (field: FormField) => {
           )}
         </div>
       );
+    case "advantageCards":
+      return (
+        <div className={styles["advantage-container"]}>
+          <div className={styles["advantage-card"]}>
+            <div className={styles["advantage-field"]}>
+              <div className={styles["advantage-label"]}>{"特色优势标题"}</div>
+              <div className={styles["advantage-input"]} />
+            </div>
+            <div className={styles["advantage-field"]}>
+              <div className={styles["advantage-label"]}>{"详细说明"}</div>
+              <div className={styles["advantage-textarea"]} />
+            </div>
+          </div>
+          <button className={styles["advantage-add-btn"]}>
+            <PlusOutlined /> {"添加特色优势"}
+          </button>
+        </div>
+      );
     case "taskBreakdownTable": {
-      const taskRows = field.props.tableRows ?? 2;
+      const taskRows = 2;
       const quarterHeaders = field.props.colHeaders ?? ["第一季度", "第二季度", "第三季度", "第四季度"];
       return (
         <div className={styles["task-breakdown-container"]}>
@@ -281,7 +311,7 @@ const renderPreview = (field: FormField) => {
       );
     }
     case "indicatorTable":
-      const rows = field.props.tableRows ?? 2;
+      const rows = 2;
       const yearHeaders = ["2021年", "2022年", "2023年", "2024年", "2025年", "2026年目标", "2030年目标"];
       const showType = field.props.showIndicatorType !== false;
       return (
