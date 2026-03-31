@@ -355,7 +355,7 @@ const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }
 
         <div className={styles.tabUploadEntry}>
           <div className={styles.tabUploadHeader}>
-            <span className={styles.tabUploadTitle}>附件上报（与在线填报二选一）</span>
+            <span className={styles.tabUploadTitle}>附件上报</span>
             <span className={styles.tabUploadHint}>一键上传附件，AI自动解析</span>
           </div>
           <Upload

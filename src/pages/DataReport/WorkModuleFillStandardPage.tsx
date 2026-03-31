@@ -114,7 +114,7 @@ const WorkModuleFillStandardPage: React.FC = () => {
 
       <div className={reportStyles.tabUploadEntry}>
         <div className={reportStyles.tabUploadHeader}>
-          <span className={reportStyles.tabUploadTitle}>{"\u9644\u4ef6\u4e0a\u62a5\uff08\u4e0e\u5728\u7ebf\u586b\u62a5\u4e8c\u9009\u4e00\uff09"}</span>
+          <span className={reportStyles.tabUploadTitle}>{"\u9644\u4ef6\u4e0a\u62a5"}</span>
           <span className={reportStyles.tabUploadHint}>{"\u4e00\u952e\u4e0a\u4f20\u9644\u4ef6\uff0cAI\u81ea\u52a8\u89e3\u6790"}</span>
         </div>
         <Upload
