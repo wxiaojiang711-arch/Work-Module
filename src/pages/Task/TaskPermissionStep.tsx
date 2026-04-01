@@ -1,7 +1,8 @@
-import React from "react";
+﻿import React from "react";
 import { Collapse, Form, Select, Space, Tree, Typography } from "antd";
 import type { TreeProps } from "antd";
 import type { TaskConfig } from "./taskConstants";
+import { departmentList, orgTypeLabelMap, soeList, townList } from "../OrganizationList/orgData";
 
 interface TaskPermissionStepProps {
   taskConfig: TaskConfig;
@@ -11,31 +12,18 @@ interface TaskPermissionStepProps {
 const unitTreeData: TreeProps["treeData"] = [
   {
     key: "level-department",
-    title: "部门",
-    children: [
-      { key: "dept_bigdata", title: "区大数据局" },
-      { key: "dept_fagai", title: "区发改委" },
-      { key: "dept_wenlv", title: "区文旅委" },
-      { key: "dept_jiaotong", title: "区交通局" },
-    ],
+    title: orgTypeLabelMap.department,
+    children: departmentList.map((item) => ({ key: item.id, title: item.fullName })),
   },
   {
     key: "level-town",
-    title: "镇街",
-    children: [
-      { key: "town_xintang", title: "新塘镇" },
-      { key: "town_shitan", title: "石滩镇" },
-      { key: "town_zhongxin", title: "中新镇" },
-    ],
+    title: orgTypeLabelMap.town,
+    children: townList.map((item) => ({ key: item.id, title: item.fullName })),
   },
   {
     key: "level-soe",
-    title: "国企",
-    children: [
-      { key: "soe_chengtou", title: "区城投集团" },
-      { key: "soe_jiaotou", title: "区交投集团" },
-      { key: "soe_wentou", title: "区文投集团" },
-    ],
+    title: orgTypeLabelMap.soe,
+    children: soeList.map((item) => ({ key: item.id, title: item.fullName })),
   },
 ];
 
@@ -61,7 +49,7 @@ const TaskPermissionStep: React.FC<TaskPermissionStepProps> = ({ taskConfig, onC
                   <span>
                     填报单位范围
                     <Typography.Text type="secondary" style={{ marginLeft: 0 }}>
-                      （选择“部分单位填报”时可按层级展开并勾选具体单位）
+                      （选择“部分单位可填报”时可按层级展开并勾选具体单位）
                     </Typography.Text>
                   </span>
                 </div>

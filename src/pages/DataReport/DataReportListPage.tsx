@@ -159,7 +159,7 @@ const DataReportListPage: React.FC = () => {
       render: (_value, record) => (
         <Space size={0}>
           <Button type="primary" size="small" onClick={() => navigate(`${basePath}/fill/${record.id}`)}>
-            {record.status === "rejected" ? "重新上报" : "去上报"}
+            {record.status === "rejected" ? "重新填报" : "去填报"}
           </Button>
           {record.status === "rejected" ? (
             <Button type="link" onClick={() => setRejectModal({ open: true, record })}>
@@ -221,7 +221,7 @@ const DataReportListPage: React.FC = () => {
       <div className={styles.workModuleEntryCard}>
         <div className={styles.workModuleEntryHeader}>
           <div>
-            <h3 className={styles.workModuleEntryTitle}>工作模块（定期）</h3>
+            <h3 className={styles.workModuleEntryTitle}>工作模块</h3>
             <div className={styles.workModuleEntrySubTitle}>按季度更新｜用于持续维护各单位工作模块内容</div>
           </div>
           <Space>
@@ -268,7 +268,7 @@ const DataReportListPage: React.FC = () => {
             key: "pending",
             label: (
               <Space size={4}>
-                <span>待上报</span>
+                <span>待填报</span>
                 <Badge count={pendingList.length} color="#ff4d4f" />
               </Space>
             ),
@@ -277,7 +277,7 @@ const DataReportListPage: React.FC = () => {
             key: "submitted",
             label: (
               <Space size={4}>
-                <span>已上报</span>
+                <span>已填报</span>
                 <Badge count={submittedList.length} color="#d9d9d9" />
               </Space>
             ),

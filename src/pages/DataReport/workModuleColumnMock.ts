@@ -33,14 +33,14 @@ export const workModuleStatusMap: Record<
   { label: string; color: string; primaryText: string }
 > = {
   pending: { label: "待填写", color: "blue", primaryText: "去填报" },
-  draft: { label: "草稿", color: "default", primaryText: "去填报" },
+  draft: { label: "待提交", color: "default", primaryText: "去填报" },
   submitted: { label: "已提交", color: "green", primaryText: "查看本期" },
   rejected: { label: "已退回", color: "orange", primaryText: "重新填报" },
   overdue: { label: "已逾期", color: "red", primaryText: "去填报" },
 };
 
 export const workModuleOverviewMock: WorkModuleOverview = {
-  currentPeriod: "2026Q1",
+  currentPeriod: "2026年一季度",
   currentTaskId: "task-000",
   currentStatus: "draft",
   deadlineTime: "2026-04-15 23:59:59",
@@ -50,15 +50,15 @@ export const workModuleOverviewMock: WorkModuleOverview = {
   overdueCount: 3,
   reminderCount: 2,
   recentPeriods: [
-    { period: "2025Q4", taskId: "task-wm-2025q4", status: "submitted" },
-    { period: "2025Q3", taskId: "task-wm-2025q3", status: "submitted" },
-    { period: "2025Q2", taskId: "task-wm-2025q2", status: "rejected" },
+    { period: "2025年四季度", taskId: "task-wm-2025q4", status: "submitted" },
+    { period: "2025年三季度", taskId: "task-wm-2025q3", status: "submitted" },
+    { period: "2025年二季度", taskId: "task-wm-2025q2", status: "rejected" },
   ],
 };
 
 export const workModulePeriods = [
   {
-    period: "2026Q1",
+    period: "2026年一季度",
     taskId: "task-000",
     status: "draft",
     deadlineTime: "2026-04-15 23:59:59",
@@ -66,7 +66,7 @@ export const workModulePeriods = [
     submitter: "-",
   },
   {
-    period: "2025Q4",
+    period: "2025年四季度",
     taskId: "task-wm-2025q4",
     status: "submitted",
     deadlineTime: "2026-01-15 23:59:59",
@@ -74,7 +74,7 @@ export const workModulePeriods = [
     submitter: "李四",
   },
   {
-    period: "2025Q3",
+    period: "2025年三季度",
     taskId: "task-wm-2025q3",
     status: "submitted",
     deadlineTime: "2025-10-15 23:59:59",
@@ -82,7 +82,7 @@ export const workModulePeriods = [
     submitter: "王五",
   },
   {
-    period: "2025Q2",
+    period: "2025年二季度",
     taskId: "task-wm-2025q2",
     status: "rejected",
     deadlineTime: "2025-07-15 23:59:59",
@@ -90,7 +90,7 @@ export const workModulePeriods = [
     submitter: "赵六",
   },
   {
-    period: "2025Q1",
+    period: "2025年一季度",
     taskId: "task-wm-2025q1",
     status: "submitted",
     deadlineTime: "2025-04-15 23:59:59",
@@ -100,14 +100,14 @@ export const workModulePeriods = [
 ] as const;
 
 export const workModuleUnitProgressMock: UnitProgressItem[] = [
-  { unitId: "dept-001", unitName: "区大数据局", period: "2026Q1", taskId: "task-000", status: "submitted", submitTime: "2026-04-02 10:22:00" },
-  { unitId: "dept-002", unitName: "区发改委", period: "2026Q1", taskId: "task-000", status: "draft", submitTime: null },
-  { unitId: "dept-003", unitName: "区文旅委", period: "2026Q1", taskId: "task-000", status: "pending", submitTime: null },
-  { unitId: "dept-004", unitName: "区住建委", period: "2026Q1", taskId: "task-000", status: "rejected", submitTime: null },
-  { unitId: "dept-005", unitName: "区交通局", period: "2026Q1", taskId: "task-000", status: "overdue", submitTime: null },
-  { unitId: "dept-006", unitName: "区教育局", period: "2026Q1", taskId: "task-000", status: "submitted", submitTime: "2026-04-03 09:00:00" },
-  { unitId: "dept-007", unitName: "区卫健委", period: "2025Q4", taskId: "task-wm-2025q4", status: "submitted", submitTime: "2026-01-05 11:20:00" },
-  { unitId: "dept-008", unitName: "区市场监管局", period: "2025Q3", taskId: "task-wm-2025q3", status: "submitted", submitTime: "2025-10-06 16:00:00" },
+  { unitId: "dept-001", unitName: "区大数据局", period: "2026年一季度", taskId: "task-000", status: "submitted", submitTime: "2026-04-02 10:22:00" },
+  { unitId: "dept-002", unitName: "区发改委", period: "2026年一季度", taskId: "task-000", status: "draft", submitTime: null },
+  { unitId: "dept-003", unitName: "区文旅委", period: "2026年一季度", taskId: "task-000", status: "pending", submitTime: null },
+  { unitId: "dept-004", unitName: "区住建委", period: "2026年一季度", taskId: "task-000", status: "rejected", submitTime: null },
+  { unitId: "dept-005", unitName: "区交通局", period: "2026年一季度", taskId: "task-000", status: "overdue", submitTime: null },
+  { unitId: "dept-006", unitName: "区教育局", period: "2026年一季度", taskId: "task-000", status: "submitted", submitTime: "2026-04-03 09:00:00" },
+  { unitId: "dept-007", unitName: "区卫健委", period: "2025年四季度", taskId: "task-wm-2025q4", status: "submitted", submitTime: "2026-01-05 11:20:00" },
+  { unitId: "dept-008", unitName: "区市场监管局", period: "2025年三季度", taskId: "task-wm-2025q3", status: "submitted", submitTime: "2025-10-06 16:00:00" },
 ];
 
 export const workModuleUserContextMock = {

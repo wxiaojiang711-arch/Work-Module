@@ -9,7 +9,7 @@ export const urgencyMap: Record<Urgency, { label: string; color: string; order: 
 };
 
 export const pendingStatusMap: Record<PendingStatus, { label: string; color: string }> = {
-  pending: { label: "待提交", color: "blue" },
+  pending: { label: "待填报", color: "blue" },
   urging: { label: "催办中", color: "red" },
   rejected: { label: "已退回", color: "orange" },
 };

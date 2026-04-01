@@ -34,6 +34,7 @@ import dayjs from "dayjs";
 import { Link, useLocation, useParams } from "react-router-dom";
 
 import styles from "./KnowledgeBaseDetailPage.module.css";
+import { knowledgeBaseFileListMock, type KnowledgeBaseFileAsset } from "./knowledgeBaseMockData";
 
 type UpdateFrequency = "daily" | "weekly" | "monthly" | "irregular";
 
@@ -43,115 +44,17 @@ type UploadStatus = "pending" | "uploading" | "success" | "error";
 
 type GovernanceStatus = "pending" | "processing" | "success";
 
-interface FileAsset {
-  id: string;
-  fileName: string;
-  fileType: FileType;
-  description: string | null;
-  sourceUnit: string;
-  reporter: string;
-  reportTime: string;
-  updateFrequency: UpdateFrequency;
-  issueDate: string;
-  lastUpdated: string;
-  visibility: string;
-  kbType: "unit" | "theme";
-  fileCategory: "work_report" | "meeting_minutes";
-  governanceStatus: GovernanceStatus;
+type FileAsset = KnowledgeBaseFileAsset;
+
+interface QueryState {
+  sourceUnit?: string;
+  reporter?: string;
+  category?: FileAsset["fileCategory"];
+  dateRange: [string, string] | null;
+  keyword: string;
 }
 
-interface UploadItem {
-  id: string;
-  file: File;
-  name: string;
-  sizeText: string;
-  status: UploadStatus;
-  progress: number;
-  error?: string;
-}
-
-const fileListMock: FileAsset[] = [
-  {
-    id: "file-001",
-    fileName: "部门简介",
-    fileType: "docx",
-    description: "区大数据局部门职能及组织架构介绍",
-    sourceUnit: "区大数据发展管理局",
-    reporter: "张三",
-    reportTime: "2026-03-16 14:20:35",
-    updateFrequency: "irregular",
-    issueDate: "2023-12-01 09:00:00",
-    lastUpdated: "2026-03-16 14:20:35",
-    visibility: "组织内公开",
-    kbType: "unit",
-    fileCategory: "work_report",
-    governanceStatus: "success",
-  },
-  {
-    id: "file-002",
-    fileName: "工作体系架构图",
-    fileType: "png",
-    description: null,
-    sourceUnit: "区大数据发展管理局",
-    reporter: "张三",
-    reportTime: "2026-03-15 18:05:22",
-    updateFrequency: "irregular",
-    issueDate: "2023-11-15 10:30:00",
-    lastUpdated: "2026-03-15 18:05:22",
-    visibility: "组织内公开",
-    kbType: "unit",
-    fileCategory: "meeting_minutes",
-    governanceStatus: "processing",
-  },
-  {
-    id: "file-003",
-    fileName: "核心业务",
-    fileType: "pdf",
-    description: "数字政府核心业务流程及规范文档",
-    sourceUnit: "区大数据发展管理局",
-    reporter: "赵刚",
-    reportTime: "2026-03-17 09:12:48",
-    updateFrequency: "monthly",
-    issueDate: "2023-10-20 14:15:00",
-    lastUpdated: "2026-03-17 09:12:48",
-    visibility: "组织内公开",
-    kbType: "unit",
-    fileCategory: "work_report",
-    governanceStatus: "pending",
-  },
-  {
-    id: "file-004",
-    fileName: "特色优势",
-    fileType: "xlsx",
-    description: null,
-    sourceUnit: "区大数据发展管理局",
-    reporter: "李伟",
-    reportTime: "2026-03-12 11:30:17",
-    updateFrequency: "weekly",
-    issueDate: "2023-09-10 11:00:00",
-    lastUpdated: "2026-03-12 11:30:17",
-    visibility: "指定部门可见",
-    kbType: "unit",
-    fileCategory: "meeting_minutes",
-    governanceStatus: "processing",
-  },
-  {
-    id: "file-005",
-    fileName: "标志性成果打造情况",
-    fileType: "docx",
-    description: "2024年度标志性成果建设进展与成效汇总",
-    sourceUnit: "区大数据发展管理局",
-    reporter: "刘洋",
-    reportTime: "2026-03-11 16:44:05",
-    updateFrequency: "monthly",
-    issueDate: "2023-08-25 08:45:00",
-    lastUpdated: "2026-03-11 16:44:05",
-    visibility: "组织内公开",
-    kbType: "theme",
-    fileCategory: "work_report",
-    governanceStatus: "success",
-  },
-];
+const fileListMock: FileAsset[] = knowledgeBaseFileListMock;
 
 const fileTypeIconMap: Record<FileType, { icon: React.ReactNode; color: string }> = {
   docx: { icon: <FileWordOutlined />, color: "#2b579a" },
@@ -179,14 +82,6 @@ const governanceStatusMap: Record<GovernanceStatus, { label: string; color: stri
   processing: { label: "处理中", color: "blue" },
   success: { label: "已完成", color: "green" },
 };
-
-interface QueryState {
-  sourceUnit?: string;
-  reporter?: string;
-  category?: FileAsset["fileCategory"];
-  dateRange: [string, string] | null;
-  keyword: string;
-}
 
 const defaultQuery: QueryState = {
   sourceUnit: undefined,
@@ -860,5 +755,6 @@ const KnowledgeBaseDetailPage: React.FC = () => {
 };
 
 export default KnowledgeBaseDetailPage;
+
 
 

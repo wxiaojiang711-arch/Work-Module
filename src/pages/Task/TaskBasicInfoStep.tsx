@@ -1,14 +1,16 @@
 ﻿import React from "react";
-import { Form, Input, Radio, Upload } from "antd";
+import { DatePicker, Form, Input, Radio, Upload } from "antd";
 import { InboxOutlined } from "@ant-design/icons";
 import type { TaskConfig } from "./taskConstants";
 
 interface TaskBasicInfoStepProps {
   taskConfig: TaskConfig;
   onChange: (patch: Partial<TaskConfig>) => void;
+  timeRange: [TaskConfig["timeRange"][0], TaskConfig["timeRange"][1]];
+  onTimeRangeChange: (value: TaskConfig["timeRange"]) => void;
 }
 
-const TaskBasicInfoStep: React.FC<TaskBasicInfoStepProps> = ({ taskConfig, onChange }) => {
+const TaskBasicInfoStep: React.FC<TaskBasicInfoStepProps> = ({ taskConfig, onChange, timeRange, onTimeRangeChange }) => {
   return (
     <Form layout="vertical" style={{ maxWidth: 700, margin: "0 auto", paddingBottom: 8 }}>
       <Form.Item label="任务名称" required>
@@ -17,6 +19,19 @@ const TaskBasicInfoStep: React.FC<TaskBasicInfoStepProps> = ({ taskConfig, onCha
           placeholder="请输入采集任务名称"
           onChange={(event) => onChange({ name: event.target.value })}
         />
+      </Form.Item>
+
+      <Form.Item label="任务时间" required>
+        <Input.Group compact style={{ width: "100%" }}>
+          <Form.Item noStyle>
+            <DatePicker.RangePicker
+              showTime
+              style={{ width: "100%" }}
+              value={timeRange}
+              onChange={(value) => onTimeRangeChange(value ?? [null, null])}
+            />
+          </Form.Item>
+        </Input.Group>
       </Form.Item>
 
       <Form.Item label="紧急程度" required>

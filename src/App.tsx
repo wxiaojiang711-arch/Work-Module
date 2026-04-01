@@ -28,6 +28,7 @@ const TaskListPage = React.lazy(() => import("./pages/Task"));
 const TaskFormPage = React.lazy(() => import("./pages/Task/TaskFormPage"));
 const TaskDetailPage = React.lazy(() => import("./pages/Task/TaskDetailPage"));
 const TaskDataViewPage = React.lazy(() => import("./pages/Task/TaskDataViewPage"));
+const WorkModuleHistoryPage = React.lazy(() => import("./pages/Task/WorkModuleHistoryPage"));
 const OrganizationListPage = React.lazy(() => import("./pages/OrganizationList"));
 const UserManagePage = React.lazy(() => import("./pages/UserManage"));
 const RoleManagePage = React.lazy(() => import("./pages/RoleManage"));
@@ -105,7 +106,7 @@ const menuItems: MenuProps["items"] = [
   {
     key: "knowledge-sharing",
     icon: <ShareAltOutlined />,
-    label: "知识共享",
+    label: "知识应用",
     children: [
       { key: "sharing-data-recall", label: "AI问答" },
       { key: "sharing-intelligent-report", label: "智能报告" },
@@ -418,6 +419,14 @@ const App: React.FC = () => {
       return (
         <Suspense fallback={null}>
           <TaskListPage />
+        </Suspense>
+      );
+    }
+
+    if (pathname === "/task/work-module/history") {
+      return (
+        <Suspense fallback={null}>
+          <WorkModuleHistoryPage />
         </Suspense>
       );
     }

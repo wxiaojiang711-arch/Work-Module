@@ -61,7 +61,7 @@ const WorkModuleColumnPage: React.FC = () => {
       width: 180,
       render: (_value, record) => (
         <Space size={0}>
-          <Button type="link" onClick={() => openPeriod(record.period, record.taskId)}>
+          <Button type="link" onClick={() => navigate(`${basePath}/view/${record.taskId}`)}>
             查看详情
           </Button>
           <Button type="link" onClick={() => message.info("导出功能开发中")}>

@@ -1,11 +1,13 @@
-﻿import React, { useState } from "react";
+﻿import React, { useMemo, useState } from "react";
 import type { MenuProps, TableProps } from "antd";
 import {
   Button,
+  DatePicker,
   Dropdown,
   Input,
   Popconfirm,
   Progress,
+  Select,
   Space,
   Table,
   Tag,
@@ -14,6 +16,7 @@ import {
 } from "antd";
 import { CheckOutlined, CloseOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
 
 import {
   taskListMock,
@@ -22,6 +25,7 @@ import {
   type TaskItem,
   type TaskStatus,
 } from "./taskConstants";
+import WorkModuleCard from "./WorkModuleCard";
 
 const TaskListPage: React.FC = () => {
   const navigate = useNavigate();
@@ -30,6 +34,10 @@ const TaskListPage: React.FC = () => {
   const [editingRowId, setEditingRowId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState("");
   const [originalName, setOriginalName] = useState("");
+  const [filterName, setFilterName] = useState("");
+  const [filterStatus, setFilterStatus] = useState<TaskStatus | "">("");
+  const [filterCreator, setFilterCreator] = useState("");
+  const [filterTimeRange, setFilterTimeRange] = useState<[dayjs.Dayjs | null, dayjs.Dayjs | null]>([null, null]);
 
   const handleCopyTask = (record: TaskItem) => {
     const now = new Date();
@@ -90,6 +98,32 @@ const TaskListPage: React.FC = () => {
     setEditingName("");
     setOriginalName("");
   };
+
+  const filteredTasks = useMemo(() => {
+    return taskList.filter((task) => {
+      if (filterName.trim() && !task.name.includes(filterName.trim())) {
+        return false;
+      }
+      if (filterCreator.trim() && !task.creator.includes(filterCreator.trim())) {
+        return false;
+      }
+      if (filterStatus && task.status !== filterStatus) {
+        return false;
+      }
+      const [start, end] = filterTimeRange;
+      if (start || end) {
+        const taskStart = dayjs(task.startTime);
+        const taskEnd = dayjs(task.deadline);
+        if (start && taskStart.isBefore(start, "minute")) {
+          return false;
+        }
+        if (end && taskEnd.isAfter(end, "minute")) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [filterCreator, filterName, filterStatus, filterTimeRange, taskList]);
 
   const columns: TableProps<TaskItem>["columns"] = [
     {
@@ -223,7 +257,7 @@ const TaskListPage: React.FC = () => {
               }}
             >
               <Button type="link" style={{ paddingInline: 4 }} disabled={record.status !== "collecting"}>
-                结束任务
+                结束填报
               </Button>
             </Popconfirm>
 
@@ -240,14 +274,91 @@ const TaskListPage: React.FC = () => {
     <div style={{ padding: 20, background: "#f3f6fb", height: "100%", overflow: "auto" }}>
       <Typography.Title level={5} style={{ marginTop: 0 }}>采集任务</Typography.Title>
 
-      <div style={{ marginBottom: 12 }}>
-        <Button type="primary" onClick={() => navigate("/task/create")}>创建采集任务</Button>
+      <WorkModuleCard />
+
+      <div style={{ marginTop: 12, marginBottom: 12 }}>
+        <Button type="primary" style={{ width: 120 }} onClick={() => navigate("/task/create")}>
+          创建采集任务
+        </Button>
+      </div>
+
+      <div
+        style={{
+          marginTop: 12,
+          marginBottom: 12,
+          padding: "12px 16px",
+          background: "#fff",
+          borderRadius: 8,
+          boxShadow: "0 1px 4px rgba(0,0,0,0.05)",
+        }}
+      >
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 12, alignItems: "center" }}>
+          <Space wrap size={[12, 12]} align="center" style={{ flex: 1 }}>
+            <Space size={8} align="center">
+              <span style={{ color: "#666", minWidth: 56 }}>任务名称</span>
+              <Input
+                placeholder="请输入"
+                value={filterName}
+                onChange={(event) => setFilterName(event.target.value)}
+                style={{ width: 200 }}
+                allowClear
+              />
+            </Space>
+            <Space size={8} align="center">
+              <span style={{ color: "#666", minWidth: 56 }}>任务状态</span>
+              <Select
+                placeholder="请选择"
+                value={filterStatus || undefined}
+                onChange={(value) => setFilterStatus(value)}
+                style={{ width: 160 }}
+                allowClear
+                options={[
+                  { label: taskStatusTextMap.pending, value: "pending" },
+                  { label: taskStatusTextMap.collecting, value: "collecting" },
+                  { label: taskStatusTextMap.finished, value: "finished" },
+                ]}
+              />
+            </Space>
+            <Space size={8} align="center">
+              <span style={{ color: "#666", minWidth: 56 }}>创建人</span>
+              <Input
+                placeholder="请输入"
+                value={filterCreator}
+                onChange={(event) => setFilterCreator(event.target.value)}
+                style={{ width: 160 }}
+                allowClear
+              />
+            </Space>
+            <Space size={8} align="center">
+              <span style={{ color: "#666", minWidth: 56 }}>任务时间</span>
+              <DatePicker.RangePicker
+                showTime
+                value={filterTimeRange}
+                onChange={(value) => setFilterTimeRange(value ?? [null, null])}
+                style={{ width: 320 }}
+              />
+            </Space>
+          </Space>
+          <Space size={8} style={{ marginLeft: "auto" }}>
+            <Button type="primary">查看</Button>
+            <Button
+              onClick={() => {
+                setFilterName("");
+                setFilterStatus("");
+                setFilterCreator("");
+                setFilterTimeRange([null, null]);
+              }}
+            >
+              重置
+            </Button>
+          </Space>
+        </div>
       </div>
 
       <Table<TaskItem>
         rowKey="id"
         columns={columns}
-        dataSource={taskList}
+        dataSource={filteredTasks}
         locale={{ emptyText: "暂无采集任务" }}
         pagination={{
           showSizeChanger: true,
@@ -261,3 +372,8 @@ const TaskListPage: React.FC = () => {
 };
 
 export default TaskListPage;
+
+
+
+
+

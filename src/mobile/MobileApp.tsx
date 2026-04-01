@@ -7,6 +7,8 @@ import AdvancedSearchPage from './pages/AdvancedSearchPage';
 import DataReportFillPage from './pages/DataReportFillPage';
 import DataReportTaskListPage from './pages/DataReportTaskListPage';
 import FilePreviewPage from './pages/FilePreviewPage';
+import MobileKnowledgeBaseDetailPage from './pages/MobileKnowledgeBaseDetailPage';
+import MobileKnowledgeBasePage from './pages/MobileKnowledgeBasePage';
 import MobileProfilePage from './pages/MobileProfilePage';
 import MobileReportPage from './pages/MobileReportPage';
 
@@ -23,6 +25,9 @@ const MobileApp: React.FC = () => {
 
         <Route path="/m/report" element={<MobileReportPage />} />
         <Route path="/m/report/detail/:reportId" element={<MobileReportPage />} />
+
+        <Route path="/m/kb" element={<MobileKnowledgeBasePage />} />
+        <Route path="/m/kb/:kbId" element={<MobileKnowledgeBaseDetailPage />} />
 
         <Route path="/m/data-report" element={<DataReportTaskListPage />} />
         <Route path="/m/data-report-fill/:taskId" element={<DataReportFillPage />} />

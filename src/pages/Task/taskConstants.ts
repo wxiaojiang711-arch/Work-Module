@@ -54,7 +54,7 @@ export interface TaskConfig {
 
 export const taskStatusTextMap: Record<TaskStatus, string> = {
   pending: "待开始",
-  collecting: "采集中",
+  collecting: "进行中",
   finished: "已结束",
 };
 
@@ -280,3 +280,31 @@ export const unitProgressMock: UnitProgressItem[] = [
     submitter: "李四",
   },
 ];
+
+// ========== 工作模块（常态）相关类型和常量 ==========
+
+export type WorkModuleStatus = "notGenerated" | "inProgress" | "completed";
+
+export interface WorkModuleInfo {
+  period: string;
+  issuer: string;
+  deadline: string;
+  status: WorkModuleStatus;
+  progress: { completed: number; total: number };
+  overdueCount: number;
+}
+
+export const workModuleStatusConfig: Record<WorkModuleStatus, { color: string; text: string }> = {
+  notGenerated: { color: "default", text: "待开始" },
+  inProgress: { color: "blue", text: "进行中" },
+  completed: { color: "green", text: "已结束" },
+};
+
+export const workModuleInfoMock: WorkModuleInfo = {
+  period: "2026年一季度",
+  issuer: "区委办公室",
+  deadline: "2026-03-31 23:59:59",
+  status: "notGenerated",
+  progress: { completed: 0, total: 12 },
+  overdueCount: 0,
+};

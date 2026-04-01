@@ -1,6 +1,13 @@
 ﻿import React, { useMemo } from 'react';
 import { TabBar } from 'antd-mobile';
-import { FileOutline, MessageFill, MessageOutline, UserOutline, UserSetOutline } from 'antd-mobile-icons';
+import {
+  FileOutline,
+  MessageFill,
+  MessageOutline,
+  UnorderedListOutline,
+  UserOutline,
+  UserSetOutline,
+} from 'antd-mobile-icons';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const BottomTabBar: React.FC = () => {
@@ -9,6 +16,7 @@ const BottomTabBar: React.FC = () => {
 
   const activeKey = useMemo(() => {
     if (pathname.startsWith('/m/report')) return '/m/report';
+    if (pathname.startsWith('/m/kb')) return '/m/kb';
     if (pathname.startsWith('/m/profile')) return '/m/profile';
     return '/m/home';
   }, [pathname]);
@@ -31,6 +39,11 @@ const BottomTabBar: React.FC = () => {
           key="/m/home"
           title="AI问数"
           icon={(active) => (active ? <MessageFill /> : <MessageOutline />)}
+        />
+        <TabBar.Item
+          key="/m/kb"
+          title="知识库"
+          icon={<UnorderedListOutline />}
         />
         <TabBar.Item
           key="/m/report"

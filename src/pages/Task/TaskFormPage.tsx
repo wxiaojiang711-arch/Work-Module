@@ -1,7 +1,7 @@
 ﻿import React, { useMemo, useState } from "react";
 import { Breadcrumb, Button, Card, DatePicker, Space, Steps, message } from "antd";
 import dayjs from "dayjs";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import TaskBasicInfoStep from "./TaskBasicInfoStep";
 import TaskFormSelectStep from "./TaskFormSelectStep";
@@ -11,22 +11,50 @@ import { taskListMock, type TaskConfig } from "./taskConstants";
 const TaskFormPage: React.FC = () => {
   const navigate = useNavigate();
   const { taskId } = useParams<{ taskId?: string }>();
+  const location = useLocation();
   const [currentStep, setCurrentStep] = useState(0);
 
   const currentTask = useMemo(() => taskListMock.find((item) => item.id === taskId), [taskId]);
+  const formState = location.state as { preset?: Partial<TaskConfig>; source?: string } | null;
+  const preset = formState?.preset;
 
-  const [taskConfig, setTaskConfig] = useState<TaskConfig>({
-    name: currentTask?.name ?? "",
-    urgency: "normal",
-    timeRange: currentTask
-      ? [dayjs(currentTask.startTime), dayjs(currentTask.deadline)]
-      : [null, null],
-    description: currentTask?.description ?? "",
-    attachments: [],
-    selectedTemplates: currentTask ? ["tpl-001", "tpl-002"] : [],
-    fillPermissions: [],
-    fillUnitScope: "all",
-  });
+  const initialConfig = useMemo<TaskConfig>(() => {
+    if (currentTask) {
+      return {
+        name: currentTask?.name ?? "",
+        urgency: "normal",
+        timeRange: [dayjs(currentTask.startTime), dayjs(currentTask.deadline)],
+        description: currentTask?.description ?? "",
+        attachments: [],
+        selectedTemplates: ["tpl-001", "tpl-002"],
+        fillPermissions: [],
+        fillUnitScope: "all",
+      };
+    }
+
+    const baseConfig: TaskConfig = {
+      name: "",
+      urgency: "normal",
+      timeRange: [null, null],
+      description: "",
+      attachments: [],
+      selectedTemplates: [],
+      fillPermissions: [],
+      fillUnitScope: "all",
+    };
+
+    if (!preset) {
+      return baseConfig;
+    }
+
+    return {
+      ...baseConfig,
+      ...preset,
+      timeRange: [null, null],
+    };
+  }, [currentTask, preset]);
+
+  const [taskConfig, setTaskConfig] = useState<TaskConfig>(initialConfig);
 
   const stepItems = [
     {
@@ -86,6 +114,9 @@ const TaskFormPage: React.FC = () => {
       return;
     }
 
+    if (!taskId && formState?.source === "workModule") {
+      window.localStorage.setItem("workModuleStatus", "inProgress");
+    }
     message.success(taskId ? "任务更新成功" : "任务发布成功");
     navigate("/task");
   };
@@ -108,19 +139,12 @@ const TaskFormPage: React.FC = () => {
       <Card style={{ marginTop: 12, marginBottom: 90 }}>
         {currentStep === 0 ? (
           <Space direction="vertical" style={{ width: "100%" }} size={16}>
-            <div style={{ maxWidth: 700, margin: "0 auto" }}>
-              <div style={{ marginBottom: 8, fontWeight: 500 }}>
-                <span style={{ color: "#ff4d4f", marginRight: 4 }}>*</span>
-                任务时间
-              </div>
-              <DatePicker.RangePicker
-                showTime
-                style={{ width: "100%" }}
-                value={taskConfig.timeRange}
-                onChange={(value) => onTaskPatch({ timeRange: value ?? [null, null] })}
-              />
-            </div>
-            <TaskBasicInfoStep taskConfig={taskConfig} onChange={(patch) => onTaskPatch(patch)} />
+            <TaskBasicInfoStep
+              taskConfig={taskConfig}
+              onChange={(patch) => onTaskPatch(patch)}
+              timeRange={taskConfig.timeRange}
+              onTimeRangeChange={(value) => onTaskPatch({ timeRange: value })}
+            />
           </Space>
         ) : null}
 
