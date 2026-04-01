@@ -55,7 +55,7 @@ const WorkModuleCard: React.FC = () => {
 
   const handleGenerate = () => {
     setGenerateModalOpen(false);
-    setModuleInfo((prev) => ({ ...prev, status: "pending" }));
+    setModuleInfo((prev) => ({ ...prev, status: "inProgress" }));
     message.success("本期任务已生成草稿");
   };
 
