@@ -41,10 +41,9 @@ const WorkModuleCard: React.FC = () => {
 
   // 生成弹窗表单状态
   const [fillUnits, setFillUnits] = useState<string[]>(["dept_bigdata", "dept_fagai", "dept_wenlv"]);
-  const [fillTimeRange, setFillTimeRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([
-    dayjs(),
-    dayjs().endOf("quarter"),
-  ]);
+  const now = dayjs();
+  const quarterEnd = now.month(Math.floor(now.month() / 3) * 3 + 2).endOf("month");
+  const [fillTimeRange, setFillTimeRange] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([now, quarterEnd]);
   const [needReview, setNeedReview] = useState(true);
 
   const statusConfig = workModuleStatusConfig[moduleInfo.status];

@@ -46,6 +46,16 @@ type GovernanceStatus = "pending" | "processing" | "success";
 
 type FileAsset = KnowledgeBaseFileAsset;
 
+interface UploadItem {
+  id: string;
+  file: File;
+  name: string;
+  sizeText: string;
+  status: UploadStatus;
+  progress: number;
+  error?: string;
+}
+
 interface QueryState {
   sourceUnit?: string;
   reporter?: string;
