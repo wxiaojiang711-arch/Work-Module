@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+﻿import React, { useMemo, useRef, useState } from "react";
 import { Button, Input, message } from "antd";
 import { DeleteOutlined, PlusOutlined } from "@ant-design/icons";
 
@@ -406,6 +406,9 @@ const WorkModuleFillPage: React.FC = () => {
           <div className={styles.tableWrap}>
             <div className={styles.richHint}>
               以表格的形式，呈现本部门本领域核心指标“十四五”期间情况及2026年、2030年目标。
+            </div>
+            <div className={styles.verifyHint}>
+              请核实表格中各项指标名称及指标值的提取是否准确，如发现问题，请及时更正。
             </div>
             <table className={styles.table}>
               <colgroup>

@@ -1,5 +1,5 @@
 ﻿import React, { useState } from "react";
-import { Button, DatePicker, Input, Modal, Radio } from "antd";
+import { Button, Input, Modal } from "antd";
 import type { TimeRange } from "../types";
 import styles from "./QuestionInput.module.css";
 
@@ -16,8 +16,6 @@ const sensitivePatterns = [
 
 const QuestionInput: React.FC<QuestionInputProps> = ({ onAsk, loading }) => {
   const [question, setQuestion] = useState("");
-  const [timeRange, setTimeRange] = useState<TimeRange>("7d");
-  const [customRange, setCustomRange] = useState<[string, string] | undefined>(undefined);
 
   const recommendQuestions = [
     { id: 1, text: "本周数据质量红黄灯情况？" },
@@ -44,7 +42,7 @@ const QuestionInput: React.FC<QuestionInputProps> = ({ onAsk, loading }) => {
       }
     }
 
-    onAsk(text, timeRange, customRange);
+    onAsk(text, "7d");
   };
 
   return (
@@ -63,29 +61,6 @@ const QuestionInput: React.FC<QuestionInputProps> = ({ onAsk, loading }) => {
           </Button>
         }
       />
-
-      <div className={styles.controlRow}>
-        <Radio.Group value={timeRange} onChange={(e) => setTimeRange(e.target.value as TimeRange)}>
-          <Radio.Button value="7d">近7天</Radio.Button>
-          <Radio.Button value="30d">近30天</Radio.Button>
-          <Radio.Button value="quarter">本季度</Radio.Button>
-          <Radio.Button value="custom">自定义</Radio.Button>
-        </Radio.Group>
-      </div>
-
-      {timeRange === "custom" && (
-        <div className={styles.customRangeRow}>
-          <DatePicker.RangePicker
-            onChange={(value) => {
-              if (!value || !value[0] || !value[1]) {
-                setCustomRange(undefined);
-                return;
-              }
-              setCustomRange([value[0].format("YYYY-MM-DD"), value[1].format("YYYY-MM-DD")]);
-            }}
-          />
-        </div>
-      )}
 
       <div className={styles.recommendSection}>
         <div className={styles.recommendTitle}>推荐问题</div>

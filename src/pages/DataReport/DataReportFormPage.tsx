@@ -138,7 +138,8 @@ const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }
     return activeTab?.groups ?? groupOrder;
   }, [activeFormTab, formTabs]);
   const activeTabAttachmentFiles = attachmentFilesByTab[activeFormTab] ?? [];
-  // const isAttachmentModeActive = !isView && activeTabAttachmentFiles.length > 0;
+  const isAttachmentModeActive = !isView && activeTabAttachmentFiles.length > 0;
+
 
   useEffect(() => {
     const cached = localStorage.getItem(draftKey);
@@ -334,7 +335,7 @@ const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }
                   </div>
                   <div>任务描述：{taskInfo.description}</div>
                   <div>
-                    填报说明附件：
+                    上报说明附件：
                     <Button type='link'>{taskInfo.attachment?.name}</Button>
                   </div>
                 </div>
@@ -391,13 +392,13 @@ const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }
 
               {groupName === '基本信息' ? (
                 <>
-                  <Form.Item label='填报单位'>
+                  <Form.Item label='上报单位'>
                     <Input value={currentUser.orgName} disabled style={{ background: '#f5f5f5' }} />
                   </Form.Item>
-                  <Form.Item label='填报人'>
+                  <Form.Item label='上报人'>
                     <Input value={currentUser.name} disabled style={{ background: '#f5f5f5' }} />
                   </Form.Item>
-                  <Form.Item label='填报日期'>
+                  <Form.Item label='上报日期'>
                     <Input value={today} disabled style={{ background: '#f5f5f5' }} />
                   </Form.Item>
                 </>
@@ -417,7 +418,7 @@ const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }
                     <div key={key} ref={(el) => { fieldRefs.current[key] = el; }} style={{ position: 'relative' }}>
                       <Form.Item label={<span>{field.required ? <span style={{ color: '#ff4d4f', marginRight: 4 }}>*</span> : null}{field.label}</span>}>
                         <select
-                          disabled={isView /* || isAttachmentModeActive */}
+                          disabled={isView || isAttachmentModeActive}
                           value={value}
                           onChange={(e) => {
                             setFormData((prev) => ({ ...prev, reportPeriod: e.target.value }));
@@ -455,7 +456,7 @@ const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }
                   <div key={key} ref={(el) => { fieldRefs.current[key] = el; }} style={{ position: 'relative' }}>
                     <Form.Item label={<span>{field.required ? <span style={{ color: '#ff4d4f', marginRight: 4 }}>*</span> : null}{field.label}</span>}>
                       <Input.TextArea
-                        disabled={isView /* || isAttachmentModeActive */}
+                        disabled={isView || isAttachmentModeActive}
                         autoSize={{ minRows: 4, maxRows: 10 }}
                         maxLength={maxLen}
                         value={value}
@@ -487,12 +488,12 @@ const DataReportFormPage: React.FC<DataReportFormPageProps> = ({ mode = 'edit' }
             </div>
           ))}
           </Form>
-          {/* {isAttachmentModeActive ? (
+          {isAttachmentModeActive ? (
             <div className={styles.formMask}>
               <div className={styles.formMaskTitle}>当前为“附件上报”模式</div>
-              <div className={styles.formMaskDesc}>已上传附件后不可继续在线填表；如需恢复填报，请先删除当前标签下的附件。</div>
+              <div className={styles.formMaskDesc}>已上传附件后不可继续在线填表；如需恢复上报，请先删除当前标签下的附件。</div>
             </div>
-          ) : null} */}
+          ) : null}
         </div>
       </Card>
 

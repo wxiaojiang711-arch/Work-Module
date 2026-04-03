@@ -5,6 +5,7 @@ import {
   Col,
   DatePicker,
   Input,
+  Modal,
   Row,
   Select,
   Space,
@@ -38,8 +39,8 @@ const DataReportListPage: React.FC = () => {
   const { pathname } = useLocation();
   const basePath = pathname.startsWith("/report/structured") ? "/report/structured" : "/report";
   const [tab, setTab] = useState<"pending" | "submitted">("pending");
-  const [pendingList] = useState<PendingReportItem[]>(pendingReportList);
-  const [submittedList] = useState<SubmittedReportItem[]>(submittedReportList);
+  const [pendingList, setPendingList] = useState<PendingReportItem[]>(pendingReportList);
+  const [submittedList, setSubmittedList] = useState<SubmittedReportItem[]>(submittedReportList);
   const [query, setQuery] = useState({
     keyword: "",
     issuer: undefined as string | undefined,
@@ -48,10 +49,50 @@ const DataReportListPage: React.FC = () => {
   });
   const [appliedQuery, setAppliedQuery] = useState(query);
   const [rejectModal, setRejectModal] = useState<{ open: boolean; record?: PendingReportItem }>({ open: false });
+  const [withdrawModal, setWithdrawModal] = useState<{ open: boolean; record?: SubmittedReportItem }>({ open: false });
+  const [withdrawReason, setWithdrawReason] = useState("");
   const workModuleStatusMeta = workModuleStatusMap[workModuleOverviewMock.currentStatus];
 
   const openWorkModuleColumn = (period: string, taskId: string) => {
     navigate(`${basePath}/work-module?period=${period}&taskId=${taskId}`);
+  };
+
+  const openWithdrawModal = (record: SubmittedReportItem) => {
+    setWithdrawReason("");
+    setWithdrawModal({ open: true, record });
+  };
+
+  const handleWithdraw = () => {
+    const record = withdrawModal.record;
+    if (!record || record.reviewStatus !== "pending_review") return;
+    if (!withdrawReason.trim()) {
+      message.warning("请填写撤回原因");
+      return;
+    }
+    setSubmittedList((prev) => prev.filter((item) => item.id !== record.id));
+    setPendingList((prev) => [
+      {
+        id: record.id,
+        taskName: record.taskName,
+        issuer: record.issuer,
+        urgency: "normal",
+        formCount: record.formCount,
+        deadline: dayjs().add(7, "day").format("YYYY-MM-DD HH:mm:ss"),
+        status: "cancelled",
+        urgeCount: 0,
+        lastUrgeTime: null,
+        rejectReason: null,
+        rejectTime: null,
+        rejectBy: null,
+        withdrawReason: withdrawReason.trim(),
+        createdAt: record.createdAt,
+        description: "已撤回。",
+        attachment: null,
+      },
+      ...prev,
+    ]);
+    setWithdrawModal({ open: false, record: undefined });
+    message.success("已撤回，任务已变更为已撤销");
   };
 
   const filteredPending = useMemo(() => {
@@ -96,11 +137,10 @@ const DataReportListPage: React.FC = () => {
           <Button
             type="link"
             className={styles.taskNameLink}
-            onClick={() =>
-              record.taskName === "工作模块"
-                ? openWorkModuleColumn(workModuleOverviewMock.currentPeriod, record.id)
-                : navigate(`${basePath}/fill/${record.id}`)
-            }
+            onClick={() => {
+              const targetId = record.id === "task-000" ? "task-001" : record.id;
+              navigate(`${basePath}/fill/${targetId}`);
+            }}
           >
             {record.taskName}
           </Button>
@@ -158,12 +198,28 @@ const DataReportListPage: React.FC = () => {
       width: 220,
       render: (_value, record) => (
         <Space size={0}>
-          <Button type="primary" size="small" onClick={() => navigate(`${basePath}/fill/${record.id}`)}>
-            {record.status === "rejected" ? "重新填报" : "去填报"}
+          <Button
+            type="primary"
+            size="small"
+            onClick={() => {
+              const targetId = record.id === "task-000" ? "task-001" : record.id;
+              navigate(`${basePath}/fill/${targetId}`);
+            }}
+          >
+            {record.status === "rejected"
+              ? "重新上报"
+              : record.status === "cancelled"
+                ? "重新上报"
+                : "去上报"}
           </Button>
           {record.status === "rejected" ? (
             <Button type="link" onClick={() => setRejectModal({ open: true, record })}>
               查看退回原因
+            </Button>
+          ) : null}
+          {record.status === "cancelled" ? (
+            <Button type="link" onClick={() => Modal.info({ title: "撤回原因", content: record.withdrawReason || "-" })}>
+              查看撤回原因
             </Button>
           ) : null}
         </Space>
@@ -185,8 +241,8 @@ const DataReportListPage: React.FC = () => {
     },
     { title: "下发单位", dataIndex: "issuer", key: "issuer", width: 140 },
     { title: "关联表单数", dataIndex: "formCount", key: "formCount", width: 110, render: (v: number) => `${v}个表单` },
-    { title: "提交时间", dataIndex: "submitTime", key: "submitTime", width: 180 },
-    { title: "提交人", dataIndex: "submitter", key: "submitter", width: 110 },
+    { title: "上报时间", dataIndex: "submitTime", key: "submitTime", width: 180 },
+    { title: "上报人", dataIndex: "submitter", key: "submitter", width: 110 },
     {
       title: "任务状态",
       dataIndex: "reviewStatus",
@@ -201,10 +257,15 @@ const DataReportListPage: React.FC = () => {
       key: "actions",
       width: 180,
       render: (_value, record) => (
-        <Space size={0}>
+        <Space size={0} className={styles.actionInline}>
           <Button type="link" onClick={() => navigate(`${basePath}/view/${record.id}`)}>
             查看详情
           </Button>
+          {record.reviewStatus === "pending_review" ? (
+            <Button type="link" onClick={() => openWithdrawModal(record)}>
+              撤回
+            </Button>
+          ) : null}
         </Space>
       ),
     },
@@ -226,7 +287,7 @@ const DataReportListPage: React.FC = () => {
           </div>
           <Space>
             <Button type="primary" onClick={() => navigate(`${basePath}/fill/${workModuleOverviewMock.currentTaskId}`)}>
-              去填报
+              去上报
             </Button>
             <Button onClick={() => openWorkModuleColumn(workModuleOverviewMock.currentPeriod, workModuleOverviewMock.currentTaskId)}>
               进入专栏
@@ -268,7 +329,7 @@ const DataReportListPage: React.FC = () => {
             key: "pending",
             label: (
               <Space size={4}>
-                <span>待填报</span>
+                <span>待上报</span>
                 <Badge count={pendingList.length} color="#ff4d4f" />
               </Space>
             ),
@@ -277,7 +338,7 @@ const DataReportListPage: React.FC = () => {
             key: "submitted",
             label: (
               <Space size={4}>
-                <span>已填报</span>
+                <span>已上报</span>
                 <Badge count={submittedList.length} color="#d9d9d9" />
               </Space>
             ),
@@ -315,10 +376,10 @@ const DataReportListPage: React.FC = () => {
           </Col>
           <Col span={6}>
             <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-              <span style={{ whiteSpace: "nowrap" }}>截止时间：</span>
+              <span style={{ whiteSpace: "nowrap" }}>{tab === "submitted" ? "上报时间：" : "截止时间："}</span>
               <DatePicker.RangePicker
                 style={{ width: "100%" }}
-                placeholder={["截止开始", "截止结束"]}
+                placeholder={tab === "submitted" ? ["上报开始", "上报结束"] : ["截止开始", "截止结束"]}
                 onChange={(value) => {
                   const start = value?.[0]?.format("YYYY-MM-DD");
                   const end = value?.[1]?.format("YYYY-MM-DD");
@@ -396,6 +457,24 @@ const DataReportListPage: React.FC = () => {
           pagination={{ showQuickJumper: true, showSizeChanger: true }}
         />
       )}
+
+      <Modal
+        title="撤回原因"
+        open={withdrawModal.open}
+        okText="确认撤回"
+        cancelText="取消"
+        onCancel={() => setWithdrawModal({ open: false, record: undefined })}
+        onOk={handleWithdraw}
+      >
+        <Input.TextArea
+          value={withdrawReason}
+          onChange={(e) => setWithdrawReason(e.target.value)}
+          placeholder="请输入撤回原因"
+          rows={4}
+          maxLength={200}
+          showCount
+        />
+      </Modal>
 
       <RejectReasonModal
         open={rejectModal.open}

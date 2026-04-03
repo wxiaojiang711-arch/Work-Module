@@ -8,7 +8,7 @@ export const taskInfo = {
   deadline: '2024-03-31 23:59:59',
   description:
     '请各单位提交2024年第一季度工作完成情况总结，包括重点工作完成情况、特色亮点、存在问题及下季度工作计划。',
-  attachment: { name: '填报模板.docx', size: '256KB' },
+  attachment: { name: '上报模板.docx', size: '256KB' },
 };
 
 export const reportFillTaskList = [
@@ -22,7 +22,7 @@ export const reportFillTaskList = [
   },
   {
     id: 'task-002',
-    name: '2024年第一季度重点项目推进情况填报',
+    name: '2024年第一季度重点项目推进情况上报',
     issuer: '区发改委',
     urgency: 'normal',
     deadline: '2024-04-05 18:00:00',
@@ -30,7 +30,7 @@ export const reportFillTaskList = [
   },
   {
     id: 'task-003',
-    name: '2024年第一季度营商环境指标填报',
+    name: '2024年第一季度营商环境指标上报',
     issuer: '区政务服务数据管理局',
     urgency: 'very_urgent',
     deadline: '2024-03-28 18:00:00',

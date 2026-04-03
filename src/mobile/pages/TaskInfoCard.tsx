@@ -46,7 +46,7 @@ const TaskInfoCard: React.FC<TaskInfoCardProps> = ({ taskInfo }) => {
             <div style={{ marginTop: 6 }}>任务描述：{taskInfo.description}</div>
             {taskInfo.attachment ? (
               <div style={{ marginTop: 6 }}>
-                填报说明附件：
+                上报说明附件：
                 <span style={{ color: '#1677ff', cursor: 'pointer' }}>{taskInfo.attachment.name}（{taskInfo.attachment.size}）</span>
               </div>
             ) : null}

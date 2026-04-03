@@ -67,7 +67,7 @@ const WorkModuleHistoryPage: React.FC = () => {
 
   const columns: TableProps<HistoryItem>["columns"] = [
     {
-      title: "期次",
+      title: "任务期次",
       dataIndex: "period",
       key: "period",
       width: 150,
@@ -83,7 +83,7 @@ const WorkModuleHistoryPage: React.FC = () => {
       ),
     },
     {
-      title: "完成进度",
+      title: "填报进度",
       key: "progress",
       width: 200,
       render: (_, record) => {
@@ -92,7 +92,7 @@ const WorkModuleHistoryPage: React.FC = () => {
           <Space direction="vertical" size={0} style={{ width: "100%" }}>
             <Progress percent={percent} size="small" strokeColor={percent === 100 ? "#52c41a" : "#2b5cd6"} />
             <Typography.Text type="secondary" style={{ fontSize: 12 }}>
-              {record.progress.completed}/{record.progress.total} 个单位
+              已完成{record.progress.completed}/{record.progress.total}个单位
             </Typography.Text>
           </Space>
         );
@@ -153,7 +153,7 @@ const WorkModuleHistoryPage: React.FC = () => {
               返回
             </Button>
             <Typography.Title level={5} style={{ margin: 0 }}>
-              工作模块- 历史期次
+              工作模块-历史期次
             </Typography.Title>
           </Space>
         </div>

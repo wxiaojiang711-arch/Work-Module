@@ -98,6 +98,15 @@ const visibilityOptions: Array<{ value: Visibility; title: string; description: 
   },
 ];
 
+const reportRoleOptions = [
+  { label: "部门负责人", value: "dept_lead" },
+  { label: "业务处室", value: "biz_office" },
+  { label: "信息员", value: "info_staff" },
+  { label: "审核人", value: "reviewer" },
+  { label: "管理员", value: "admin" },
+  { label: "填报人员", value: "reporter" },
+];
+
 const KnowledgeBaseManagementPage: React.FC = () => {
   const [knowledgeBases, setKnowledgeBases] = useState<KnowledgeBase[]>(mockData);
   const [searchText, setSearchText] = useState("");
@@ -174,6 +183,7 @@ const KnowledgeBaseManagementPage: React.FC = () => {
       description: "",
       visibility: "组织内公开",
       authorizedUnits: [],
+      reportRoles: [],
     });
     setModalOpen(true);
   };
@@ -191,6 +201,7 @@ const KnowledgeBaseManagementPage: React.FC = () => {
       visibility: normalizedVisibility,
       unitCategory: kb.unitCategory,
       authorizedUnits: initialAuthorizedUnits,
+      reportRoles: [],
     });
     applyVisibilityToTree(normalizedVisibility, initialAuthorizedUnits);
     setModalOpen(true);
@@ -588,7 +599,7 @@ const KnowledgeBaseManagementPage: React.FC = () => {
         okText="保存"
         cancelText="取消"
         width={800}
-        styles={{ body: { maxHeight: "80vh", overflowY: "auto", paddingTop: 8 } }}
+        styles={{ body: { maxHeight: "80vh", overflowY: "scroll", paddingTop: 8 } }}
         okButtonProps={{ style: { height: 40, borderRadius: 6, background: "#2b5cd6", borderColor: "#2b5cd6", padding: "0 24px" } }}
         cancelButtonProps={{ style: { height: 40, borderRadius: 6, padding: "0 24px" } }}
         destroyOnClose
@@ -708,6 +719,27 @@ const KnowledgeBaseManagementPage: React.FC = () => {
                   支持在组织树中按单位直接勾选查看/上传权限；与上方可见范围保持联动。
                 </Typography.Text>
               </div>
+            </Form.Item>
+
+            <Form.Item
+              name="reportRoles"
+              label={
+                <span>
+                  <span style={{ color: "#ff4d4f", marginRight: 4 }}>*</span>
+                  上传角色范围
+                </span>
+              }
+            >
+              <Select
+                mode="multiple"
+                allowClear
+                placeholder="请选择上传角色"
+                className={`${styles.modalInput} ${styles.roleSelect}`}
+                options={reportRoleOptions}
+              />
+              <Typography.Text className={styles.fieldHint}>
+                支持按角色配置上传权限，仅所选角色对应的用户可以进行文件上传。
+              </Typography.Text>
             </Form.Item>
 
           </div>

@@ -88,7 +88,7 @@ const taskDetail: TaskDetail = {
 
 const formTabs = [
   { key: "form-001", name: "季度工作总结报告", type: "text", icon: "FormOutlined" },
-  { key: "form-002", name: "量化指标填报表", type: "table", icon: "TableOutlined" },
+  { key: "form-002", name: "量化指标上报表", type: "table", icon: "TableOutlined" },
   { key: "form-003", name: "重点项目进展表", type: "table", icon: "TableOutlined" },
 ] as const;
 
@@ -304,7 +304,7 @@ const ReportDetailPage: React.FC = () => {
       label: (
         <span className={styles.tabLabel}>
           <TableOutlined />
-          量化指标填报表
+          量化指标上报表
         </span>
       ),
       children: <FormTableReadonly tableType="quantitative" data={formTableData1} />,

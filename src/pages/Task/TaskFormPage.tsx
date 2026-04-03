@@ -17,6 +17,7 @@ const TaskFormPage: React.FC = () => {
   const currentTask = useMemo(() => taskListMock.find((item) => item.id === taskId), [taskId]);
   const formState = location.state as { preset?: Partial<TaskConfig>; source?: string } | null;
   const preset = formState?.preset;
+  const isFromWorkModule = formState?.source === "workModule";
 
   const initialConfig = useMemo<TaskConfig>(() => {
     if (currentTask) {
@@ -34,6 +35,7 @@ const TaskFormPage: React.FC = () => {
 
     const baseConfig: TaskConfig = {
       name: "",
+      taskPeriod: undefined,
       urgency: "normal",
       timeRange: [null, null],
       description: "",
@@ -85,6 +87,10 @@ const TaskFormPage: React.FC = () => {
       }
       if (!start || !end) {
         message.warning("请选择任务时间");
+        return;
+      }
+      if (isFromWorkModule && !taskConfig.taskPeriod) {
+        message.warning("请选择任务期次");
         return;
       }
     }
@@ -144,6 +150,7 @@ const TaskFormPage: React.FC = () => {
               onChange={(patch) => onTaskPatch(patch)}
               timeRange={taskConfig.timeRange}
               onTimeRangeChange={(value) => onTaskPatch({ timeRange: value })}
+              showTaskPeriod={isFromWorkModule}
             />
           </Space>
         ) : null}

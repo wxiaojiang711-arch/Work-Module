@@ -1,9 +1,16 @@
 ﻿import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Breadcrumb, Button, Card, Divider, Empty, Input, Modal, Space, Steps, Tabs, Tag, message } from "antd";
 import type { StepsProps } from "antd";
-import { Link, useParams } from "react-router-dom";
+import { Link, useLocation, useParams } from "react-router-dom";
 
-import { availableTemplates, taskTemplateMap, unitProgressMock, type UnitProgressItem } from "./taskConstants";
+import {
+  availableTemplates,
+  fillStatusTextMap,
+  taskListMock,
+  taskTemplateMap,
+  unitProgressMock,
+  type UnitProgressItem,
+} from "./taskConstants";
 import styles from "./TaskDataViewPage.module.css";
 import reportStyles from "../DataReport/DataReport.module.css";
 
@@ -165,6 +172,14 @@ const unitAliasToName: Record<string, string> = {
 
 const TaskDataViewPage: React.FC = () => {
   const { taskId, unitId } = useParams<{ taskId: string; unitId: string }>();
+  const location = useLocation() as { state?: { progress?: UnitProgressItem } };
+  const task = useMemo(() => taskListMock.find((item) => item.id === taskId), [taskId]);
+  const progressTarget = useMemo(() => {
+    return (
+      location.state?.progress ??
+      (unitProgressMock.find((item) => item.unitId === (unitId ?? "")) ?? null)
+    );
+  }, [location.state, unitId]);
   const [activeTabKey, setActiveTabKey] = useState<string>("file-0");
   const [auditModalOpen, setAuditModalOpen] = useState(false);
   const [auditResult, setAuditResult] = useState<"approve" | "reject" | "">("");
@@ -321,146 +336,183 @@ const TaskDataViewPage: React.FC = () => {
       </div>
 
       <Card style={{ marginBottom: 16 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>基础上报信息</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "10px 16px" }}>
+          <div style={{ fontSize: 14, color: "#666" }}>上报单位：{progressTarget?.unitName ?? unitData.unitName}</div>
+          <div style={{ fontSize: 14, color: "#666" }}>上报人：{progressTarget?.submitter ?? "-"}</div>
+          <div style={{ fontSize: 14, color: "#666" }}>上报时间：{progressTarget?.submitTime ?? "-"}</div>
+          <div style={{ fontSize: 14, color: "#666" }}>
+            上报状态：
+            <span style={progressTarget?.fillStatus === "revoked" ? { color: "#ff4d4f", fontWeight: 600 } : {}}>
+              {progressTarget ? fillStatusTextMap[progressTarget.fillStatus] : "-"}
+            </span>
+          </div>
+        </div>
+        {progressTarget?.fillStatus === "revoked" ? (
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "10px 16px", marginTop: 10 }}>
+            <div style={{ fontSize: 14, color: "#666" }}>撤销原因：{progressTarget.withdrawReason ?? "-"}</div>
+            <div style={{ fontSize: 14, color: "#666" }}>撤销时间：{progressTarget.withdrawTime ?? "-"}</div>
+          </div>
+        ) : null}
+      </Card>
+
+      <Card style={{ marginBottom: 16 }}>
         <Tabs items={fileTabs} activeKey={activeTabKey} onChange={setActiveTabKey} />
 
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>1. 部门简介</h3>
-          <div className={styles.fieldGroup}>
-            <div className={styles.field}>
-              <label className={styles.label}>职能职责</label>
-              <div className={styles.value}>{currentFileData.step1.职能职责}</div>
+        {activeFileIndex === 0 ? (
+          <div style={{ padding: "12px 0" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", border: "1px solid #f0f0f0", borderRadius: 8, background: "#fafafa" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ fontSize: 14, color: "#333" }}>区级工作模块采集说明（2026年一季度）.docx</div>
             </div>
-            <div className={styles.field}>
-              <label className={styles.label}>组织架构</label>
-              <div className={styles.value}>{currentFileData.step1.组织架构}</div>
+              <Space size={12}>
+                <Button type="link" style={{ paddingInline: 4 }}>预览</Button>
+                <Button type="link" style={{ paddingInline: 4 }}>下载</Button>
+              </Space>
             </div>
           </div>
-        </div>
-
-        <Divider />
-
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>2. 附件清单</h3>
-          <div className={styles.fileList}>
-            {currentFileData.step2.files.map((file) => (
-              <Tag key={file} color="blue">
-                {file}
-              </Tag>
-            ))}
-          </div>
-        </div>
-
-        <Divider />
-
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>3. 核心业务</h3>
-          <div className={styles.cardList}>
-            {currentFileData.step3.map((card) => (
-              <div key={card.id} className={styles.card}>
-                <div className={styles.cardTitle}>{card.title}</div>
-                <div className={styles.cardDetail}>{card.detail}</div>
+        ) : (
+          <>
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>1. 部门简介</h3>
+              <div className={styles.fieldGroup}>
+                <div className={styles.field}>
+                  <label className={styles.label}>职能职责</label>
+                  <div className={styles.value}>{currentFileData.step1.职能职责}</div>
+                </div>
+                <div className={styles.field}>
+                  <label className={styles.label}>组织架构</label>
+                  <div className={styles.value}>{currentFileData.step1.组织架构}</div>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        <Divider />
+            <Divider />
 
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>4. 特色优势</h3>
-          <div className={styles.value}>{currentFileData.step4}</div>
-        </div>
-
-        <Divider />
-
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>5. 标志性成果打造情况</h3>
-          <div className={styles.cardList}>
-            {currentFileData.step5.map((card) => (
-              <div key={card.id} className={styles.card}>
-                <div className={styles.cardTitle}>{card.title}</div>
-                <div className={styles.cardDetail}>{card.detail}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <Divider />
-
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>6. 存在的主要问题</h3>
-          <div className={styles.cardList}>
-            {currentFileData.step6.map((card) => (
-              <div key={card.id} className={styles.card}>
-                <div className={styles.cardTitle}>{card.title}</div>
-                <div className={styles.cardDetail}>{card.detail}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <Divider />
-
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>7. 主要指标数据表</h3>
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>指标名称</th>
-                  <th>2021年</th>
-                  <th>2022年</th>
-                  <th>2023年</th>
-                  <th>2024年</th>
-                  <th>2025年</th>
-                  <th>2026目标</th>
-                  <th>2030目标</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentFileData.step7.map((row) => (
-                  <tr key={row.id}>
-                    <td>{row.name}</td>
-                    {row.values.map((value, index) => (
-                      <td key={`${row.id}-${index}`}>{value}</td>
-                    ))}
-                  </tr>
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>2. 附件清单</h3>
+              <div className={styles.fileList}>
+                {currentFileData.step2.files.map((file) => (
+                  <Tag key={file} color="blue">
+                    {file}
+                  </Tag>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+              </div>
+            </div>
 
-        <Divider />
+            <Divider />
 
-        <div className={styles.section}>
-          <h3 className={styles.sectionTitle}>8. 季度主要目标任务分解表</h3>
-          <div className={styles.tableWrap}>
-            <table className={styles.table}>
-              <thead>
-                <tr>
-                  <th>任务名称</th>
-                  <th>第一季度</th>
-                  <th>第二季度</th>
-                  <th>第三季度</th>
-                  <th>第四季度</th>
-                  <th>责任人</th>
-                </tr>
-              </thead>
-              <tbody>
-                {currentFileData.step8.map((row) => (
-                  <tr key={row.id}>
-                    <td>{row.name}</td>
-                    {row.quarters.map((quarter, index) => (
-                      <td key={`${row.id}-q-${index}`}>{quarter}</td>
-                    ))}
-                    <td>{row.owner}</td>
-                  </tr>
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>3. 核心业务</h3>
+              <div className={styles.cardList}>
+                {currentFileData.step3.map((card) => (
+                  <div key={card.id} className={styles.card}>
+                    <div className={styles.cardTitle}>{card.title}</div>
+                    <div className={styles.cardDetail}>{card.detail}</div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+              </div>
+            </div>
+
+            <Divider />
+
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>4. 特色优势</h3>
+              <div className={styles.value}>{currentFileData.step4}</div>
+            </div>
+
+            <Divider />
+
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>5. 标志性成果打造情况</h3>
+              <div className={styles.cardList}>
+                {currentFileData.step5.map((card) => (
+                  <div key={card.id} className={styles.card}>
+                    <div className={styles.cardTitle}>{card.title}</div>
+                    <div className={styles.cardDetail}>{card.detail}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Divider />
+
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>6. 存在的主要问题</h3>
+              <div className={styles.cardList}>
+                {currentFileData.step6.map((card) => (
+                  <div key={card.id} className={styles.card}>
+                    <div className={styles.cardTitle}>{card.title}</div>
+                    <div className={styles.cardDetail}>{card.detail}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Divider />
+
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>7. 主要指标数据表</h3>
+              <div className={styles.tableWrap}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>指标名称</th>
+                      <th>2021年</th>
+                      <th>2022年</th>
+                      <th>2023年</th>
+                      <th>2024年</th>
+                      <th>2025年</th>
+                      <th>2026目标</th>
+                      <th>2030目标</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentFileData.step7.map((row) => (
+                      <tr key={row.id}>
+                        <td>{row.name}</td>
+                        {row.values.map((value, index) => (
+                          <td key={`${row.id}-${index}`}>{value}</td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <Divider />
+
+            <div className={styles.section}>
+              <h3 className={styles.sectionTitle}>8. 季度主要目标任务分解表</h3>
+              <div className={styles.tableWrap}>
+                <table className={styles.table}>
+                  <thead>
+                    <tr>
+                      <th>任务名称</th>
+                      <th>第一季度</th>
+                      <th>第二季度</th>
+                      <th>第三季度</th>
+                      <th>第四季度</th>
+                      <th>责任人</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {currentFileData.step8.map((row) => (
+                      <tr key={row.id}>
+                        <td>{row.name}</td>
+                        {row.quarters.map((quarter, index) => (
+                          <td key={`${row.id}-q-${index}`}>{quarter}</td>
+                        ))}
+                        <td>{row.owner}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        )}
       </Card>
 
       <div className={reportStyles.stickyFooter}>
@@ -501,13 +553,7 @@ const TaskDataViewPage: React.FC = () => {
         destroyOnClose
         bodyStyle={{ maxHeight: "70vh", overflow: "auto", paddingInline: 24 }}
       >
-        <div style={{ background: "#fafafa", borderRadius: 8, padding: 16, marginBottom: 24 }}>
-          <div style={{ fontSize: 14, color: "#666" }}>上报单位：{auditTarget?.unitName ?? "-"}</div>
-          <div style={{ fontSize: 14, color: "#666", marginTop: 8 }}>上报人：{auditTarget?.submitter ?? "-"}</div>
-          <div style={{ fontSize: 14, color: "#666", marginTop: 8 }}>上报时间：{auditTarget?.submitTime ?? "-"}</div>
-        </div>
-
-        <div style={{ marginBottom: 24 }}>
+        <div style={{ marginTop: 36, marginBottom: 24 }}>
           <Steps direction="vertical" size="small" items={getAuditSteps(auditTarget)} />
         </div>
 

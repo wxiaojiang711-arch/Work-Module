@@ -134,14 +134,14 @@ const DataReportFillPage: React.FC = () => {
   const openActions = () => {
     ActionSheet.show({
       actions: [
-        { key: 'instruction', text: '查看填报说明' },
+        { key: 'instruction', text: '查看上报说明' },
         { key: 'template', text: '下载附件模板' },
         { key: 'clear', text: '清空表单', danger: true },
       ],
       cancelText: '取消',
       onAction: async (action) => {
         if (action.key === 'instruction') {
-          Dialog.alert({ title: '填报说明', content: taskInfo.description });
+          Dialog.alert({ title: '上报说明', content: taskInfo.description });
         }
         if (action.key === 'template') {
           Toast.show({ content: '模板下载功能开发中' });
@@ -216,7 +216,7 @@ const DataReportFillPage: React.FC = () => {
         <div style={{ fontSize: 13, color: progressPercent === 100 ? '#52c41a' : '#999', marginBottom: 8 }}>
           {progressPercent === 100
             ? '✅ 已填写完毕，可提交'
-            : `填报进度：${completedRequired}/${requiredFields.length}（${progressPercent}%）`}
+            : `上报进度：${completedRequired}/${requiredFields.length}（${progressPercent}%）`}
         </div>
         <ProgressBar percent={progressPercent / 100} style={{ '--fill-color': progressPercent === 100 ? '#52c41a' : '#1890ff' }} />
       </div>

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+﻿import React, { useMemo, useRef, useState } from "react";
 import { Button, Input, Upload } from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 
@@ -169,6 +169,9 @@ const WorkModuleFillStandardPage: React.FC = () => {
         <RichEditor />
         {step === 7 ? (
           <div style={{ marginTop: 16 }}>
+            <div className={styles.verifyHint}>
+              请核实表格中各项指标名称及指标值的提取是否准确，如发现问题，请及时更正。
+            </div>
             <table style={{ width: "100%", borderCollapse: "collapse" }}>
               <thead>
                 <tr>

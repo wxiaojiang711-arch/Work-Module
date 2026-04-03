@@ -1,6 +1,5 @@
-﻿import React, { useMemo, useRef, useState } from "react";
+﻿import React, { useMemo, useState } from "react";
 import {
-  Alert,
   Breadcrumb,
   Button,
   Col,
@@ -13,18 +12,18 @@ import {
   Space,
   Table,
   Tag,
-  Tooltip,
   Typography,
+  Upload,
   message,
 } from "antd";
 import type { TableColumnsType, TablePaginationConfig } from "antd";
+import type { UploadFile, UploadProps } from "antd/es/upload/interface";
 import {
   FileExcelOutlined,
   FileImageOutlined,
   FilePdfOutlined,
-  FilePptOutlined,
-  FileUnknownOutlined,
   FileWordOutlined,
+  InboxOutlined,
   ReloadOutlined,
   SearchOutlined,
   UploadOutlined,
@@ -40,21 +39,10 @@ type UpdateFrequency = "daily" | "weekly" | "monthly" | "irregular";
 
 type FileType = "docx" | "xlsx" | "pdf" | "png" | "jpg" | "mp4";
 
-type UploadStatus = "pending" | "uploading" | "success" | "error";
-
 type GovernanceStatus = "pending" | "processing" | "success";
 
 type FileAsset = KnowledgeBaseFileAsset;
 
-interface UploadItem {
-  id: string;
-  file: File;
-  name: string;
-  sizeText: string;
-  status: UploadStatus;
-  progress: number;
-  error?: string;
-}
 
 interface QueryState {
   sourceUnit?: string;
@@ -149,14 +137,12 @@ const KnowledgeBaseDetailPage: React.FC = () => {
   const [appliedQuery, setAppliedQuery] = useState<QueryState>(defaultQuery);
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [uploadOpen, setUploadOpen] = useState(false);
-  const [uploadItems, setUploadItems] = useState<UploadItem[]>([]);
+  const [uploadFileList, setUploadFileList] = useState<UploadFile[]>([]);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [categoryOptions, setCategoryOptions] = useState(categorySeed);
   const [categoryValue, setCategoryValue] = useState<string | undefined>(undefined);
   const [categorySearch, setCategorySearch] = useState("");
-  const [dragActive, setDragActive] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const uploadTimers = useRef<Record<string, number>>({});
   const [pagination, setPagination] = useState<TablePaginationConfig>({
     current: 1,
     pageSize: 10,
@@ -188,14 +174,6 @@ const KnowledgeBaseDetailPage: React.FC = () => {
 
   const kbTypeLabel = kbType === "theme" ? "主题库" : "单位库";
 
-  const formatFileSize = (bytes: number) => {
-    if (bytes < 1024) return `${bytes} B`;
-    const kb = bytes / 1024;
-    if (kb < 1024) return `${kb.toFixed(1)} KB`;
-    const mb = kb / 1024;
-    return `${mb.toFixed(1)} MB`;
-  };
-
   const acceptedExts = [
     "pdf",
     "doc",
@@ -216,23 +194,12 @@ const KnowledgeBaseDetailPage: React.FC = () => {
     return parts[parts.length - 1].toLowerCase();
   };
 
-  const getFileIcon = (fileName: string) => {
-    const ext = getFileExt(fileName);
-    if (ext === "pdf") return { icon: <FilePdfOutlined />, color: "#f5222d" };
-    if (ext === "doc" || ext === "docx") return { icon: <FileWordOutlined />, color: "#2b5cd6" };
-    if (ext === "xls" || ext === "xlsx") return { icon: <FileExcelOutlined />, color: "#52c41a" };
-    if (ext === "ppt" || ext === "pptx") return { icon: <FilePptOutlined />, color: "#fa8c16" };
-    if (["jpg", "jpeg", "png", "gif"].includes(ext)) return { icon: <FileImageOutlined />, color: "#722ed1" };
-    return { icon: <FileUnknownOutlined />, color: "#8c8c8c" };
-  };
-
   const resetUploadForm = () => {
-    setUploadItems([]);
+    setUploadFileList([]);
     setUploadError(null);
     setCategoryOptions(categorySeed);
     setCategoryValue(undefined);
     setCategorySearch("");
-    setDragActive(false);
     setIsUploading(false);
   };
 
@@ -242,73 +209,38 @@ const KnowledgeBaseDetailPage: React.FC = () => {
   };
 
   const closeUploadModal = () => {
-    Object.values(uploadTimers.current).forEach((timer) => window.clearInterval(timer));
-    uploadTimers.current = {};
     setUploadOpen(false);
   };
 
-  const validateAndAppendFiles = (files: FileList | File[]) => {
-    const list = Array.from(files);
-    if (!list.length) return;
+  const beforeUpload: UploadProps["beforeUpload"] = (file) => {
+    const ext = getFileExt(file.name);
+    const isSupported = acceptedExts.includes(ext);
+    const isTooLarge = file.size > 100 * 1024 * 1024;
+    const isDuplicate = uploadFileList.some(
+      (item) =>
+        item.name === file.name &&
+        item.size === file.size &&
+        item.lastModified === file.lastModified
+    );
 
-    let errorMessage: string | null = null;
-
-    setUploadItems((prev) => {
-      const next = [...prev];
-
-      list.forEach((file) => {
-        const ext = getFileExt(file.name);
-        const isSupported = acceptedExts.includes(ext);
-        const isTooLarge = file.size > 100 * 1024 * 1024;
-        const isDuplicate = next.some(
-          (item) =>
-            item.file.name === file.name &&
-            item.file.size === file.size &&
-            item.file.lastModified === file.lastModified
-        );
-
-        if (!isSupported) {
-          errorMessage = "该文件格式不支持，请选择支持的格式";
-          return;
-        }
-        if (isTooLarge) {
-          errorMessage = "文件大小超过100MB，请选择较小的文件";
-          return;
-        }
-        if (isDuplicate) {
-          errorMessage = "该文件已选择，请勿重复选择";
-          return;
-        }
-
-        next.push({
-          id: `${file.name}-${file.size}-${file.lastModified}`,
-          file,
-          name: file.name,
-          sizeText: formatFileSize(file.size),
-          status: "pending",
-          progress: 0,
-        });
-      });
-
-      return next;
-    });
-
-    if (errorMessage) {
-      setUploadError(errorMessage);
-    } else {
-      setUploadError(null);
+    if (!isSupported) {
+      setUploadError("该文件格式不支持，请选择支持的格式");
+      return Upload.LIST_IGNORE;
     }
+    if (isTooLarge) {
+      setUploadError("文件大小超过100MB，请选择较小的文件");
+      return Upload.LIST_IGNORE;
+    }
+    if (isDuplicate) {
+      setUploadError("该文件已选择，请勿重复选择");
+      return Upload.LIST_IGNORE;
+    }
+    setUploadError(null);
+    return false;
   };
 
-  const handleFileInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      validateAndAppendFiles(event.target.files);
-    }
-    event.target.value = "";
-  };
-
-  const handleDeleteUploadItem = (id: string) => {
-    setUploadItems((prev) => prev.filter((item) => item.id !== id));
+  const handleUploadChange: UploadProps["onChange"] = ({ fileList }) => {
+    setUploadFileList(fileList);
   };
 
   const handleCategoryEnter: React.KeyboardEventHandler<HTMLInputElement | HTMLTextAreaElement> = (event) => {
@@ -321,59 +253,18 @@ const KnowledgeBaseDetailPage: React.FC = () => {
     setCategorySearch("");
   };
 
-  const startUploadForItem = (id: string) => {
-    let progress = 0;
-    setUploadItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, status: "uploading", progress: 0, error: undefined } : item
-      )
-    );
-
-    const timer = window.setInterval(() => {
-      progress = Math.min(100, progress + Math.floor(Math.random() * 14) + 6);
-      setUploadItems((prev) =>
-        prev.map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                progress,
-                status: progress >= 100 ? "success" : "uploading",
-              }
-            : item
-        )
-      );
-
-      if (progress >= 100) {
-        window.clearInterval(timer);
-        delete uploadTimers.current[id];
-      }
-    }, 350);
-
-    uploadTimers.current[id] = timer;
-  };
-
   const handleSubmitUpload = () => {
-    if (uploadItems.length === 0) {
+    if (uploadFileList.length === 0) {
       setUploadError("请至少选择一个文件");
       return;
     }
     setUploadError(null);
     setIsUploading(true);
-
-    uploadItems.forEach((item) => startUploadForItem(item.id));
-
-    const checkDone = window.setInterval(() => {
-      setUploadItems((prev) => {
-        const allDone = prev.length > 0 && prev.every((item) => item.status === "success");
-        if (allDone) {
-          window.clearInterval(checkDone);
-          setIsUploading(false);
-          message.success("上传完成，已刷新文件列表");
-          closeUploadModal();
-        }
-        return prev;
-      });
-    }, 500);
+    window.setTimeout(() => {
+      setIsUploading(false);
+      message.success("上传完成，已刷新文件列表");
+      closeUploadModal();
+    }, 600);
   };
 
   const columns: TableColumnsType<FileAsset> = [
@@ -633,97 +524,21 @@ const KnowledgeBaseDetailPage: React.FC = () => {
             <div className={styles.fieldLabel}>
               <span className={styles.required}>*</span> 选择文件
             </div>
-            <div
-              className={`${styles.uploadArea} ${dragActive ? styles.uploadAreaActive : ""}`}
-              role="presentation"
-              onClick={() => document.getElementById("kb-upload-input")?.click()}
-              onDragOver={(event) => {
-                event.preventDefault();
-                setDragActive(true);
-              }}
-              onDragLeave={() => setDragActive(false)}
-              onDrop={(event) => {
-                event.preventDefault();
-                setDragActive(false);
-                if (event.dataTransfer.files) {
-                  validateAndAppendFiles(event.dataTransfer.files);
-                }
-              }}
+            <Upload.Dragger
+              multiple
+              fileList={uploadFileList}
+              beforeUpload={beforeUpload}
+              onChange={handleUploadChange}
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif"
             >
-              <div className={styles.uploadIcon}>⭳</div>
-              <div className={styles.uploadText}>点击或拖拽文件到此区域上传</div>
-              <div className={styles.uploadHint}>支持 PDF、Word、Excel、图片等格式，单个文件不超过100MB</div>
-              <input
-                id="kb-upload-input"
-                type="file"
-                multiple
-                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.gif"
-                className={styles.hiddenInput}
-                onChange={handleFileInputChange}
-              />
-            </div>
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">点击或拖拽文件到此区域上传</p>
+              <p className="ant-upload-hint">支持 PDF、Word、Excel、图片等格式，单个文件不超过100MB</p>
+            </Upload.Dragger>
             {uploadError ? <div className={styles.fieldError}>{uploadError}</div> : null}
           </div>
-
-          {uploadItems.length > 0 ? (
-            <div className={styles.formBlock}>
-              <div className={styles.sectionTitle}>已选文件</div>
-              <div className={styles.uploadList}>
-                {uploadItems.map((item) => {
-                  const icon = getFileIcon(item.name);
-                  const statusLabel =
-                    item.status === "pending"
-                      ? "待上传"
-                      : item.status === "uploading"
-                        ? `上传中 ${item.progress}%`
-                        : item.status === "success"
-                          ? "✓ 上传成功"
-                          : "✗ 上传失败";
-                  const statusClass =
-                    item.status === "success"
-                      ? styles.statusSuccess
-                      : item.status === "error"
-                        ? styles.statusError
-                        : item.status === "uploading"
-                          ? styles.statusUploading
-                          : styles.statusPending;
-
-                  return (
-                    <div key={item.id} className={styles.uploadItem}>
-                      <div className={styles.uploadItemMain}>
-                        <div className={styles.uploadItemTitle}>
-                          <span className={styles.fileIcon} style={{ color: icon.color }}>{icon.icon}</span>
-                          <Tooltip title={item.name}>
-                            <span className={styles.fileName}>{item.name}</span>
-                          </Tooltip>
-                        </div>
-                        <div className={styles.uploadMetaRow}>
-                          <span className={styles.fileSize}>{item.sizeText}</span>
-                          <span className={statusClass}>{statusLabel}</span>
-                        </div>
-                        {item.status === "uploading" ? (
-                          <div className={styles.progressRow}>
-                            <div className={styles.progressBar}>
-                              <div className={styles.progressFill} style={{ width: `${item.progress}%` }} />
-                            </div>
-                            <span className={styles.progressText}>{item.progress}%</span>
-                          </div>
-                        ) : null}
-                      </div>
-                      <button
-                        type="button"
-                        className={styles.deleteBtn}
-                        onClick={() => handleDeleteUploadItem(item.id)}
-                        aria-label="删除文件"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ) : null}
 
           <div className={styles.formBlock}>
             <div className={styles.fieldLabel}>文件分类</div>
@@ -741,14 +556,6 @@ const KnowledgeBaseDetailPage: React.FC = () => {
             <div className={styles.helpText}>为文件选择分类可以更好地组织和查找文件</div>
           </div>
 
-          {uploadItems.some((item) => item.status === "error") ? (
-            <Alert
-              type="error"
-              showIcon
-              message="部分文件上传失败，请检查后重试"
-              className={styles.alertBox}
-            />
-          ) : null}
         </div>
 
         <div className={styles.modalFooter}>

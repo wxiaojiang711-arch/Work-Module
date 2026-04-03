@@ -1,5 +1,5 @@
 ﻿export type Urgency = "normal" | "urgent" | "very_urgent";
-export type PendingStatus = "pending" | "urging" | "rejected";
+export type PendingStatus = "pending" | "urging" | "rejected" | "cancelled";
 export type ReviewStatus = "pending_review" | "approved" | "rejected";
 
 export const urgencyMap: Record<Urgency, { label: string; color: string; order: number }> = {
@@ -9,9 +9,10 @@ export const urgencyMap: Record<Urgency, { label: string; color: string; order: 
 };
 
 export const pendingStatusMap: Record<PendingStatus, { label: string; color: string }> = {
-  pending: { label: "待填报", color: "blue" },
+  pending: { label: "待上报", color: "blue" },
   urging: { label: "催办中", color: "red" },
   rejected: { label: "已退回", color: "orange" },
+  cancelled: { label: "已撤销", color: "default" },
 };
 
 export const reviewStatusMap: Record<ReviewStatus, { label: string; color: string }> = {

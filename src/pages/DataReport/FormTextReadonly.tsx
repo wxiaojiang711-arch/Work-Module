@@ -70,9 +70,9 @@ const FormTextReadonly: React.FC<FormTextReadonlyProps> = ({ data }) => {
     <div>
       <div className={styles.groupTitle}>第一组：基本信息</div>
       <Descriptions bordered size="small" column={4} labelStyle={{ color: "#999" }} contentStyle={{ color: "#333" }}>
-        <Descriptions.Item label="填报单位">{data.basicInfo.orgName}</Descriptions.Item>
-        <Descriptions.Item label="填报人">{data.basicInfo.reporter}</Descriptions.Item>
-        <Descriptions.Item label="填报日期">{data.basicInfo.reportDate}</Descriptions.Item>
+        <Descriptions.Item label="上报单位">{data.basicInfo.orgName}</Descriptions.Item>
+        <Descriptions.Item label="上报人">{data.basicInfo.reporter}</Descriptions.Item>
+        <Descriptions.Item label="上报日期">{data.basicInfo.reportDate}</Descriptions.Item>
         <Descriptions.Item label="报告期间">{data.basicInfo.reportPeriod}</Descriptions.Item>
       </Descriptions>
 

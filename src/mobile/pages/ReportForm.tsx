@@ -121,15 +121,15 @@ const ReportForm: React.FC<ReportFormProps> = ({
               {group === '基本信息' ? (
                 <>
                   <div style={{ marginBottom: 12 }}>
-                    <div style={{ fontSize: 13, color: '#666', marginBottom: 6 }}>填报单位</div>
+                    <div style={{ fontSize: 13, color: '#666', marginBottom: 6 }}>上报单位</div>
                     <div style={{ background: '#f5f5f5', borderRadius: 8, padding: '10px 12px', fontSize: 14, color: '#666' }}>{currentUser.orgName}</div>
                   </div>
                   <div style={{ marginBottom: 12 }}>
-                    <div style={{ fontSize: 13, color: '#666', marginBottom: 6 }}>填报人</div>
+                    <div style={{ fontSize: 13, color: '#666', marginBottom: 6 }}>上报人</div>
                     <div style={{ background: '#f5f5f5', borderRadius: 8, padding: '10px 12px', fontSize: 14, color: '#666' }}>{currentUser.name}</div>
                   </div>
                   <div style={{ marginBottom: 12 }}>
-                    <div style={{ fontSize: 13, color: '#666', marginBottom: 6 }}>填报日期</div>
+                    <div style={{ fontSize: 13, color: '#666', marginBottom: 6 }}>上报日期</div>
                     <div style={{ background: '#f5f5f5', borderRadius: 8, padding: '10px 12px', fontSize: 14, color: '#666' }}>{nowDate}</div>
                   </div>
                 </>

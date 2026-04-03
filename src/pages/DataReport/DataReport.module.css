@@ -341,3 +341,11 @@
   margin-top: 8px;
   font-style: italic;
 }
+
+.actionInline :global(.ant-btn) {
+  padding-inline: 4px;
+}
+
+.actionInline :global(.ant-btn + .ant-btn) {
+  margin-left: 2px;
+}

@@ -1,4 +1,4 @@
-.page {
+﻿.page {
   background: #f5f7fa;
   min-height: 100%;
   padding: 20px;
@@ -604,6 +604,17 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+.verifyHint {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: #f5f9ff;
+  border: 1px solid #cfe0ff;
+  color: #2b5cd6;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 .richHintTop {

@@ -33,6 +33,11 @@ const WorkModuleCard: React.FC = () => {
   const [generateModalOpen, setGenerateModalOpen] = useState(false);
 
   useEffect(() => {
+    window.localStorage.setItem("workModuleStatus", "notGenerated");
+    setModuleInfo((prev) => ({ ...prev, status: "notGenerated" }));
+  }, []);
+
+  useEffect(() => {
     const storedStatus = window.localStorage.getItem("workModuleStatus") as WorkModuleStatus | null;
     if (storedStatus && storedStatus !== moduleInfo.status) {
       setModuleInfo((prev) => ({ ...prev, status: storedStatus }));
@@ -59,8 +64,17 @@ const WorkModuleCard: React.FC = () => {
   };
 
   const handleQuickCreate = () => {
+    const periodMap: Record<string, string> = {
+      "一季度": "第一季度",
+      "二季度": "第二季度",
+      "三季度": "第三季度",
+      "四季度": "第四季度",
+    };
+    const normalizedPeriod =
+      Object.entries(periodMap).reduce((acc, [short, full]) => acc.replace(short, full), moduleInfo.period);
     const preset: Partial<TaskConfig> = {
-      name: `工作模块-${moduleInfo.period}`,
+      name: `工作模块`,
+      taskPeriod: normalizedPeriod,
       urgency: "normal",
       description: `请各单位完成${moduleInfo.period}工作模块更新填报。`,
       attachments: [],
@@ -120,8 +134,8 @@ const WorkModuleCard: React.FC = () => {
               查看进度
             </Button>
             <Popconfirm
-              title="确认催办"
-              description="将向未填报单位发送催办提醒"
+              title=""
+              description="确认催办未完成单位吗？"
               okText="确认"
               cancelText="取消"
               onConfirm={handleRemind}

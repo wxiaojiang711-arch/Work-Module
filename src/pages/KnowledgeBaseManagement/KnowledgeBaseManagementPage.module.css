@@ -288,6 +288,40 @@
   overflow: auto;
 }
 
+.roleOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 16px;
+}
+
+.roleSelect :global(.ant-select-selection-overflow-item .ant-select-selection-item-content) {
+  max-width: none;
+}
+
+.roleSelect :global(.ant-select-selection-item) {
+  max-width: 100%;
+}
+
+.roleSelect :global(.ant-select-selection-item) {
+  height: 28px;
+  line-height: 28px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.roleSelect :global(.ant-select-selection-item-content) {
+  line-height: 28px;
+}
+
+.roleSelect :global(.ant-select-selection-overflow) {
+  align-items: center;
+}
+
+.roleSelect :global(.ant-select-selection-overflow-item) {
+  display: flex;
+  align-items: center;
+}
+
 .permissionCategoryTitle {
   font-weight: 600;
   color: #333;

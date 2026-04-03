@@ -218,7 +218,22 @@ const TaskDetailPage: React.FC = () => {
             const viewStyle = blueViewIds.has(record.unitId) ? { paddingInline: 4, color: "#2b5cd6" } : { paddingInline: 4 };
             return (
               <>
-                <Link to={`/task/${task.id}/view/${record.unitId}`}>
+                <Link
+                  to={`/task/${task.id}/view/${record.unitId}`}
+                  state={{
+                    progress: {
+                      unitName: record.unitName,
+                      submitter: record.submitter,
+                      submitTime: record.submitTime,
+                      fillStatus: record.fillStatus,
+                      auditTime: record.auditTime,
+                      auditReason: record.auditReason,
+                      auditRemark: record.auditRemark,
+                      withdrawReason: record.withdrawReason,
+                      withdrawTime: record.withdrawTime,
+                    },
+                  }}
+                >
                   <Button type="link" style={viewStyle}>
                     查看详情
                   </Button>
@@ -404,13 +419,7 @@ const TaskDetailPage: React.FC = () => {
         destroyOnClose
         bodyStyle={{ maxHeight: "70vh", overflow: "auto", paddingInline: 24 }}
       >
-        <div style={{ background: "#fafafa", borderRadius: 8, padding: 16, marginBottom: 24 }}>
-          <div style={{ fontSize: 14, color: "#666" }}>上报单位：{auditTarget?.unitName ?? "-"}</div>
-          <div style={{ fontSize: 14, color: "#666", marginTop: 8 }}>上报人：{auditTarget?.submitter ?? "-"}</div>
-          <div style={{ fontSize: 14, color: "#666", marginTop: 8 }}>上报时间：{auditTarget?.submitTime ?? "-"}</div>
-        </div>
-
-        <div style={{ marginBottom: 24 }}>
+        <div style={{ marginTop: 36, marginBottom: 24 }}>
           <Steps direction="vertical" size="small" items={getAuditSteps(auditTarget)} />
         </div>
 
@@ -671,12 +680,9 @@ const TaskDetailPage: React.FC = () => {
           </Button>,
         ]}
       >
-        <div style={{ background: "#fafafa", borderRadius: 8, padding: 16, marginBottom: 16 }}>
-          <div style={{ fontSize: 14, color: "#666" }}>上报单位：{auditDetailTarget?.unitName ?? "-"}</div>
-          <div style={{ fontSize: 14, color: "#666", marginTop: 8 }}>上报人：{auditDetailTarget?.submitter ?? "-"}</div>
-          <div style={{ fontSize: 14, color: "#666", marginTop: 8 }}>上报时间：{auditDetailTarget?.submitTime ?? "-"}</div>
+        <div style={{ marginTop: 36 }}>
+          <Steps direction="vertical" size="small" items={getAuditDetailSteps(auditDetailTarget)} />
         </div>
-        <Steps direction="vertical" size="small" items={getAuditDetailSteps(auditDetailTarget)} />
       </Modal>
 
     </div>

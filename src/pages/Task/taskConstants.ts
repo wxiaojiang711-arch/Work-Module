@@ -1,7 +1,7 @@
 ﻿import type { Dayjs } from "dayjs";
 
 export type TaskStatus = "pending" | "collecting" | "finished";
-export type FillStatus = "submitted" | "pending" | "rejected" | "approved";
+export type FillStatus = "submitted" | "pending" | "rejected" | "approved" | "revoked";
 
 export interface TaskItem {
   id: string;
@@ -30,11 +30,14 @@ export interface UnitProgressItem {
   auditTime?: string | null;
   auditReason?: string;
   auditRemark?: string;
+  withdrawReason?: string;
+  withdrawTime?: string | null;
   submitter: string | null;
 }
 
 export interface TaskConfig {
   name: string;
+  taskPeriod?: string;
   urgency: "normal" | "urgent" | "very_urgent";
   timeRange: [Dayjs | null, Dayjs | null];
   description: string;
@@ -69,6 +72,7 @@ export const fillStatusTextMap: Record<FillStatus, string> = {
   pending: "待提交",
   rejected: "已退回",
   approved: "已通过",
+  revoked: "已撤销",
 };
 
 export const fillStatusColorMap: Record<FillStatus, string> = {
@@ -76,6 +80,7 @@ export const fillStatusColorMap: Record<FillStatus, string> = {
   pending: "warning",
   rejected: "error",
   approved: "processing",
+  revoked: "default",
 };
 
 export const permissionTreeData = [
@@ -242,9 +247,18 @@ export const unitProgressMock: UnitProgressItem[] = [
   {
     unitId: "u-001",
     unitName: "区大数据局",
-    fillStatus: "submitted",
+    fillStatus: "revoked",
     submitTime: "2024-03-15 10:00:00",
+    withdrawTime: "2024-03-16 09:30:00",
+    withdrawReason: "填报口径需重新确认，先撤回调整。",
     submitter: "王五",
+  },
+  {
+    unitId: "u-008",
+    unitName: "区审计局",
+    fillStatus: "submitted",
+    submitTime: "2024-03-17 09:10:00",
+    submitter: "陈晨",
   },
   {
     unitId: "u-007",

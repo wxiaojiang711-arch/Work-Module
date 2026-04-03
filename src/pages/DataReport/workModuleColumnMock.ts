@@ -1,4 +1,4 @@
-export type WorkModuleStatus = "pending" | "draft" | "submitted" | "rejected" | "overdue";
+﻿export type WorkModuleStatus = "pending" | "draft" | "submitted" | "rejected" | "overdue";
 
 export interface WorkModuleRecentPeriod {
   period: string;
@@ -32,11 +32,11 @@ export const workModuleStatusMap: Record<
   WorkModuleStatus,
   { label: string; color: string; primaryText: string }
 > = {
-  pending: { label: "待填写", color: "blue", primaryText: "去填报" },
-  draft: { label: "待提交", color: "default", primaryText: "去填报" },
+  pending: { label: "待填写", color: "blue", primaryText: "去上报" },
+  draft: { label: "待上报", color: "default", primaryText: "去上报" },
   submitted: { label: "已提交", color: "green", primaryText: "查看本期" },
-  rejected: { label: "已退回", color: "orange", primaryText: "重新填报" },
-  overdue: { label: "已逾期", color: "red", primaryText: "去填报" },
+  rejected: { label: "已退回", color: "orange", primaryText: "重新上报" },
+  overdue: { label: "已逾期", color: "red", primaryText: "去上报" },
 };
 
 export const workModuleOverviewMock: WorkModuleOverview = {

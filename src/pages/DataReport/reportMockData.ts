@@ -13,6 +13,7 @@ export interface PendingReportItem {
   rejectReason: string | null;
   rejectTime: string | null;
   rejectBy: string | null;
+  withdrawReason?: string | null;
   createdAt: string;
   description?: string;
   attachment?: { name: string; url: string } | null;
@@ -62,11 +63,11 @@ export const pendingReportList: PendingReportItem[] = [
     rejectBy: null,
     createdAt: "2024-03-01 10:00:00",
     description: "请提交季度经济运行分析。",
-    attachment: { name: "填报说明.docx", url: "#" },
+    attachment: { name: "上报说明.docx", url: "#" },
   },
   {
     id: "task-002",
-    taskName: "营商环境指标填报",
+    taskName: "营商环境指标上报",
     issuer: "区委办公室",
     urgency: "normal",
     formCount: 1,
@@ -78,7 +79,7 @@ export const pendingReportList: PendingReportItem[] = [
     rejectTime: null,
     rejectBy: null,
     createdAt: "2024-03-10 14:00:00",
-    description: "请填报营商环境指标数据。",
+    description: "请上报营商环境指标数据。",
     attachment: null,
   },
   {
@@ -95,8 +96,8 @@ export const pendingReportList: PendingReportItem[] = [
     rejectTime: null,
     rejectBy: null,
     createdAt: "2024-03-05 09:00:00",
-    description: "请填报重点项目推进情况。",
-    attachment: { name: "填报模板.pdf", url: "#" },
+    description: "请上报重点项目推进情况。",
+    attachment: { name: "上报模板.pdf", url: "#" },
   },
   {
     id: "task-004",
@@ -113,7 +114,7 @@ export const pendingReportList: PendingReportItem[] = [
     rejectBy: "王五（区委办公室）",
     createdAt: "2024-02-28 08:00:00",
     description: "请补充隐患整改情况。",
-    attachment: { name: "填报说明.xlsx", url: "#" },
+    attachment: { name: "上报说明.xlsx", url: "#" },
   },
   {
     id: "task-005",
@@ -129,7 +130,7 @@ export const pendingReportList: PendingReportItem[] = [
     rejectTime: null,
     rejectBy: null,
     createdAt: "2024-03-15 11:00:00",
-    description: "请填报生态环境治理成效。",
+    description: "请上报生态环境治理成效。",
     attachment: null,
   },
 ];
