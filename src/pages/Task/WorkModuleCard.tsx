@@ -121,9 +121,6 @@ const WorkModuleCard: React.FC = () => {
                 查看历史期次
               </Button>
             </Space>
-            <Typography.Text type="secondary" style={{ fontSize: 12, textAlign: "center" }}>
-              系统将自动带入工作模块模板、默认填报范围与时间窗
-            </Typography.Text>
           </Space>
         );
 

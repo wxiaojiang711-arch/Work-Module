@@ -15,6 +15,15 @@ export const pendingStatusMap: Record<PendingStatus, { label: string; color: str
   cancelled: { label: "已撤销", color: "default" },
 };
 
+export type TaskStatus = "pending" | "collecting" | "finished" | "overdue";
+
+export const taskStatusMap: Record<TaskStatus, { label: string; color: string }> = {
+  pending: { label: "待开始", color: "processing" },
+  collecting: { label: "进行中", color: "success" },
+  finished: { label: "已结束", color: "default" },
+  overdue: { label: "已逾期", color: "error" },
+};
+
 export const reviewStatusMap: Record<ReviewStatus, { label: string; color: string }> = {
   pending_review: { label: "待审核", color: "blue" },
   approved: { label: "已通过", color: "green" },

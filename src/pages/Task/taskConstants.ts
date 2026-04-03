@@ -1,6 +1,6 @@
 ﻿import type { Dayjs } from "dayjs";
 
-export type TaskStatus = "pending" | "collecting" | "finished";
+export type TaskStatus = "pending" | "collecting" | "finished" | "overdue";
 export type FillStatus = "submitted" | "pending" | "rejected" | "approved" | "revoked";
 
 export interface TaskItem {
@@ -59,12 +59,14 @@ export const taskStatusTextMap: Record<TaskStatus, string> = {
   pending: "待开始",
   collecting: "进行中",
   finished: "已结束",
+  overdue: "已逾期",
 };
 
 export const taskStatusColorMap: Record<TaskStatus, string> = {
   pending: "processing",
   collecting: "success",
   finished: "default",
+  overdue: "error",
 };
 
 export const fillStatusTextMap: Record<FillStatus, string> = {
@@ -147,7 +149,7 @@ export const templateCategoryTextMap: Record<TemplateItem["category"], string> =
 export const taskListMock: TaskItem[] = [
   {
     id: "task-001",
-    name: "部门简介",
+    name: "数字政府建设进展上报",
     formCount: 1,
     status: "collecting",
     progress: { completed: 8, total: 12 },
@@ -159,7 +161,7 @@ export const taskListMock: TaskItem[] = [
   },
   {
     id: "task-002",
-    name: "工作体系架构图",
+    name: "政务数据共享交换情况",
     formCount: 1,
     status: "pending",
     progress: { completed: 0, total: 15 },
@@ -171,7 +173,7 @@ export const taskListMock: TaskItem[] = [
   },
   {
     id: "task-003",
-    name: "核心业务",
+    name: "项目推进进展统计",
     formCount: 2,
     status: "finished",
     progress: { completed: 10, total: 10 },
@@ -183,9 +185,9 @@ export const taskListMock: TaskItem[] = [
   },
   {
     id: "task-004",
-    name: "特色优势",
+    name: "人才引进情况统计",
     formCount: 1,
-    status: "collecting",
+    status: "overdue",
     progress: { completed: 5, total: 12 },
     startTime: "2024-03-10 00:00:00",
     deadline: "2024-04-10 23:59:59",
@@ -195,7 +197,7 @@ export const taskListMock: TaskItem[] = [
   },
   {
     id: "task-005",
-    name: "标志性成果打造情况",
+    name: "重点事项督办清单",
     formCount: 2,
     status: "pending",
     progress: { completed: 0, total: 12 },
@@ -207,7 +209,7 @@ export const taskListMock: TaskItem[] = [
   },
   {
     id: "task-006",
-    name: "存在的主要问题",
+    name: "预算执行情况上报",
     formCount: 1,
     status: "collecting",
     progress: { completed: 3, total: 12 },
@@ -216,30 +218,6 @@ export const taskListMock: TaskItem[] = [
     creator: "王五",
     createdAt: "2024-03-10 09:00:00",
     description: "采集各单位存在的主要问题。",
-  },
-  {
-    id: "task-007",
-    name: "主要指标数据表",
-    formCount: 3,
-    status: "pending",
-    progress: { completed: 0, total: 15 },
-    startTime: "2024-04-01 00:00:00",
-    deadline: "2024-04-25 23:59:59",
-    creator: "张三",
-    createdAt: "2024-03-18 15:00:00",
-    description: "采集主要指标数据表。",
-  },
-  {
-    id: "task-008",
-    name: "季度主要目标任务分解表",
-    formCount: 2,
-    status: "collecting",
-    progress: { completed: 6, total: 12 },
-    startTime: "2024-03-01 00:00:00",
-    deadline: "2024-03-31 23:59:59",
-    creator: "李四",
-    createdAt: "2024-02-25 10:00:00",
-    description: "采集季度主要目标任务分解表。",
   },
 ];
 

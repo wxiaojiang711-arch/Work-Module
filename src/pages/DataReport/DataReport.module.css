@@ -255,6 +255,23 @@
   gap: 6px;
 }
 
+.reportDetailTabs {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.reportDetailTabs :global(.ant-tabs-content-holder) {
+  flex: 1;
+}
+
+.reportDetailTabFill {
+  height: 100%;
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+}
+
 .groupTitle {
   border-left: 3px solid #1890ff;
   padding-left: 10px;
@@ -313,12 +330,14 @@
 }
 
 .attachmentItem {
-  padding: 8px 12px;
-  border-radius: 6px;
+  padding: 12px 16px;
+  border-radius: 8px;
   border: 1px solid #f0f0f0;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  background: #fafafa;
 }
 
 .fileIcon {

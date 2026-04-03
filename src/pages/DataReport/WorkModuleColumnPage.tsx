@@ -1,5 +1,5 @@
 ﻿import React, { useMemo, useState } from "react";
-import { Breadcrumb, Button, Card, Select, Space, Table, Tag, Typography, message } from "antd";
+import { Breadcrumb, Button, Card, Space, Table, Tag, Typography, message } from "antd";
 import type { TableProps } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -36,25 +36,21 @@ const WorkModuleColumnPage: React.FC = () => {
 
   const goFill = (taskId: string) => navigate(`${basePath}/fill/${taskId}`);
 
-  const openPeriod = (period: string, taskId: string) => {
-    setSelectedPeriod(period);
-    setSelectedTaskId(taskId);
-    navigate(`${basePath}/work-module?period=${period}&taskId=${taskId}`);
-  };
-
   const historyColumns: TableProps<(typeof historyPeriods)[number]>["columns"] = [
-    { title: "期次", dataIndex: "period", key: "period", width: 120 },
+    { title: "任务期次", dataIndex: "period", key: "period", width: 120 },
     {
-      title: "状态",
+      title: "上报状态",
       dataIndex: "status",
       key: "status",
       width: 120,
       render: (value: WorkModuleStatus) => (
-        <Tag color={workModuleStatusMap[value].color}>{workModuleStatusMap[value].label}</Tag>
+        <Tag color={value === "submitted" ? "green" : "orange"}>
+          {value === "submitted" ? "已通过" : "待审核"}
+        </Tag>
       ),
     },
-    { title: "提交时间", dataIndex: "submitTime", key: "submitTime", width: 180 },
-    { title: "提交人", dataIndex: "submitter", key: "submitter", width: 120 },
+    { title: "上报时间", dataIndex: "submitTime", key: "submitTime", width: 180 },
+    { title: "上报人", dataIndex: "submitter", key: "submitter", width: 120 },
     {
       title: "操作",
       key: "actions",
@@ -63,9 +59,6 @@ const WorkModuleColumnPage: React.FC = () => {
         <Space size={0}>
           <Button type="link" onClick={() => navigate(`${basePath}/view/${record.taskId}`)}>
             查看详情
-          </Button>
-          <Button type="link" onClick={() => message.info("导出功能开发中")}>
-            导出
           </Button>
         </Space>
       ),
@@ -76,7 +69,7 @@ const WorkModuleColumnPage: React.FC = () => {
     <div className={styles.page}>
       <Breadcrumb items={[{ title: "数据上报" }, { title: "工作模块专栏" }]} style={{ marginBottom: 12 }} />
 
-      <Card className={styles.workModuleEntryCard}>
+      <Card className={styles.workModuleEntryCard} style={{ padding: "8px 12px" }}>
         <div className={styles.workModuleEntryHeader}>
           <div>
             <h3 className={styles.workModuleEntryTitle}>{"\u5de5\u4f5c\u6a21\u5757\u4e13\u680f"}</h3>
@@ -93,18 +86,7 @@ const WorkModuleColumnPage: React.FC = () => {
             <div className={`${styles.workModuleInfoGrid} ${styles.workModuleInfoGridFour}`}>
               <div className={styles.workModuleInfoItem}>
                 {"\u5f53\u524d\u671f\u6b21\uff1a"}
-                <span style={{ marginLeft: 6 }}>
-                  <Select
-                    value={selectedPeriod}
-                    style={{ width: 140 }}
-                    options={workModulePeriods.map((item) => ({ label: item.period, value: item.period }))}
-                    onChange={(period) => {
-                      const target = workModulePeriods.find((item) => item.period === period);
-                      if (!target) return;
-                      openPeriod(target.period, target.taskId);
-                    }}
-                  />
-                </span>
+                <span style={{ marginLeft: 6 }}>{selectedPeriod}</span>
               </div>
               <div className={styles.workModuleInfoItem}>
                 {"\u72b6\u6001\uff1a"}

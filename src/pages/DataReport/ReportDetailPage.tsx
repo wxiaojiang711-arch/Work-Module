@@ -3,13 +3,12 @@ import {
   FormOutlined,
   TableOutlined,
 } from "@ant-design/icons";
-import { Breadcrumb, Tabs } from "antd";
+import { Breadcrumb, Button, Card, Space, Tabs } from "antd";
 import type { TabsProps } from "antd";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import styles from "./DataReport.module.css";
 import FormTableReadonly from "./FormTableReadonly";
-import FormTextReadonly from "./FormTextReadonly";
 import TaskInfoCard from "./TaskInfoCard";
 
 export type TaskDetail = {
@@ -20,7 +19,10 @@ export type TaskDetail = {
   submittedAt: string;
   submitter: string;
   formCount: number;
-  status: "submitted";
+  status: "submitted" | "revoked";
+  urgentLevel: string;
+  revokedAt?: string;
+  revokedReason?: string;
   description: string;
 };
 
@@ -83,6 +85,9 @@ const taskDetail: TaskDetail = {
   submitter: "王五",
   formCount: 3,
   status: "submitted",
+  urgentLevel: "一般",
+  revokedAt: "2024-03-20 10:20:00",
+  revokedReason: "上报口径调整，需重新汇总后提交。",
   description: "请各单位提交2024年第一季度工作完成情况总结，包括重点工作完成情况、量化指标、重点项目进展等内容。",
 };
 
@@ -287,42 +292,47 @@ const formTableData2: FormTableData2 = {
 const ReportDetailPage: React.FC = () => {
   const navigate = useNavigate();
   const { taskId } = useParams<{ taskId: string }>();
+  const location = useLocation() as { state?: { reportStatusText?: string } };
 
   const tabItems: TabsProps["items"] = [
     {
       key: "form-001",
-      label: (
-        <span className={styles.tabLabel}>
-          <FormOutlined />
-          季度工作总结报告
-        </span>
+      label: <span className={styles.tabLabel}>季度工作总结报告</span>,
+      children: (
+        <div className={styles.reportDetailTabFill}>
+          <div className={styles.attachmentItem}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ fontSize: 14, color: "#333" }}>
+                2024年第一季度工作总结报告.docx
+                <span style={{ marginLeft: 10, fontSize: 12, color: "#999" }}>-</span>
+              </div>
+            </div>
+            <Space size={12}>
+              <Button type="link" style={{ paddingInline: 4 }}>
+                预览
+              </Button>
+              <Button type="link" style={{ paddingInline: 4 }}>
+                下载
+              </Button>
+            </Space>
+          </div>
+        </div>
       ),
-      children: <FormTextReadonly data={formTextData} />,
     },
     {
       key: "form-002",
-      label: (
-        <span className={styles.tabLabel}>
-          <TableOutlined />
-          量化指标上报表
-        </span>
-      ),
+      label: <span className={styles.tabLabel}>量化指标上报表</span>,
       children: <FormTableReadonly tableType="quantitative" data={formTableData1} />,
     },
     {
       key: "form-003",
-      label: (
-        <span className={styles.tabLabel}>
-          <TableOutlined />
-          重点项目进展表
-        </span>
-      ),
+      label: <span className={styles.tabLabel}>重点项目进展表</span>,
       children: <FormTableReadonly tableType="project" data={formTableData2} />,
     },
   ];
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} style={{ display: "flex", flexDirection: "column", minHeight: "100%" }}>
       <Breadcrumb
         style={{ marginBottom: 12 }}
         items={[
@@ -354,9 +364,15 @@ const ReportDetailPage: React.FC = () => {
         ]}
       />
 
-      <TaskInfoCard task={{ ...taskDetail, id: taskId ?? taskDetail.id }} />
+      <TaskInfoCard
+        task={{ ...taskDetail, id: taskId ?? taskDetail.id }}
+        reportStatusText={location.state?.reportStatusText}
+      />
 
-      <Tabs type="card" style={{ marginTop: 16 }} items={tabItems} />
+      <Card style={{ marginTop: 0 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>上报详情</div>
+        <Tabs className={styles.reportDetailTabs} items={tabItems} />
+      </Card>
     </div>
   );
 };

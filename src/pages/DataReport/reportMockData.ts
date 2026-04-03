@@ -8,12 +8,15 @@ export interface PendingReportItem {
   formCount: number;
   deadline: string;
   status: PendingStatus;
+  taskStatus: "pending" | "collecting" | "finished" | "overdue";
   urgeCount: number;
   lastUrgeTime: string | null;
   rejectReason: string | null;
   rejectTime: string | null;
   rejectBy: string | null;
   withdrawReason?: string | null;
+  withdrawTime?: string | null;
+  withdrawBy?: string | null;
   createdAt: string;
   description?: string;
   attachment?: { name: string; url: string } | null;
@@ -39,6 +42,7 @@ export const pendingReportList: PendingReportItem[] = [
     formCount: 1,
     deadline: "2024-04-30 23:59:59",
     status: "pending",
+    taskStatus: "collecting",
     urgeCount: 0,
     lastUrgeTime: null,
     rejectReason: null,
@@ -56,6 +60,7 @@ export const pendingReportList: PendingReportItem[] = [
     formCount: 1,
     deadline: "2024-03-25 23:59:59",
     status: "pending",
+    taskStatus: "pending",
     urgeCount: 0,
     lastUrgeTime: null,
     rejectReason: null,
@@ -73,6 +78,7 @@ export const pendingReportList: PendingReportItem[] = [
     formCount: 1,
     deadline: "2024-04-15 23:59:59",
     status: "pending",
+    taskStatus: "finished",
     urgeCount: 0,
     lastUrgeTime: null,
     rejectReason: null,
@@ -88,8 +94,9 @@ export const pendingReportList: PendingReportItem[] = [
     issuer: "区委办公室",
     urgency: "normal",
     formCount: 2,
-    deadline: "2024-03-22 18:00:00",
+    deadline: "2024-04-25 18:00:00",
     status: "pending",
+    taskStatus: "collecting",
     urgeCount: 0,
     lastUrgeTime: null,
     rejectReason: null,
@@ -105,13 +112,14 @@ export const pendingReportList: PendingReportItem[] = [
     issuer: "区委办公室",
     urgency: "normal",
     formCount: 1,
-    deadline: "2024-03-18 23:59:59",
-    status: "rejected",
-    urgeCount: 1,
-    lastUrgeTime: "2024-03-15 10:00:00",
-    rejectReason: '内容不够详细，请补充具体案例和数据支撑。',
-    rejectTime: "2024-03-18 10:30:00",
-    rejectBy: "王五（区委办公室）",
+    deadline: "2024-04-05 18:30:00",
+    status: "pending",
+    taskStatus: "overdue",
+    urgeCount: 0,
+    lastUrgeTime: null,
+    rejectReason: null,
+    rejectTime: null,
+    rejectBy: null,
     createdAt: "2024-02-28 08:00:00",
     description: "请补充隐患整改情况。",
     attachment: { name: "上报说明.xlsx", url: "#" },
@@ -122,13 +130,14 @@ export const pendingReportList: PendingReportItem[] = [
     issuer: "区委办公室",
     urgency: "normal",
     formCount: 2,
-    deadline: "2024-04-10 23:59:59",
-    status: "pending",
+    deadline: "2024-04-08 18:00:00",
+    status: "rejected",
+    taskStatus: "collecting",
     urgeCount: 0,
     lastUrgeTime: null,
-    rejectReason: null,
-    rejectTime: null,
-    rejectBy: null,
+    rejectReason: "数据口径不一致，请按最新模板调整后重新上报。",
+    rejectTime: "2024-03-19 09:40:00",
+    rejectBy: "王五（区委办公室）",
     createdAt: "2024-03-15 11:00:00",
     description: "请上报生态环境治理成效。",
     attachment: null,
@@ -165,16 +174,6 @@ export const submittedReportList: SubmittedReportItem[] = [
     submitter: "王五",
     reviewStatus: "pending_review",
     createdAt: "2024-03-01 08:00:00",
-  },
-  {
-    id: "task-104",
-    taskName: "法治政府建设工作进度",
-    issuer: "区委办公室",
-    formCount: 1,
-    submitTime: "2024-03-15 11:00:00",
-    submitter: "李四",
-    reviewStatus: "rejected",
-    createdAt: "2024-03-01 09:00:00",
   },
   {
     id: "task-105",

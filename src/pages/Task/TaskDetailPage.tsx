@@ -179,18 +179,25 @@ const TaskDetailPage: React.FC = () => {
   const columns: TableProps<UnitProgressItem>["columns"] = [
     { title: "单位名称", dataIndex: "unitName", key: "unitName", width: 300 },
     {
-      title: "上报人",
-      dataIndex: "submitter",
-      key: "submitter",
-      width: 120,
-      render: (value: string | null) => value ?? "-",
-    },
-    {
       title: "上报状态",
       dataIndex: "fillStatus",
       key: "fillStatus",
       width: 120,
       render: (value: FillStatus) => <Tag color={fillStatusColorMap[value]}>{fillStatusTextMap[value]}</Tag>,
+    },
+    {
+      title: "催办次数",
+      dataIndex: "remindCount",
+      key: "remindCount",
+      width: 100,
+      render: (value?: number) => (typeof value === "number" ? value : 0),
+    },
+    {
+      title: "上报人",
+      dataIndex: "submitter",
+      key: "submitter",
+      width: 120,
+      render: (value: string | null) => value ?? "-",
     },
     {
       title: "上报时间",
@@ -221,6 +228,7 @@ const TaskDetailPage: React.FC = () => {
                 <Link
                   to={`/task/${task.id}/view/${record.unitId}`}
                   state={{
+                    taskName: task.name,
                     progress: {
                       unitName: record.unitName,
                       submitter: record.submitter,
@@ -256,20 +264,6 @@ const TaskDetailPage: React.FC = () => {
                     审核
                   </Button>
                 ) : null}
-                {record.fillStatus === "approved" ||
-                record.fillStatus === "rejected" ||
-                isSecondMock ? (
-                  <Button
-                    type="link"
-                    style={{ paddingInline: 4 }}
-                    onClick={() => {
-                      setAuditDetailTarget(record);
-                      setAuditDetailOpen(true);
-                    }}
-                  >
-                    审核详情
-                  </Button>
-                ) : null}
                 {record.fillStatus === "pending" ? (
                   <Button
                     type="link"
@@ -299,12 +293,6 @@ const TaskDetailPage: React.FC = () => {
 
         <Card
           title="任务概览"
-          extra={
-            <Space>
-              <Button onClick={() => message.success("已向未完成单位发送催办")}>一键催办</Button>
-              <Button type="primary" onClick={() => message.success("已导出全部数据")}>导出全部数据</Button>
-            </Space>
-          }
         >
           <Descriptions column={3} bordered size="small">
             <Descriptions.Item label="任务名称">{task.name}</Descriptions.Item>
@@ -328,7 +316,17 @@ const TaskDetailPage: React.FC = () => {
           </Descriptions>
         </Card>
 
-        <Card title="各单位上报明细">
+        <Card
+          title="各单位上报明细"
+          extra={
+            <Space>
+              <Button onClick={() => message.success("已向未完成单位发送催办")}>一键催办</Button>
+              <Button type="primary" onClick={() => message.success("已导出全部数据")}>
+                导出全部数据
+              </Button>
+            </Space>
+          }
+        >
           <div style={{ background: "#fafafa", borderRadius: 8, padding: "12px 16px", marginBottom: 12 }}>
             <Row gutter={12} align="middle" wrap={false}>
               <Col flex="280px">

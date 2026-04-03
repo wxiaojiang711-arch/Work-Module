@@ -83,7 +83,7 @@ const WorkModuleHistoryPage: React.FC = () => {
       ),
     },
     {
-      title: "填报进度",
+      title: "上报进度",
       key: "progress",
       width: 200,
       render: (_, record) => {

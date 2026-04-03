@@ -161,7 +161,7 @@ const TaskListPage: React.FC = () => {
       render: (value: TaskStatus) => <Tag color={taskStatusColorMap[value]}>{taskStatusTextMap[value]}</Tag>,
     },
     {
-      title: "填报进度",
+      title: "上报进度",
       key: "progress",
       width: 220,
       render: (_value, record) => {
@@ -237,10 +237,17 @@ const TaskListPage: React.FC = () => {
               title="确认催办未完成单位吗？"
               okText="确认"
               cancelText="取消"
-              disabled={record.status !== "collecting"}
+              disabled={!(record.status === "collecting" || record.status === "overdue")}
               onConfirm={() => message.success("催办已发送")}
             >
-              <Button type="link" style={{ paddingInline: 4 }} disabled={record.status !== "collecting"}>
+              <Button
+                type="link"
+                style={{
+                  paddingInline: 4,
+                  color: record.status === "overdue" ? "#2b5cd6" : undefined,
+                }}
+                disabled={!(record.status === "collecting" || record.status === "overdue")}
+              >
                 催办
               </Button>
             </Popconfirm>
@@ -248,7 +255,7 @@ const TaskListPage: React.FC = () => {
               title="确认提前结束该任务吗？"
               okText="确认"
               cancelText="取消"
-              disabled={record.status !== "collecting"}
+              disabled={!(record.status === "collecting" || record.status === "overdue")}
               onConfirm={() => {
                 setTaskList((prev) =>
                   prev.map((item) => (item.id === record.id ? { ...item, status: "finished" } : item)),
@@ -256,7 +263,14 @@ const TaskListPage: React.FC = () => {
                 message.success("任务已结束");
               }}
             >
-              <Button type="link" style={{ paddingInline: 4 }} disabled={record.status !== "collecting"}>
+              <Button
+                type="link"
+                style={{
+                  paddingInline: 4,
+                  color: record.status === "overdue" ? "#2b5cd6" : undefined,
+                }}
+                disabled={!(record.status === "collecting" || record.status === "overdue")}
+              >
                 结束填报
               </Button>
             </Popconfirm>
@@ -316,6 +330,7 @@ const TaskListPage: React.FC = () => {
                   { label: taskStatusTextMap.pending, value: "pending" },
                   { label: taskStatusTextMap.collecting, value: "collecting" },
                   { label: taskStatusTextMap.finished, value: "finished" },
+                  { label: taskStatusTextMap.overdue, value: "overdue" },
                 ]}
               />
             </Space>
@@ -330,7 +345,7 @@ const TaskListPage: React.FC = () => {
               />
             </Space>
             <Space size={8} align="center">
-              <span style={{ color: "#666", minWidth: 56 }}>任务时间</span>
+              <span style={{ color: "#666", minWidth: 56 }}>截止时间</span>
               <DatePicker.RangePicker
                 showTime
                 value={filterTimeRange}

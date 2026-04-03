@@ -172,7 +172,7 @@ const unitAliasToName: Record<string, string> = {
 
 const TaskDataViewPage: React.FC = () => {
   const { taskId, unitId } = useParams<{ taskId: string; unitId: string }>();
-  const location = useLocation() as { state?: { progress?: UnitProgressItem } };
+  const location = useLocation() as { state?: { progress?: UnitProgressItem; taskName?: string } };
   const task = useMemo(() => taskListMock.find((item) => item.id === taskId), [taskId]);
   const progressTarget = useMemo(() => {
     return (
@@ -256,6 +256,57 @@ const TaskDataViewPage: React.FC = () => {
     ];
   };
 
+  const getAuditDetailSteps = (target: UnitProgressItem | null): StepsProps["items"] => {
+    const submitTime = target?.submitTime ?? "-";
+    const auditTime = target?.auditTime ?? "-";
+    const reasonText = target?.auditReason;
+    const remarkText = target?.auditRemark ?? "-";
+    const auditStatus =
+      target?.fillStatus === "approved"
+        ? "通过"
+        : target?.fillStatus === "rejected"
+          ? "退回"
+          : "待审核";
+    return [
+      {
+        title: "数据专员",
+        status: "finish",
+        description: (
+          <div style={{ marginTop: 8, fontSize: 13, color: "#666" }}>
+            <div>审核状态：通过</div>
+            <div>审核备注：-</div>
+            <div style={{ whiteSpace: "nowrap" }}>审核时间：{submitTime}</div>
+          </div>
+        ),
+      },
+      {
+        title: "单位管理员",
+        status: "error",
+        description: (
+          <div style={{ marginTop: 8, fontSize: 13, color: "#666" }}>
+            <div>审核状态：{auditStatus}</div>
+            <div>审核备注：{remarkText}</div>
+            {reasonText ? <div>退回原因：{reasonText}</div> : null}
+            <div style={{ whiteSpace: "nowrap" }}>
+              审核时间：{auditTime !== "-" ? auditTime : "2024-03-20 10:00:00"}
+            </div>
+          </div>
+        ),
+      },
+      {
+        title: "区委办公室",
+        status: "process",
+        description: (
+          <div style={{ marginTop: 8, fontSize: 13, color: "#666" }}>
+            <div>审核状态：待审核</div>
+            <div>审核备注：-</div>
+            <div style={{ whiteSpace: "nowrap" }}>审核时间：-</div>
+          </div>
+        ),
+      },
+    ];
+  };
+
   const templateNameById = useMemo(
     () => availableTemplates.reduce<Record<string, string>>((acc, item) => {
       acc[item.id] = item.name;
@@ -303,11 +354,36 @@ const TaskDataViewPage: React.FC = () => {
 
   const fileTabs = filesToRender.map((file, index) => ({
     key: `file-${index}`,
-    label: templateNameById[file.templateId] ?? file.fileName,
+    label: index === 1 ? "工作模块" : (templateNameById[file.templateId] ?? file.fileName),
   }));
 
   const activeFileIndex = Number(activeTabKey.replace("file-", ""));
   const currentFileData = filesToRender[activeFileIndex] ?? filesToRender[0];
+  const indicatorPairs = useMemo(
+    () => [
+      { id: "kv-01", key: "规上工业产值（亿元）", value: "1250" },
+      { id: "kv-02", key: "规上工业产值增速（%）", value: "8.5" },
+      { id: "kv-03", key: "规上工业增加值增速（%）", value: "7.2" },
+      { id: "kv-04", key: "工业投资（亿元）", value: "320" },
+      { id: "kv-05", key: "工业投资增速（%）", value: "6.1" },
+      { id: "kv-06", key: "制造业亩均税收增速（%）", value: "5.4" },
+      { id: "kv-07", key: "制造业投资（亿元）", value: "210" },
+      { id: "kv-08", key: "制造业投资增速（%）", value: "4.8" },
+      { id: "kv-09", key: "高技术制造业产值占比（%）", value: "32.6" },
+      { id: "kv-10", key: "企业技术改造投资（亿元）", value: "95" },
+      { id: "kv-11", key: "工业用电量（亿千瓦时）", value: "58" },
+      { id: "kv-12", key: "工业用电量增速（%）", value: "3.9" },
+      { id: "kv-13", key: "新增规上工业企业数（家）", value: "42" },
+      { id: "kv-14", key: "单位能耗下降（%）", value: "2.1" },
+      { id: "kv-15", key: "工业固定资产投资增速（%）", value: "5.9" },
+      { id: "kv-16", key: "战略性新兴产业产值（亿元）", value: "180" },
+      { id: "kv-17", key: "专精特新企业数（家）", value: "65" },
+      { id: "kv-18", key: "高新技术企业数（家）", value: "120" },
+      { id: "kv-19", key: "科技型中小企业数（家）", value: "260" },
+      { id: "kv-20", key: "工业增加值增速（%）", value: "6.7" },
+    ],
+    [],
+  );
 
   useEffect(() => {
     if (activeFileIndex >= filesToRender.length) {
@@ -324,92 +400,101 @@ const TaskDataViewPage: React.FC = () => {
   }
 
   return (
-    <div style={{ padding: "20px 20px 0", background: "#f3f6fb", height: "100%", overflow: "auto" }}>
-      <div style={{ marginBottom: 16 }}>
-        <Breadcrumb
-          items={[
-            { title: <Link to="/task">采集任务</Link> },
-            { title: <Link to={`/task/detail/${taskId}`}>任务详情</Link> },
-            { title: `${unitData.unitName}数据详情` },
-          ]}
-        />
-      </div>
-
-      <Card style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 12 }}>基础上报信息</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "10px 16px" }}>
-          <div style={{ fontSize: 14, color: "#666" }}>上报单位：{progressTarget?.unitName ?? unitData.unitName}</div>
-          <div style={{ fontSize: 14, color: "#666" }}>上报人：{progressTarget?.submitter ?? "-"}</div>
-          <div style={{ fontSize: 14, color: "#666" }}>上报时间：{progressTarget?.submitTime ?? "-"}</div>
-          <div style={{ fontSize: 14, color: "#666" }}>
-            上报状态：
-            <span style={progressTarget?.fillStatus === "revoked" ? { color: "#ff4d4f", fontWeight: 600 } : {}}>
-              {progressTarget ? fillStatusTextMap[progressTarget.fillStatus] : "-"}
-            </span>
-          </div>
+    <div style={{ padding: "20px 20px 0", background: "#f3f6fb", height: "100%", overflow: "auto", display: "flex", flexDirection: "column", minHeight: "100%" }}>
+      <div style={{ flex: 1 }}>
+        <div style={{ marginBottom: 16 }}>
+          <Breadcrumb
+            items={[
+              { title: <Link to="/task">采集任务</Link> },
+              { title: <Link to={`/task/detail/${taskId}`}>任务详情</Link> },
+              { title: `${unitData.unitName}数据详情` },
+            ]}
+          />
         </div>
-        {progressTarget?.fillStatus === "revoked" ? (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "10px 16px", marginTop: 10 }}>
-            <div style={{ fontSize: 14, color: "#666" }}>撤销原因：{progressTarget.withdrawReason ?? "-"}</div>
-            <div style={{ fontSize: 14, color: "#666" }}>撤销时间：{progressTarget.withdrawTime ?? "-"}</div>
-          </div>
-        ) : null}
-      </Card>
 
-      <Card style={{ marginBottom: 16 }}>
-        <Tabs items={fileTabs} activeKey={activeTabKey} onChange={setActiveTabKey} />
+        <Card style={{ marginBottom: 16 }}>
+          <Tabs
+            style={{ marginTop: -8 }}
+            tabBarStyle={{ margin: "0 0 4px" }}
+            items={[
+              {
+                key: "report",
+                label: <span style={{ fontSize: 15 }}>上报信息</span>,
+                children: (
+                  <div style={{ paddingTop: 12 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, minmax(0, 1fr))", gap: "10px 16px" }}>
+                      <div style={{ fontSize: 14, color: "#666" }}>上报单位：{progressTarget?.unitName ?? unitData.unitName}</div>
+                      <div style={{ fontSize: 14, color: "#666" }}>上报人：{progressTarget?.submitter ?? "-"}</div>
+                      <div style={{ fontSize: 14, color: "#666" }}>上报时间：{progressTarget?.submitTime ?? "-"}</div>
+                      <div style={{ fontSize: 14, color: "#666" }}>
+                        上报状态：
+                        <span style={progressTarget?.fillStatus === "revoked" ? { color: "#ff4d4f", fontWeight: 600 } : {}}>
+                          {progressTarget ? fillStatusTextMap[progressTarget.fillStatus] : "-"}
+                        </span>
+                      </div>
+                    </div>
+                    {progressTarget?.fillStatus === "revoked" ? (
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+                          gap: "10px 16px",
+                          marginTop: 10,
+                        }}
+                      >
+                        <div style={{ fontSize: 14, color: "#666" }}>撤销时间：{progressTarget.withdrawTime ?? "-"}</div>
+                        <div style={{ fontSize: 14, color: "#666" }}>撤销原因：{progressTarget.withdrawReason ?? "-"}</div>
+                      </div>
+                    ) : null}
+                  </div>
+                ),
+              },
+              {
+                key: "audit",
+                label: <span style={{ fontSize: 15 }}>审核信息</span>,
+                children: (
+                  <div style={{ maxWidth: 1440, paddingTop: 12 }}>
+                    <Steps direction="horizontal" size="small" items={getAuditDetailSteps(progressTarget)} />
+                  </div>
+                ),
+              },
+            ]}
+          />
+        </Card>
 
-        {activeFileIndex === 0 ? (
-          <div style={{ padding: "12px 0" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", border: "1px solid #f0f0f0", borderRadius: 8, background: "#fafafa" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <div style={{ fontSize: 14, color: "#333" }}>区级工作模块采集说明（2026年一季度）.docx</div>
-            </div>
-              <Space size={12}>
-                <Button type="link" style={{ paddingInline: 4 }}>预览</Button>
-                <Button type="link" style={{ paddingInline: 4 }}>下载</Button>
-              </Space>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>1. 部门简介</h3>
-              <div className={styles.fieldGroup}>
-                <div className={styles.field}>
-                  <label className={styles.label}>职能职责</label>
-                  <div className={styles.value}>{currentFileData.step1.职能职责}</div>
+        <Card style={{ marginBottom: 16 }}>
+          <div style={{ fontSize: 16, fontWeight: 600, marginBottom: 8 }}>上报详情</div>
+          <Tabs items={fileTabs} activeKey={activeTabKey} onChange={setActiveTabKey} />
+
+          {activeFileIndex === 0 ? (
+            <div style={{ padding: "12px 0" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", border: "1px solid #f0f0f0", borderRadius: 8, background: "#fafafa" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ fontSize: 14, color: "#333" }}>区级工作模块采集说明（2026年一季度）.docx</div>
                 </div>
-                <div className={styles.field}>
-                  <label className={styles.label}>组织架构</label>
-                  <div className={styles.value}>{currentFileData.step1.组织架构}</div>
-                </div>
+                <Space size={12}>
+                  <Button type="link" style={{ paddingInline: 4 }}>预览</Button>
+                  <Button type="link" style={{ paddingInline: 4 }}>下载</Button>
+                </Space>
               </div>
             </div>
-
-            <Divider />
-
-            <div className={styles.section}>
-              <h3 className={styles.sectionTitle}>2. 附件清单</h3>
-              <div className={styles.fileList}>
-                {currentFileData.step2.files.map((file) => (
-                  <Tag key={file} color="blue">
-                    {file}
-                  </Tag>
-                ))}
+          ) : (
+            <>
+              <div className={styles.section}>
+                <h3 className={styles.sectionTitle}>1. 部门简介</h3>
+                <div className={styles.richTextView}>
+                  <p>{currentFileData.step1.职能职责}</p>
+                  <p>{currentFileData.step1.组织架构}</p>
+                </div>
               </div>
-            </div>
 
             <Divider />
 
             <div className={styles.section}>
               <h3 className={styles.sectionTitle}>3. 核心业务</h3>
-              <div className={styles.cardList}>
+              <div className={styles.richTextView}>
                 {currentFileData.step3.map((card) => (
-                  <div key={card.id} className={styles.card}>
-                    <div className={styles.cardTitle}>{card.title}</div>
-                    <div className={styles.cardDetail}>{card.detail}</div>
-                  </div>
+                  <p key={card.id}>{card.title}：{card.detail}</p>
                 ))}
               </div>
             </div>
@@ -418,19 +503,18 @@ const TaskDataViewPage: React.FC = () => {
 
             <div className={styles.section}>
               <h3 className={styles.sectionTitle}>4. 特色优势</h3>
-              <div className={styles.value}>{currentFileData.step4}</div>
+              <div className={styles.richTextView}>
+                <p>{currentFileData.step4}</p>
+              </div>
             </div>
 
             <Divider />
 
             <div className={styles.section}>
               <h3 className={styles.sectionTitle}>5. 标志性成果打造情况</h3>
-              <div className={styles.cardList}>
+              <div className={styles.richTextView}>
                 {currentFileData.step5.map((card) => (
-                  <div key={card.id} className={styles.card}>
-                    <div className={styles.cardTitle}>{card.title}</div>
-                    <div className={styles.cardDetail}>{card.detail}</div>
-                  </div>
+                  <p key={card.id}>{card.title}：{card.detail}</p>
                 ))}
               </div>
             </div>
@@ -439,12 +523,9 @@ const TaskDataViewPage: React.FC = () => {
 
             <div className={styles.section}>
               <h3 className={styles.sectionTitle}>6. 存在的主要问题</h3>
-              <div className={styles.cardList}>
+              <div className={styles.richTextView}>
                 {currentFileData.step6.map((card) => (
-                  <div key={card.id} className={styles.card}>
-                    <div className={styles.cardTitle}>{card.title}</div>
-                    <div className={styles.cardDetail}>{card.detail}</div>
-                  </div>
+                  <p key={card.id}>{card.title}：{card.detail}</p>
                 ))}
               </div>
             </div>
@@ -453,69 +534,76 @@ const TaskDataViewPage: React.FC = () => {
 
             <div className={styles.section}>
               <h3 className={styles.sectionTitle}>7. 主要指标数据表</h3>
-              <div className={styles.tableWrap}>
-                <table className={styles.table}>
-                  <thead>
-                    <tr>
-                      <th>指标名称</th>
-                      <th>2021年</th>
-                      <th>2022年</th>
-                      <th>2023年</th>
-                      <th>2024年</th>
-                      <th>2025年</th>
-                      <th>2026目标</th>
-                      <th>2030目标</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentFileData.step7.map((row) => (
-                      <tr key={row.id}>
-                        <td>{row.name}</td>
-                        {row.values.map((value, index) => (
-                          <td key={`${row.id}-${index}`}>{value}</td>
-                        ))}
+              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+                <thead>
+                  <tr>
+                    <th style={{ border: "1px solid #e8e8e8", background: "#fafafa", padding: 8, textAlign: "left" }}>
+                      指标名称
+                    </th>
+                    <th style={{ border: "1px solid #e8e8e8", background: "#fafafa", padding: 8, textAlign: "left" }}>
+                      指标值
+                    </th>
+                    <th style={{ border: "1px solid #e8e8e8", background: "#fafafa", padding: 8, textAlign: "left" }}>
+                      指标名称
+                    </th>
+                    <th style={{ border: "1px solid #e8e8e8", background: "#fafafa", padding: 8, textAlign: "left" }}>
+                      指标值
+                    </th>
+                    <th style={{ border: "1px solid #e8e8e8", background: "#fafafa", padding: 8, textAlign: "left" }}>
+                      指标名称
+                    </th>
+                    <th style={{ border: "1px solid #e8e8e8", background: "#fafafa", padding: 8, textAlign: "left" }}>
+                      指标值
+                    </th>
+                    <th style={{ border: "1px solid #e8e8e8", background: "#fafafa", padding: 8, textAlign: "left" }}>
+                      指标名称
+                    </th>
+                    <th style={{ border: "1px solid #e8e8e8", background: "#fafafa", padding: 8, textAlign: "left" }}>
+                      指标值
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {Array.from({ length: 5 }).map((_, rowIndex) => {
+                    const first = indicatorPairs[rowIndex * 4];
+                    const second = indicatorPairs[rowIndex * 4 + 1];
+                    const third = indicatorPairs[rowIndex * 4 + 2];
+                    const fourth = indicatorPairs[rowIndex * 4 + 3];
+                    return (
+                      <tr key={`row-${rowIndex}`}>
+                        <td style={{ border: "1px solid #e8e8e8", padding: 8 }}>{first ? first.key : ""}</td>
+                        <td style={{ border: "1px solid #e8e8e8", padding: 8 }}>{first ? first.value || "-" : ""}</td>
+                        <td style={{ border: "1px solid #e8e8e8", padding: 8 }}>{second ? second.key : ""}</td>
+                        <td style={{ border: "1px solid #e8e8e8", padding: 8 }}>{second ? second.value || "-" : ""}</td>
+                        <td style={{ border: "1px solid #e8e8e8", padding: 8 }}>{third ? third.key : ""}</td>
+                        <td style={{ border: "1px solid #e8e8e8", padding: 8 }}>{third ? third.value || "-" : ""}</td>
+                        <td style={{ border: "1px solid #e8e8e8", padding: 8 }}>{fourth ? fourth.key : ""}</td>
+                        <td style={{ border: "1px solid #e8e8e8", padding: 8 }}>{fourth ? fourth.value || "-" : ""}</td>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
 
             <Divider />
 
             <div className={styles.section}>
               <h3 className={styles.sectionTitle}>8. 季度主要目标任务分解表</h3>
-              <div className={styles.tableWrap}>
-                <table className={styles.table}>
-                  <thead>
-                    <tr>
-                      <th>任务名称</th>
-                      <th>第一季度</th>
-                      <th>第二季度</th>
-                      <th>第三季度</th>
-                      <th>第四季度</th>
-                      <th>责任人</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {currentFileData.step8.map((row) => (
-                      <tr key={row.id}>
-                        <td>{row.name}</td>
-                        {row.quarters.map((quarter, index) => (
-                          <td key={`${row.id}-q-${index}`}>{quarter}</td>
-                        ))}
-                        <td>{row.owner}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className={styles.richTextView}>
+                {currentFileData.step8.map((row) => (
+                  <p key={row.id}>
+                    任务名称：{row.name}；第一季度：{row.quarters[0]}；第二季度：{row.quarters[1]}；第三季度：{row.quarters[2]}；第四季度：{row.quarters[3]}；责任人：{row.owner}
+                  </p>
+                ))}
               </div>
             </div>
-          </>
-        )}
-      </Card>
+            </>
+          )}
+        </Card>
+      </div>
 
-      <div className={reportStyles.stickyFooter}>
+      <div className={reportStyles.stickyFooter} style={{ marginTop: "auto" }}>
         <Space>
           <Button
             type="primary"

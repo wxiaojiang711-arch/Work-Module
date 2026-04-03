@@ -1,12 +1,5 @@
 ﻿import React from "react";
 import { Button, Descriptions, Space, Typography } from "antd";
-import {
-  FileExcelOutlined,
-  FileImageOutlined,
-  FilePdfOutlined,
-  FileWordOutlined,
-  PaperClipOutlined,
-} from "@ant-design/icons";
 
 import type { FormTextData } from "./ReportDetailPage";
 import styles from "./DataReport.module.css";
@@ -14,34 +7,6 @@ import styles from "./DataReport.module.css";
 interface FormTextReadonlyProps {
   data: FormTextData;
 }
-
-const fileTypeColorMap: Record<string, string> = {
-  docx: "#1890ff",
-  doc: "#1890ff",
-  xlsx: "#52c41a",
-  xls: "#52c41a",
-  pdf: "#ff4d4f",
-  jpg: "#fa8c16",
-  png: "#fa8c16",
-};
-
-const renderFileIcon = (type: string) => {
-  const color = fileTypeColorMap[type] ?? "#8c8c8c";
-
-  if (["doc", "docx"].includes(type)) {
-    return <FileWordOutlined style={{ color }} className={styles.fileIcon} />;
-  }
-  if (["xls", "xlsx"].includes(type)) {
-    return <FileExcelOutlined style={{ color }} className={styles.fileIcon} />;
-  }
-  if (type === "pdf") {
-    return <FilePdfOutlined style={{ color }} className={styles.fileIcon} />;
-  }
-  if (["jpg", "png"].includes(type)) {
-    return <FileImageOutlined style={{ color }} className={styles.fileIcon} />;
-  }
-  return <PaperClipOutlined style={{ color }} className={styles.fileIcon} />;
-};
 
 const ReadonlyField: React.FC<{ label: string; required: boolean; aiGenerated?: boolean; value?: string }> = ({
   label,
@@ -93,18 +58,29 @@ const FormTextReadonly: React.FC<FormTextReadonlyProps> = ({ data }) => {
 
       <div className={styles.groupTitle}>第六组：附件</div>
       {data.attachments.length ? (
-        <Space direction="vertical" style={{ width: "100%" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
           {data.attachments.map((file) => (
-            <div className={styles.attachmentItem} key={file.id}>
-              {renderFileIcon(file.type)}
-              <span className={styles.fileName}>{file.name}</span>
-              <span className={styles.fileSize}>{file.size}</span>
-              <Button type="link" style={{ paddingInline: 0 }} onClick={() => void 0}>
-                下载
-              </Button>
+            <div
+              key={file.id}
+              className={styles.attachmentItem}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ fontSize: 14, color: "#333" }}>
+                  {file.name}
+                  <span style={{ marginLeft: 10, fontSize: 12, color: "#999" }}>{file.size}</span>
+                </div>
+              </div>
+              <Space size={12}>
+                <Button type="link" style={{ paddingInline: 4 }} onClick={() => void 0}>
+                  预览
+                </Button>
+                <Button type="link" style={{ paddingInline: 4 }} onClick={() => void 0}>
+                  下载
+                </Button>
+              </Space>
             </div>
           ))}
-        </Space>
+        </div>
       ) : (
         <span className={styles.sourceText}>无附件</span>
       )}
